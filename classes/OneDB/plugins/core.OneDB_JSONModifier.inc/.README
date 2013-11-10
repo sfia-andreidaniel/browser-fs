@@ -1,0 +1,4 @@
+Functions placed inside this folder are automatically
+loaded by the OneDB_JsonModifier function.
+
+These functions at this time, are not receiving any arguments

@@ -1,0 +1,10 @@
+Place here plugins that are extending the OneDB.class.php
+
+Each plugin should implement only a single class method
+
+File names should be in format:
+
+OneDB_plugin_<method_name>.class.php
+
+and should implement a class called OneDB_plugin_<method_name>, 
+which should extend the main OneDB.class.php class

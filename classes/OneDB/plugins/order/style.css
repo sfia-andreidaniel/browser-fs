@@ -1,0 +1,61 @@
+div.OneDB_CategoryOrder_Overlay {
+    overflow-y: hidden;
+    overflow-x: auto;
+    display: block;
+    position: relative !important;
+}
+
+div.OneDB_CategoryOrder_Overlay.dragenter {
+}
+
+div.OneDB_CategoryOrder_Overlay.dragenter > * {
+    opacity: 0.5;
+}
+
+div.OneDB_CategoryOrder_Overlay > div {
+    display: block;
+    background-color: white;
+    padding: 2px;
+    border: 1px solid black;
+    cursor: move;
+    
+    margin: 5px;
+    
+    position: relative;
+    height: 32px;
+}
+
+div.OneDB_CategoryOrder_Overlay > div > div.icon {
+    position: absolute;
+    left: 0px;
+    top: 2px;
+    bottom: 0px
+    width: 32px;
+    display: block;
+}
+
+div.OneDB_CategoryOrder_Overlay > div > div.order {
+    position: absolute;
+    right: 5px;
+    top: 11px;
+    bottom: 0px
+    display: block;
+    text-align: center;
+    background-color: #ddd;
+    font-weight: bold;
+}
+
+div.OneDB_CategoryOrder_Overlay > div > div.icon > img {
+    max-height: 32px;
+    width: auto;
+    border: none;
+}
+
+div.OneDB_CategoryOrder_Overlay > div > div.text {
+    position: absolute;
+    left: 36px;
+    top: 2px;
+    bottom: 0px;
+    right: 40px;
+    display: block;
+}

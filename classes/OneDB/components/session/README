@@ -1,0 +1,6 @@
+These are the classes that OneDB is using in order to migrate
+sessions either to a MySQL server, either to a Memcache server.
+
+See also files:
+
+conf/session.<session_type>.opendb.php

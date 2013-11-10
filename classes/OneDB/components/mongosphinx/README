@@ -1,0 +1,2 @@
+MongoSphinx server, used to integrate sphinx search server with MongoDB databases.
+Usefull if you want to implement text searches over OneDB

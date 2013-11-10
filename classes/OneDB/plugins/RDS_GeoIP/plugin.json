@@ -1,0 +1,8 @@
+{
+    "plugin": {
+        "hasPanel": false,
+        "panelName": "RDS GEOIP Plugin",
+        "panelClass": "RDS_GeoIP",
+        "main": "RDS_GEOIP_main"
+    }
+}

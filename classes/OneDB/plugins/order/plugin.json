@@ -1,0 +1,8 @@
+{
+    "plugin": {
+        "hasPanel": true,
+        "panelName": "Category Order",
+        "panelClass": "OneDB_CategoryOrder_Plugin_Panel",
+        "main": "OneDB_CategoryOrder_Plugin_Main"
+    }
+}

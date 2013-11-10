@@ -1,0 +1,101 @@
+div.article div.rating {
+    width: 200px;
+    height: 82px;
+    display: inline-block;
+    padding: 0;
+    margin: 5px;
+    
+    background-repeat: no-repeat;
+    background-image: url(OneDB_Rating/track.png);
+    background-position: 200px 10px;
+}
+
+div.article div.rating.readOnly {
+    background-image: url(OneDB_Rating/track-readonly.png);
+}
+
+div.article div.rating > div.overlay {
+    display: block;
+    position: relative;
+    width: 200px;
+    height: 82px;
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    background-image: url(OneDB_Rating/overlay.png);
+    background-size: 200px 82px;
+}
+
+div.article div.rating > div.overlay > .score {
+    display: block;
+    font-size: 32px;
+    font-family: Arial;
+    font-weight: bold;
+    position: absolute;
+    left: 13px;
+    bottom: 6px;
+    color: #aaa;
+    text-shadow: 0px 2px 0px rgba(0, 0, 0, .9);
+}
+
+div.article div.rating > div.overlay .rank {
+    position: absolute;
+    top: 9px;
+    width: 5px;
+    display: block;
+    height: 25px;
+}
+
+div.article div.rating div.overlay .rank {
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+}
+
+div.article div.rating.no-votes div.overlay .rank {
+    background-image: url(OneDB_Rating/star-disabled.png);
+}
+
+div.article div.rating.no-votes div.overlay .score {
+    display: none;
+}
+
+div.article div.rating > div.overlay .rank:hover {
+    background-image: url(OneDB_Rating/star-hover.png);
+}
+
+div.article div.rating > div.overlay .r1 {
+    width: 172px;
+    left: 12px;
+}
+
+div.article div.rating > div.overlay .r2,
+div.article div.rating > div.overlay .r3,
+div.article div.rating > div.overlay .r4,
+div.article div.rating > div.overlay .r5 {
+    left: 36px;
+    top: 0px;
+    width: 172px;
+}
+
+div.article div.rating > div.overlay .r2 {
+    width: 143px;
+}
+div.article div.rating > div.overlay .r3 {
+    width: 108px;
+}
+div.article div.rating > div.overlay .r4 {
+    width: 73px;
+}
+div.article div.rating > div.overlay .r5 {
+    width: 38px;
+}
+
+div.article div.rating > div.overlay > div.voters {
+    display: block;
+    right: 14px;
+    bottom: 11px;
+    position: absolute;
+    color: #ddd;
+    font-family: arial;
+    font-size: 15px;
+    text-shadow: 0px 1px 0px rgba(0,0,0,.5);
+}
