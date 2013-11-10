@@ -53,7 +53,7 @@
                     $packageClassName = preg_replace( '/[\.]+/', '_', $package );
                     
                     if ( !class_exists( $packageClassName ) ) {
-                        $packagePathFile  = preg_replace( '/[\._]+/', DIRECTORY_SEPARATOR, $package ) . ".class.php";
+                        $packagePathFile  = __DIR__ . '/' . preg_replace( '/[\._]+/', DIRECTORY_SEPARATOR, $package ) . ".class.php";
                         
                         if (!file_exists( $packagePathFile ))
                             throw new Exception("trait Class $packageClassName not found in $packagePathFile");
@@ -145,6 +145,12 @@
             }
         }
         
+        public function __getOwnProperty( $propertyName ) {
+            return array_key_exists( $propertyName, $this->_keys() )
+                ? $this->__get( $propertyName )
+                : NULL;
+        }
+        
         public function __set( $propertyName, $propertyValue ) {
             if ( $propertyName == 'prototype' )
                 throw new Exception("Prototype not implemented!");
@@ -167,9 +173,6 @@
             return array_unique( array_merge( $protoKeys, $myKeys ) );
         }
         
-        public function logger( $type = 0 /* $arg1, $arg2, ... $argX */ ) {
-            forward_static_call_array( [ 'Logger', '_echo' ], array_merge( [ $type, $this ], array_slice( func_get_args(), 1 ) ) );
-        }
     }
 
     function Object( $objectType = 'Object' ) {
@@ -177,7 +180,7 @@
         $packageClassName = preg_replace( '/[\.]+/', '_', $objectType );
             
         if ( !class_exists( $packageClassName ) ) {
-            $packagePathFile  = preg_replace( '/[\._]+/', DIRECTORY_SEPARATOR, $objectType ) . ".class.php";
+            $packagePathFile  = __DIR__ . '/' . preg_replace( '/[\._]+/', DIRECTORY_SEPARATOR, $objectType ) . ".class.php";
             
             if (!file_exists( $packagePathFile ))
                 throw new Exception("trait Class $packageClassName not found in $packagePathFile");
@@ -199,6 +202,5 @@
     require_once dirname(__FILE__) . "/@/ListenerInterface.trait.php";
     require_once dirname(__FILE__) . "/Base/Math.class.php";
     require_once dirname(__FILE__) . "/Base/JSON.class.php";
-    require_once dirname(__FILE__) . "/Utils/Logger.class.php";
 
 ?>
