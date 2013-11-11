@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rpc>
 
-<definitions>
+<classes>
 
     <class name="OneDB_Client">
         
@@ -586,6 +586,9 @@
         
     </class>
     
+</classes>
+
+<types>
     <!-- PRIMITIVE FIELDS -->
     
     <type name="string" is="is_string" cast="cast_string" />
@@ -608,6 +611,6 @@
     
     <type name="string32" is="is_string32" cast="cast_string32" />
     
-</definitions>
+</types>
 
 </rpc>
