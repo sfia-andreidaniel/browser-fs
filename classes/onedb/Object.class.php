@@ -154,10 +154,11 @@
         public function __set( $propertyName, $propertyValue ) {
             if ( $propertyName == 'prototype' )
                 throw new Exception("Prototype not implemented!");
+                
             parent::__set( $propertyName, $propertyValue );
         }
         
-        final public function __call( $methodName, $args ) {
+        /* final */ public function __call( $methodName, $args ) {
         
             $mtd = $this->__get( $methodName );
             

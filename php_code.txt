@@ -1,0 +1,7 @@
+<?php
+    
+    assign( 'foo', $foo );
+    
+    parse( 'block' );
+
+?>

@@ -1,0 +1,9 @@
+This is a widget
+
+<!-- BEGIN: block -->
+    and this is a block.
+    
+    Foo is: {foo}
+<!-- END: block -->
+
+And this is the rest of the widget

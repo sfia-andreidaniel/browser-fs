@@ -6,6 +6,9 @@
         
         protected $_root = NULL;
         
+        static protected $_isContainer = FALSE;
+        static protected $_isReadOnly  = FALSE;
+        
         public function init( OneDB_Object $root ) {
             $this->_root = $root;
         }
@@ -18,6 +21,17 @@
             throw Object( 'Exception.OneDB', "You must implement the exportOwnProperties method in class " . get_class( $this ) );
         }
         
+        public function isContainer() {
+            return static::$_isContainer;
+        }
+        
+        public function isReadOnly() {
+            return static::$_isReadOnly;
+        }
+        
+        public function getChildNodes() {
+            return Object( 'OneDB.Iterator', [] );
+        }
     }
     
     OneDB_Type::prototype()->defineProperty( 'name', [

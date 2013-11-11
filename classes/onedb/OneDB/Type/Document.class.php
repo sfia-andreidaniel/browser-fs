@@ -1,11 +1,14 @@
 <?php
 
-    require __DIR__ . '/../Type.class.php';
+    require_once __DIR__ . '/../Type.class.php';
 
     Object( 'Vendor.PhpQuery' );
     Object( 'Vendor.HTML2Text' );
     
     class OneDB_Type_Document extends OneDB_Type {
+        
+        static protected $_isContainer = FALSE;
+        static protected $_isReadOnly  = FALSE;
         
         protected $_document           = '';
         protected $_title              = '';
@@ -41,14 +44,14 @@
         }
     }
     
-    OneDB_Type_Document::prototype()->defineProperty( "dom", [
+    OneDB_Type_Document::prototype()->defineProperty( 'dom', [
         "get" => function() {
             $result = phpQuery::newDocument( $this->_document );
             return $result;
         }
     ] );
     
-    OneDB_Type_Document::prototype()->defineProperty( "document", [
+    OneDB_Type_Document::prototype()->defineProperty( 'document', [
         "get" => function() {
             return $this->_document;
         },
@@ -84,7 +87,7 @@
             $this->_title = trim( $str . '' );
             $this->_root->_change( 'title', $this->_title );
         }
-    ]);
+    ] );
     
     OneDB_Type_Document::prototype()->defineProperty( 'textContent', [
         "get" => function() {
@@ -101,5 +104,5 @@
             $this->_root->_change( 'isDocumentTemplate', $this->_isDocumentTemplate );
         }
     ] );
-
+    
 ?>

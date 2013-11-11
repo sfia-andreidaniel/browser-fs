@@ -30,10 +30,14 @@
         protected $_autoCommit  = TRUE;
         protected $_changed     = FALSE;
         protected $_type        = NULL;
+        protected $_unlinked    = FALSE;
 
         // Weather or not this object is a container.
         // If the object is a container, it can hold childrens inside.
         protected static $_isContainer = FALSE;
+        
+        // Weather or not the object is readOnly.
+        protected static $_isReadOnly  = FALSE;
 
         /* Initializes the object. This is the constructor of the object 
          */
@@ -59,13 +63,26 @@
             
         }
         
-        public function __isContainer() {
-            return static::$_isContainer;
+        public function isContainer() {
+            if ( $this->_type !== NULL )
+                return $this->_type->isContainer();
+            else
+                return static::$_isContainer;
+        }
+        
+        public function isReadOnly() {
+            if ( $this->_type !== NULL )
+                return $this->_type->isReadOnly();
+            else
+                return static::$_isReadOnly;
         }
         
         /* Saves the object in database
          */
         public function save() {
+            
+            if ( $this->_unlinked )
+                return;
             
             //echo "saving...\n";
             
@@ -87,7 +104,7 @@
             if ( $this->_id != NULL )
                 $saveProperties[ '_id' ]     = $this->_id;
 
-            $saveProperties[ '_type' ]       = $this->_type === NULL 
+            $saveProperties[ '_type' ] = $this->_type === NULL 
                 ? NULL
                 : $this->_type->name;
 
@@ -124,7 +141,21 @@
                 
             } catch ( Exception $e ) {
                 
-                throw Object( 'Exception.OneDB', "Failed to save object" . ( $this->_id ? "( _id = $this->_id )" : "" ), 0, $e );
+                $errorMessage = "Failed to save object" . ( $this->_id ? "( _id = $this->_id )" : "" ) . ": " . $e->getMessage();
+                
+                if ( $e instanceof MongoCursorException ) {
+                    
+                    switch ( $e->getCode() ) {
+                        
+                        case 11000:
+                            $errorMessage = "Another item allready exists with that name!";
+                            break;
+                        
+                    }
+                    
+                }
+                
+                throw Object( 'Exception.OneDB', $errorMessage, 0, $e );
                 
             }
         }
@@ -132,19 +163,24 @@
         /* Returns an array with all object fields */
         public function toObject() {
             
+            if ( $this->_unlinked )
+                return NULL;
+            
             $out = [];
             
-            if ( $this->_id != NULL )
-                $out[ '_id' ] = "$this->_id";
+            $out[ '_id' ] = $this->_id === NULL
+                ? NULL
+                : $this->_id . '';
 
-            $out[ '_container' ]  = static::$_isContainer;
+            $out[ '_container' ]  = $this->isContainer();
             
-            $out[ '_parent' ] = $this->_parent->_id . '';
+            if ( $this->_parent )
+                $out['_parent'] = $this->_parent->_id . '';
 
             if ( $this->_type != NULL )
                 $out['_type'] = $this->_type->name;
 
-            $out[ 'name' ] = $this->_name;
+            $out[ 'name' ]        = $this->_name;
             $out[ 'created' ]     = $this->_created;
             $out[ 'modified' ]    = $this->_modified;
             $out[ 'owner' ]       = $this->_owner;
@@ -205,11 +241,11 @@
                 ? Object( 'OneDB.Object.Root', $this->_server, NULL )
                 : Object( 'OneDB.Object', $this->_server, $fromData[ '_parent' ] );
 
-            $_type              = $fromData[ '_type' ];
+            $_type = $fromData[ '_type' ];
             
             if ( $_type !== NULL ) {
                 
-                $this->_type    = Object( 'OneDB.Type.' . $_type, $this );
+                $this->_type = Object( 'OneDB.Type.' . $_type, $this );
                 
                 $this->_type->importOwnProperties( $fromData );
                 
@@ -220,9 +256,96 @@
             $this->_changed     = FALSE;
         }
         
+        public function create( $objectType, $objectName = NULL ) {
+            
+            if ( $this->_changed )
+                throw Object( 'Exception.OneDB', "Object is in an unsaved state, save it first before creating something inside it!" );
+            
+            if ( !$this->isContainer() )
+                throw Object( 'Exception.OneDB', "Object is not a container, and it cannot hold stuff inside!" );
+            
+            if ( $this->isReadOnly() )
+                throw Object( 'Exception.OneDB', "Object is ReadOnly!" );
+            
+            try {
+                
+                $item = Object( 'OneDB.Object', $this->_server );
+
+                $item->parent = $this;
+                
+                $item->type = $objectType;
+                
+                if ( $objectName )
+                    $item->name = $objectName;
+                
+                return $item;
+                
+            } catch ( Exception $e ) {
+                
+                throw Object( 'Exception.OneDB', "Failed to create object", 0, $e );
+                
+            }
+        }
+        
+        protected function getChildNodes() {
+            return Object( 'OneDB.Iterator', [] );
+        }
+        
+        public function find( array $query, $limit = NULL, $orderBy = NULL ) {
+
+            if ( $this->isContainer() ) {
+                
+                // If I am a root object, there's no need to filter results
+                if ( $this->_id !== NULL )
+                    $query[ '$childOf' ] = $this->url;
+
+                return $this->_server->find( $query, $limit, $orderBy );
+
+            } else return Object( 'OneDB.Iterator', [] );
+        
+        }
+        
+        // Removes the object from collection.
+        public function delete() {
+            
+            if ( $this->isContainer() ) {
+                $this->find([])->each( function( $item ) {
+                    $item->___unlink();
+                });
+            }
+            
+            $this->___unlink();
+            
+        }
+        
+        public function ___unlink() {
+            
+            if ( $this->_unlinked )
+                return;
+            
+            $this->_unlinked = TRUE;
+            
+            if ( $this->_id ) {
+                
+                $this->_server->objects->remove([
+                    '_id' => $this->_id
+                ], [
+                    'justOne' => TRUE
+                ]);
+                
+            }
+            
+        }
+        
     }
     
-    OneDB_Object::prototype()->defineProperty( '_id', [
+    OneDB_Object::prototype()->defineProperty( 'server', [
+        "get" => function() {
+            return $this->_server;
+        }
+    ]);
+    
+    OneDB_Object::prototype()->defineProperty( 'id', [
         
         "get" => function() {
             return $this->_id;
@@ -261,7 +384,7 @@
     
     ]);
     
-    OneDB_Object::prototype()->defineProperty( '_type', [
+    OneDB_Object::prototype()->defineProperty( 'type', [
         
         "get" => function() {
             return $this->_type === NULL
@@ -277,7 +400,7 @@
             
             else {
                 
-                if ( !preg_match( '/^[a-z\d\_]+$/i', $newType ) )
+                if ( !preg_match( '/^[a-z\d]+((\.[a-z\d]+)+)?$/i', $newType ) )
                     throw Object( 'Exception.OneDB', "Invalid object type name $newType" );
                 
                 $this->_type = Object( 'OneDB.Type.' . $newType, $this );
@@ -405,12 +528,13 @@
         }
     ]);
     
-    OneDB_Object::prototype()->defineProperty( '_parent', [
+    OneDB_Object::prototype()->defineProperty( 'parent', [
         "get" => function() {
             return $this->_parent;
         },
         
         "set" => function( $newParent ) {
+        
             if ( ! ( $newParent instanceof OneDB_Object ) )
                 throw Object( 'Exception.OneDB', "Failed to set parent: The parent property should be an instance of OneDB_Object" );
             else
@@ -441,6 +565,12 @@
         }
     ]);
     
+    OneDB_Object::prototype()->defineProperty( 'changed', [
+        "get" => function() {
+            return $this->_changed;
+        }
+    ]);
+    
     OneDB_Object::prototype()->defineProperty( 'url', [
         
         "get" => function() {
@@ -448,6 +578,18 @@
                 return '/' . $this->_name;
             else
                 return preg_replace( '/[\/]+/', '/', $this->_parent->url . '/' . urlencode( $this->_name ) );
+        }
+        
+    ] );
+    
+    OneDB_Object::prototype()->defineProperty( 'childNodes', [
+        
+        "get" => function() {
+            if ( $this->_type ) {
+                return $this->_type->getChildNodes();
+            } else {
+                return $this->getChildNodes();
+            }
         }
         
     ] );
