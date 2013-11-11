@@ -30,7 +30,7 @@
         }
         
         public function getChildNodes() {
-            return Object( 'OneDB.Iterator', [] );
+            return Object( 'OneDB.Iterator', [], $this->_root->server );
         }
     }
     
@@ -39,6 +39,7 @@
         "get" => function() {
             
             $myName = get_class( $this );
+            
             return preg_replace( '/^OneDB_Type_/', '', $myName );
             
         }

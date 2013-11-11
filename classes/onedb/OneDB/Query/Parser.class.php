@@ -51,6 +51,9 @@
                         if ( $item === NULL )
                             throw Object('Exception.OneDB', 'Object in magic query field $childOf was not found!' );
 
+                        if ( $item->isLive() )
+                            $item->refresh();
+
                         //echo "url: " . $item->url . "\n";
                         $expr = new MongoRegex( '/^' .
                             addcslashes( $item->url, '*/\\.#{}+?%()^:' ) . // ' > mc bug
@@ -79,6 +82,9 @@
                             
                             if ( $item === NULL )
                                 throw Object( 'Exception.OneDB', 'Path ' . $path . ' provided in magic query field $childOf was not found!' );
+                            
+                            if ( $item->isLive() )
+                                $item->refresh();
                             
                             $where[] = [ 'url' => new MongoRegex( '/^' .
                                 addcslashes( $item->url, '*/\\.#{}+?%()^:' ) . 

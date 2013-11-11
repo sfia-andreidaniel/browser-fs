@@ -4,8 +4,9 @@
 
     class OneDB_Type_Category extends OneDB_Type {
         
-        static $_isReadOnly  = FALSE;
-        static $_isContainer = TRUE;
+        public static $_isReadOnly  = FALSE;
+        public static $_isContainer = TRUE;
+        public static $_isLive      = FALSE;
         
         public function exportOwnProperties( array &$properties ) {
         }
@@ -13,9 +14,9 @@
         public function importOwnProperties( array $properties ) {
         }
         
+        public function refresh() { }
+        
         public function getChildNodes() {
-            
-            // return Object( 'OneDB.Iterator', [] );
             
             $out = [];
             
@@ -27,7 +28,7 @@
                 $out[] = Object( 'OneDB.Object', $this->_root->server, $item['_id'], $item );
             }
             
-            return Object( 'OneDB.Iterator', $out );
+            return Object( 'OneDB.Iterator', $out, $this->_root->server );
         }
     }
     

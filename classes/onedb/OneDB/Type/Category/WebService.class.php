@@ -1,11 +1,13 @@
 <?php
 
     require_once __DIR__ . '/../Category.class.php';
+    require_once __DIR__ . '/../../Object.class.php';
 
     class OneDB_Type_Category_WebService extends OneDB_Type_Category {
         
         static $_isReadOnly  = FALSE;
         static $_isContainer = TRUE;
+        static $_isLive      = TRUE;
         
         protected $_webserviceMaxObjects = -1; // -1 unlimited
         protected $_webserviceUrl        = ''; // the url of the webservice
@@ -48,12 +50,16 @@
         public function refresh() {
             
             //test if configured
-            if ( $this->_webserviceUrl == '' )
+            if ( $this->_webserviceUrl == '' ) {
+                //echo "skip refresh: not set\n";
                 return TRUE;
+            }
             
             // test if expired
-            if ( $this->_webserviceTtl > 0 && $this->_webserviceLastHit > 0 && ( time() - $this->_webserviceLastHit < $this->_webserviceTtl ) )
+            if ( $this->_webserviceTtl > 0 && $this->_webserviceLastHit > 0 && ( time() - $this->_webserviceLastHit < $this->_webserviceTtl ) ) {
+                //echo "skip refresh: 1\n";
                 return TRUE;
+            }
             
             $url = $this->_webserviceUrl;
             
@@ -114,28 +120,87 @@
                 
             }
             
-            echo $data;
+            // Set names if necesarry
+            
+            for ( $i=0, $len = count( $data ); $i<$len; $i++ ) {
+                
+                if ( !array_key_exists( 'name', $data[$i] ) )
+                    $data[$i]['name'] = 'Item #' . ( $i + 1 );
+                else
+                    $data[$i]['name'] = trim( $data[$i]['name'] );
+                
+                // if the item has an _id property, rename that property
+                // to -> __id
+                
+                if ( array_key_exists( '_id', $data[$i] ) ) {
+                    $data[$i]['_id_'] = $data[$i]['_id'];
+                    unset( $data[$i]['_id'] );
+                }
+                
+                if ( array_key_exists( 'id', $data[$i] ) ) {
+                    
+                    $data[$i]['id_'] = $data[$i]['id'];
+                    unset( $data[$i]['id'] );
+                    
+                }
+            }
+            
+            /* Remove current objects from this category ... */
+            
+            $seenNames = [];
+            
+            parent::getChildNodes()->each( function( $item ) use (&$seenNames) {
+                if ( $item->type == 'Json' )
+                    $item->delete();
+                else
+                    $seenNames[ $item->name ] = 0;
+            } );
+            
+            // insert objects ...
+            $this->_root->save();
+            
+            foreach ( $data as $item ) {
+                
+                if ( !isset( $seenNames[ $item['name'] ] ) )
+                    $seenNames[ $item['name'] ] = 0;
+                else {
+                    $seenNames[ $item[ 'name' ] ] ++;
+                    
+                    while ( array_key_exists( $item[ 'name' ] . " (" . $seenNames[ $item['name'] ] . ")", $seenNames ) )
+                        $seenNames[ $item['name'] ] ++;
+                    
+                    $item['name'] .= ' (' . $seenNames[ $item['name'] ] . ')';
+                }
+                
+                $dbitem = $this->_root->create( 'Json' );
+                
+                // setup properties
+                
+                foreach ( array_keys( $item ) as $key ) {
+                    
+                    if ( in_array( $key, OneDB_Object::$_nativeProperties ) ) {
+                        
+                        if ( !in_array( $key, [ 'type', 'id' ] ) )
+                            $dbitem->{$key} = $item[ $key ];
+                        
+                    } else $dbitem->data->{$key} = $item[ $key ];
+                    
+                }
+                
+                $dbitem->save();
+            }
+            
+            // set _webserviceLastHit
+            
+            $this->webserviceLastHit = time();
             
         }
         
         public function getChildNodes() {
-            
-            /*
-            // return Object( 'OneDB.Iterator', [] );
-            
-            $out = [];
-            
-            $result = $this->_root->server->objects->find([
-                '_parent' => $this->_root->id
-            ]);
-            
-            foreach ( $result as $item ) {
-                $out[] = Object( 'OneDB.Object', $this->_root->server, $item['_id'], $item );
-            }
-            */
-            
-            return Object( 'OneDB.Iterator', [] );
+            $this->refresh();
+            return parent::getChildNodes();
         }
+        
     }
     
     OneDB_Type_Category_Webservice::prototype()->defineProperty( "webserviceMaxObjects", [

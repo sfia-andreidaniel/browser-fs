@@ -42,7 +42,7 @@
                 
             }
             
-            return Object( 'OneDB.Iterator', $out );
+            return Object( 'OneDB.Iterator', $out, $this->_server );
         }
         
     }

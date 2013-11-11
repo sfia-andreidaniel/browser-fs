@@ -38,7 +38,24 @@
         
         // Weather or not the object is readOnly.
         protected static $_isReadOnly  = FALSE;
-
+        
+        // The native properties of a OneDB_Object
+        public static $_nativeProperties = [
+            '_id',
+            '_parent',
+            '_type',
+            'name',
+            'created',
+            'modified',
+            'owner',
+            'modifier',
+            'description',
+            'icon',
+            'keywords',
+            'tags',
+            'online'
+        ];
+        
         /* Initializes the object. This is the constructor of the object 
          */
         public function init( OneDB_Client $client, $objectId = NULL, $loadFromProperties = NULL ) {
@@ -124,7 +141,7 @@
             
             if ( $this->_type !== NULL )
                 $this->_type->exportOwnProperties( $saveProperties );
-            
+
             try {
             
                 $this->_server->objects->save(
@@ -288,7 +305,7 @@
         }
         
         protected function getChildNodes() {
-            return Object( 'OneDB.Iterator', [] );
+            return Object( 'OneDB.Iterator', [], $this->_server );
         }
         
         public function find( array $query, $limit = NULL, $orderBy = NULL ) {
@@ -301,7 +318,7 @@
 
                 return $this->_server->find( $query, $limit, $orderBy );
 
-            } else return Object( 'OneDB.Iterator', [] );
+            } else return Object( 'OneDB.Iterator', [], $this->_server );
         
         }
         
@@ -318,6 +335,7 @@
             
         }
         
+        // DO NOT USE THIS FUNCTION DIRECTLY, EVEN IF IT IS DECLARED AS PUBLIC.
         public function ___unlink() {
             
             if ( $this->_unlinked )
@@ -335,6 +353,27 @@
                 
             }
             
+        }
+        
+        public function isLive() {
+            
+            if ( $this->_type ) {
+                
+                $typeName = "OneDB_Type_" . $this->_type->name;
+                
+                if ( isset( $typeName::$_isLive ) )
+                    return $typeName::$_isLive;
+                else
+                    return FALSE;
+                
+            } else return FALSE;
+            
+        }
+        
+        public function refresh() {
+            
+            if ( $this->_type && method_exists( $this->_type, 'refresh' ) )
+                $this->_type->refresh();
         }
         
     }
@@ -375,6 +414,8 @@
             
             if ( empty( $newName ) )
                 throw Object('Exception.OneDB', "The name cannot be empty!" );
+            
+            //echo "set name: $newName\n";
             
             $this->_name = $newName;
             
@@ -585,11 +626,10 @@
     OneDB_Object::prototype()->defineProperty( 'childNodes', [
         
         "get" => function() {
-            if ( $this->_type ) {
-                return $this->_type->getChildNodes();
-            } else {
-                return $this->getChildNodes();
-            }
+            
+            return $this->_type
+                ? $this->_type->getChildNodes()
+                : $this->getChildNodes();
         }
         
     ] );

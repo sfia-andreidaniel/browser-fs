@@ -77,7 +77,7 @@
                     $filesList = scandir("/dev/shm");
 
                     foreach ($filesList as $file) {
-                        if ( preg_match( '/^' . $this->_root->_id . '-([\d]+)?\.php$/', $file ) ) {
+                        if ( preg_match( '/^' . $this->_root->id . '-([\d]+)?\.php$/', $file ) ) {
 
                             @unlink( "/dev/shm/$file" );
 

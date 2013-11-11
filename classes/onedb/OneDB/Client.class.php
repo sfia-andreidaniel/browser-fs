@@ -219,7 +219,7 @@
             foreach ( $result as $item )
                 $out[] = Object( 'OneDB.Object', $this, $item['_id'], $item );
             
-            return Object( 'OneDB.Iterator', $out );
+            return Object( 'OneDB.Iterator', $out, $this );
         }
     }
     

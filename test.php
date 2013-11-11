@@ -41,9 +41,13 @@
         
         // $my->getElementByPath( '/' )->delete();
         
+        /*
+        
         if ( ( $ws = $my->getElementByPath( '/ws' ) ) === NULL ) {
             $ws = $my->getElementByPath( '/' )->create( 'Category.WebService', 'ws' );
         }
+        
+        $ws->data->webserviceTtl = 60;
         
         $ws->data->webserviceUrl = 'http://www.rcs-rds.ro/external/epg/channel-data/';
         $ws->data->webserviceConf = [
@@ -53,11 +57,52 @@
             ]
         ];
         
-        print_r( $ws->data->webserviceConf );
+        $ws->childNodes->each( function( $item ) {
+            echo $item->id, "\t", $item->name, "\n";
+        } );
         
-        $ws->save();
+        */
         
-        $ws->data->refresh();
+        /*
+        if ( ( $qr = $my->getElementByPath( '/qr' ) ) === NULL ) {
+            
+            $qr = $my->getElementByPath( '/' )->create( 'Category.Search', 'qr' );
+            
+            $qr->data->query = [
+                '_type' => 'Document'
+            ];
+            
+            $qr->save();
+        
+        }
+        
+        $qr->childNodes->each( function( $item ) {
+            
+            echo $item->url, "\n";
+            
+        } );
+        */
+        
+        if ( ( $ag = $my->getElementByPath( '/ag' ) ) === NULL ) {
+            
+            $ag = $my->getElementByPath( '/' )->create( 'Category.Aggregator', 'ag' );
+            
+            $ag->data->paths = [
+                '/ws',
+                '/qr'
+            ];
+            
+            $ag->save();
+            
+        }
+        
+        $ag->childNodes->find([
+            'name' => 'STIRI'
+        ])->each( function( $item ) {
+            
+            echo $item->url, "\n";
+            
+        } );
     
     } catch (Exception $e) {
         

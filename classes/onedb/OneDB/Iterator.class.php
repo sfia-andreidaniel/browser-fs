@@ -1,12 +1,13 @@
 <?php
 
-    require_once __DIR__ . '/Iterator/Void.class.php';
-
     class OneDB_Iterator extends Object {
         
         private $_values = [];
+        private $_server = NULL;
         
-        public function init( $data = NULL ) {
+        public function init( $data = NULL, OneDB_Client $server ) {
+            
+            $this->_server = $server;
             
             if ( is_array( $data ) )
                 $this->_values = $data;
@@ -59,7 +60,7 @@
                 
             }
             
-            return Object( 'OneDB.Iterator', $out );
+            return Object( 'OneDB.Iterator', $out, $this->_server );
             
         }
         
@@ -77,13 +78,13 @@
                 
                 usort( $out, $callback );
                 
-                return Object( 'OneDB.Iterator', $out );
+                return Object( 'OneDB.Iterator', $out, $this->_server );
             }
         }
         
         public function reverse() {
             if ( count( $this->_values ) )
-                return Object( 'OneDB.Iterator', array_reverse( $this->_values ) );
+                return Object( 'OneDB.Iterator', array_reverse( $this->_values ), $this->_server );
             else
                 return $this;
         }
@@ -93,7 +94,7 @@
             if ( !count( $this->_values ) )
                 return $this;
             else
-                return Object( 'OneDB.Iterator', array_slice( $this->_values, $howMany ) );
+                return Object( 'OneDB.Iterator', array_slice( $this->_values, $howMany ), $this->_server );
         }
         
         public function limit( $howMany ) {
@@ -101,7 +102,7 @@
             if ( !count( $this->_values ) )
                 return $this;
             else
-                return Object( 'OneDB.Iterator', array_slice( $this->values, 0, $howMany ) );
+                return Object( 'OneDB.Iterator', array_slice( $this->values, 0, $howMany ), $this->_server );
             
         }
         
@@ -143,7 +144,7 @@
                     for ( $i=0, $len = $hisLen; $i<$len; $i++ )
                         $out[] = $resultSet->get( $i );
             
-                    return Object( 'OneDB.Iterator', $out );
+                    return Object( 'OneDB.Iterator', $out, $this->_server );
                     
                     break;
                 
@@ -159,6 +160,11 @@
         
         }
         
+        public function add( $item ) {
+            $this->_values[] = $item;
+            return $this;
+        }
+        
         public function continueIf( $boolOrCallback ) {
             
             switch ( TRUE ) {
@@ -167,19 +173,46 @@
                     if ( $boolOrCallback() )
                         return $this;
                     else
-                        return new OneDB_Iterator_Void();
+                        return Object( 'OneDB.Iterator.Void', null, $this->_server );
                     break;
                 
                 default:
                     
                     if ( empty( $boolOrCallback ) )
-                        return new OneDB_Iterator_Void();
+                        return Object( 'OneDB.Iterator.Void', null, $this->_server );
                     else
                         return $this;
                     
                     break;
             }
             
+        }
+        
+        // Performs a fast mongo search
+        public function find( $query ) {
+            
+            $query = is_array( $query ) ? $query : [];
+            
+            if ( !count( $query ) )
+                return $this;
+            
+            $seenIDs = [];
+            $idList  = [];
+            
+            foreach ( $this->_values as $item ) {
+                if ( !isset( $seenIDs[ "$item->id" ] ) ) {
+                    $idList[] = $item->id;
+                    $seenIDs[ "$item->id" ] = 1;
+                }
+            }
+            
+            $query[ '_id' ] = [
+                '$in' => $idList
+            ];
+            
+            //print_r( $query );
+            
+            return $this->_server->find( $query );
         }
         
     }

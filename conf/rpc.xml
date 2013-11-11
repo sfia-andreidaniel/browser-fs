@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rpc>
+
+<definitions>
+
+    <class name="OneDB_Client">
+        
+        <constructor>
+        
+            <property name="websiteName" type="string" />
+            
+            <property name="runAsUserName" type="string" />
+        
+        </constructor>
+        
+        <description>
+            The OneDB_Client is the core class of the OneDB v2.
+        </description>
+        
+        <property name="website" type="string" readOnly="yes" >
+            The name of the website that the OneDB_Client is managing.
+        </property>
+        
+        <property name="runAs" type="string" readOnly="yes" >
+            The name of the user that is running the OneDB_Client.
+        </property>
+        
+        <method name="getElementByPath" >
+            
+            <description>
+                Returns a OneDB_Object based on it's path or
+                null otherwise.
+            </description>
+            
+            <parameter name="elementPath" type="string">
+                The path referring to the object.
+            </parameter>
+            
+            <return type="nullable OneDB_Object">
+                Returns the object on success, or NULL when
+                the object was not found.
+            </return>
+            
+        </method>
+        
+        <method name="getElementById" >
+        
+            <description>
+                Returns a OneDB_Object based on it's id,
+                or null otherwise.
+            </description>
+            
+            <parameter name="elementId" type="string">
+                The Id of the object.
+            </parameter>
+            
+            <return type="nullable OneDB_Object">
+                Returns the object on success, or NULL when
+                the object was not found.
+            </return>
+        
+        </method>
+        
+    </class>
+    
+    <class name="OneDB_Iterator">
+        
+        <constructor>
+        
+            <property name="data" type="array" />
+            
+            <property name="server" type="OneDB_Client" />
+        
+        </constructor>
+        
+        <description>
+            A OneDB_Iterator is a tool that is used to manipulate
+            an array of objects of type OneDB_Object.
+        </description>
+        
+        <property name="length" type="integer" readOnly="yes" />
+        
+        <property name="items" type="Array" readOnly="yes">
+            Returns the items of this iterator in a window.Array object.
+        </property>
+        
+        <method name="each" >
+            
+            <parameter name="callback" type="closure">
+                
+                A callback function that is using to process the items
+                of the iterator.
+                
+                closure = function( value, index, iterator )
+                
+                If the closure returns FALSE, the rest of the iterators
+                items won't be processed.
+                
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns the same iterator object.
+            </return>
+            
+        </method>
+        
+        <method name="here" >
+            
+            <parameter name="callback" type="closure">
+                
+                A callback.
+                
+                closure = function( iterator )
+                
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns the same iterator object.
+            </return>
+            
+        </method>
+        
+        <method name="filter" >
+            
+            <parameter name="callback" type="closure">
+                
+                A callback that is receiving the item
+                on it's first argument, and is returning a
+                boolean value.
+                
+                Elements that are callbacked as FALSE, will be
+                excluded.
+            
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns another iterator with the filtered
+                callbacked( item ) == true items.
+            </return>
+            
+        </method>
+        
+        <method name="sort" >
+        
+            <parameter name="callback" type="closure">
+                
+                A user defined function( a, b ) that is
+                returning -1 if a gt b, 0 if a eq b, and 1 if b gt a.
+            
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns another iterator with the sorted
+                items.
+            </return>
+        
+        </method>
+        
+        <method name="reverse" >
+            
+            <return type="OneDB_Iterator">
+                Returns a new iterator with the original
+                iterator's items in reverse order.
+            </return>
+            
+        </method>
+        
+        <method name="skip" >
+            
+            <parameter name="howMany" type="integer">
+                Indicates how many items to skip from
+                the current iterator.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns a new iterator which don't contain
+                the first howMany elements.
+            </return>
+            
+        </method>
+        
+        <method name="limit" >
+            
+            <parameter name="howMany" type="integer">
+                Indicates how many items should be returned
+                in the next iterator.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns an iterator with first howMany items
+                from the original iterator.
+            </return>
+            
+        </method>
+        
+        <method name="get" >
+            
+            <parameter name="index" type="integer">
+                The element index.
+            </parameter>
+            
+            <return type="OneDB_Object">
+                Returns the item located on the position # index.
+                Position index starts from 0.
+            </return>
+        
+        </method>
+        
+        <method name="join" >
+            
+            <parameter name="iterator" type="OneDB_Iterator">
+                Another Iterator.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Returns another iterator with the items from
+                the original iterator combined with the items of the
+                iterator OneDB_Iterator.
+            </return>
+            
+        </method>
+        
+        <method name="add" >
+            
+            <parameter name="item" type="OneDB_Object">
+                A OneDB Object.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                Adds the item to current iterator, and returns
+                the current iterator.
+            </return>
+            
+        </method>
+        
+        <method name="continueIf" >
+            
+            <parameter name="booleanOrCallback" type="mixed">
+                A closure, or
+                a value that will be casted as boolean.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                If the booleanOrCallback is a closure and returns
+                a true value, or the booleanOrCallback is evaluated as
+                TRUE and is not a closure, the current iterator is returned.
+                
+                Otherwise, an empty OneDB_Iterator will be returned.
+            </return>
+            
+        </method>
+        
+        <method name="find" >
+            
+            <parameter name="query" type="object">
+                A mongoDB query, that can contains OneDB magic fields.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                performs a MongoDB search in database, based on the
+                items ID's located in the iterator, and on the
+                fields contained in the query object.
+                
+                Returns another OneDB_Iterator.
+            </return>
+
+        </method>
+        
+    </class>
+    
+    <class name="OneDB_Object">
+        
+        <constructor>
+        
+            <property name="server" type="OneDB_Client" />
+            
+            <property name="objectId" type="nullable MongoId" />
+            
+            <property name="loadFromProperties" type="nullable object" />
+        
+        </constructor>
+        
+        <description>
+            The OneDB_Object is implementing every object from the
+            OneDB v2 that is stored in the MongoDB database.
+        </description>
+        
+        <property name="server" type="OneDB_Client" readOnly="yes" >
+            The OneDB server instance that owns this object.
+        </property>
+        
+        <property name="id" type="MongoId" readOnly="yes" >
+            The Mongo Id of this object in it's database.
+        </property>
+        
+        <property name="name" type="string" readOnly="no" >
+            The name of this object.
+        </property>
+        
+        <property name="type" type="nullable string" readOnly="no" >
+            The type of this object.
+            
+            NULL if the object has no type.
+        </property>
+        
+        <property name="data" type="OneDB_Type" readOnly="yes">
+            If the object has a type, then the data holds the
+            information of the type.
+            
+            Otherwise, this field is NULL.
+        </property>
+        
+        <property name="created" type="integer" readOnly="yes">
+            A unix timestamp representing the date when this object
+            was first created in the database.
+        </property>
+        
+        <property name="modified" type="integer" readOnly="yes">
+            A unix timestamp representing the date when this object
+            was last modified in the database.
+        </property>
+        
+        <property name="owner" type="string" readOnly="yes">
+            The name of the user that created this object first time.
+        </property>
+        
+        <property name="modifier" type="string" readOnly="yes">
+            The name of the user that last saved this object.
+        </property>
+        
+        <property name="description" type="nullable string" readOnly="yes">
+            A description of this object. Can be NULL.
+        </property>
+        
+        <property name="icon" type="nullable string" readOnly="yes">
+            A path to an icon representing this object. Can be NULL.
+        </property>
+        
+        <property name="keywords" type="array" readOnly="yes">
+            A list of keywords describing this object.
+        </property>
+        
+        <property name="tags" type="array" readOnly="yes">
+            A list of tags that this object has.
+        </property>
+        
+        <property name="parent" type="nullable OneDB_Object" readOnly="yes">
+            The parent that holds this object. If the object is the
+            root node, this property is NULL.
+        </property>
+        
+        <property name="online" type="boolean" readOnly="yes">
+            A flag indicating that this object is online or not.
+        </property>
+        
+        <property name="changed" type="boolean" readOnly="yes">
+            A flag indicating if the object was changed.
+        </property>
+        
+        <property name="url" type="string" readOnly="yes">
+            The url of this object.
+        </property>
+        
+        <property name="childNodes" type="OneDB_Iterator">
+            An iterator with the child nodes of this object.
+        </property>
+        
+        <method name="isLive" >
+            <description>
+                Returns TRUE if this object is a category which
+                implements a remote obtaining of the items from another
+                source other than the Mongo Database.
+            </description>
+            
+            <return type="boolean" />
+        </method>
+        
+        <method name="delete" >
+            <description>
+                Unlinks this object from the Mongo Database.
+            </description>
+        </method>
+        
+        <method name="find" >
+            
+            <description>
+                If this object implements a category, then a query
+                in Mongo Database will be made against all the nodes
+                which are contained by this object.
+                
+                Otherwise, an empty OneDB_Iterator will be returned.
+            </description>
+            
+            <parameter name="query" type="object">
+                A MongoDB query. Magic OneDB fields can be specified.
+            </parameter>
+            
+            <parameter name="limit" type="integer" default="null">
+                If this parameter is not null, then a maximum number
+                of items will be returned.
+            </parameter>
+            
+            <parameter name="orderBy" type="nullable object" default="null">
+                If this parameter is not null, then a database order by
+                will be executed on the result set.
+            </parameter>
+            
+            <return type="OneDB_Iterator">
+                An iterator containing the items that matched the query.
+            </return>
+            
+        </method>
+        
+        <method name="create" >
+            
+            <description>
+                If this object implements a category, then a new OneDB_Object
+                can be created as child of this category.
+                
+                Otherwise, an exception will be throwned.
+            </description>
+            
+            <parameter name="objectType" type="string">
+                The type of the new object.
+            </parameter>
+            
+            <parameter name="optionalName" type="nullable string" default="null">
+                An optional object name.
+            </parameter>
+            
+            <return type="void">
+                Throws exception if error occurs.
+            </return>
+            
+        </method>
+        
+        <method name="_change" >
+            
+            <description>
+                A function that is used to notify this object that one
+                of it's property values has been changed.
+            </description>
+            
+            <parameter name="propertyName" type="string">
+                The name of the property.
+            </parameter>
+            
+            <parameter name="propertyValue" type="mixed">
+                The value of the property.
+            </parameter>
+        
+        </method>
+        
+        <method name="toObject" >
+            
+            <description>
+                Returns an object representation of the data
+                from this instance.
+            </description>
+            
+            <return type="window.Object">
+                An object.
+            </return>
+            
+        </method>
+        
+        <method name="save" >
+            
+            <description>
+                Saves this object in database.
+            </description>
+            
+            <return type="void">
+                An exception will be thrown if errors occur.
+            </return>
+            
+        </method>
+        
+        <method name="isReadOnly" >
+            
+            <description>
+                Returns true if the object is read-only, false
+                otherwise.
+            </description>
+            
+            <return type="boolean" />
+            
+        </method>
+        
+        <method name="isContainer" >
+            
+            <description>
+                Returns true if the object can hold other objects,
+                false otherwise.
+            </description>
+            
+            <return type="boolean" />
+            
+        </method>
+        
+    </class>
+    
+    <class name="OneDB_Type_Widget" pattern="proxy" endpoint="OneDB_Object" >
+        
+        <property name="php" type="string" readOnly="no" />
+        
+        <property name="html" type="string" readOnly="no" />
+        
+        <property name="engine" type="string" readOnly="no" />
+        
+        <method name="run" >
+            
+            <parameter name="ENV" type="array" />
+            
+        </method>
+        
+    </class>
+    
+    <class name="OneDB_Type_Json" pattern="proxy" endpoint="OneDB_Object" >
+        
+        <property name="*" type="mixed" readOnly="no" />
+        
+    </class>
+    
+    <class name="OneDB_Type_Document" pattern="proxy" endpoint="OneDB_Object" >
+        
+        <property name="document" type="string" readOnly="no" />
+        
+        <property name="title" type="string" readOnly="no" />
+        
+        <property name="textContent" type="string" readOnly="yes" />
+        
+        <property name="isDocumentTemplate" type="boolean" readOnly="no" />
+        
+        <property name="dom" type="DomNode" readOnly="no" />
+        
+    </class>
+    
+    <class name="OneDB_Type_Category" pattern="proxy" endpoint="OneDB_Object" >
+        
+    </class>
+    
+    <class name="OneDB_Type_Category_Aggregator" pattern="proxy" endpoint="OneDB_Object" >
+        
+        <property name="paths" type="array" readOnly="no" />
+        
+        <property name="maxItems" type="integer" readOnly="no" />
+    
+    </class>
+    
+    <class name="OneDB_Type_Category_Search" pattern="proxy" endpoint="OneDB_Object" >
+        
+        <property name="query" type="object" />
+        
+    </class>
+    
+    <class name="OneDB_Type_Category_WebService" pattern="proxy" endpoint="OneDB_Object" >
+        
+        <property name="webserviceMaxObjects" type="integer" />
+        
+        <property name="webserviceUrl" type="string" />
+        
+        <property name="webserviceTtl" type="integer" />
+        
+        <property name="webserviceConf" type="window.Object" />
+        
+        <property name="webserviceUsername" type="string" />
+        
+        <property name="webservicePassword" type="string" />
+        
+        <property name="webserviceLastHit" type="integer" />
+        
+        <property name="webserviceObjectPath" type="string" />
+        
+        <property name="webserviceTimeout" type="integer" />
+        
+    </class>
+    
+    <class name="MongoId" >
+        
+        <constructor>
+            
+            <parameter name="id" type="string24" />
+            
+        </constructor>
+        
+    </class>
+    
+    <!-- PRIMITIVE FIELDS -->
+    
+    <type name="string" is="is_string" cast="cast_string" />
+    
+    <type name="object" is="is_object" cast="cast_object" />
+    
+    <type name="array" is="is_array" cast="cast_array" />
+    
+    <type name="integer" is="is_integer" cast="cast_integer" />
+    
+    <type name="boolean" is="is_boolean" cast="cast_boolean" />
+    
+    <type name="DomNode" is="is_domnode" cast="cast_domnode" />
+    
+    <type name="closure" is="is_closure" cast="cast_closure" />
+    
+    <type name="mixed" is="is_mixed" cast="cast_mixed" />
+    
+    <type name="string24" is="is_string24" cast="cast_string24" />
+    
+    <type name="string32" is="is_string32" cast="cast_string32" />
+    
+</definitions>
+
+</rpc>
