@@ -200,8 +200,8 @@
         return $o;
     }
 
-    require_once dirname(__FILE__) . "/@/ListenerInterface.trait.php";
-    require_once dirname(__FILE__) . "/Base/Math.class.php";
-    require_once dirname(__FILE__) . "/Base/JSON.class.php";
+    require_once __DIR__ . "/@/ListenerInterface.trait.php";
+    require_once __DIR__ . "/@/IDemuxable.interface.php";
+    require_once __DIR__ . "/Base/Undefined.class.php";
 
 ?>

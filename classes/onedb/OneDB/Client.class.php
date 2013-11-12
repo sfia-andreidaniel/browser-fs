@@ -1,6 +1,6 @@
 <?php
 
-    class OneDB_Client extends Object {
+    class OneDB_Client extends Object implements IDemuxable {
         
         protected static $_cfg   = NULL;   // @type Utils.Parsers.OneDBCfg
         protected static $_sites = [];     // @type OneDB_Client[]
@@ -224,6 +224,19 @@
                 $out[] = Object( 'OneDB.Object', $this, $item['_id'], $item );
             
             return Object( 'OneDB.Iterator', $out, $this );
+        }
+        
+        public static function __demux( $data ) {
+            if ( !is_string( $data ) )
+                throw Object( 'Exception.RPC', "Bad demuxing input. Expected a string!" );
+            
+            $data = explode( ':', $data );
+            
+            $data[1] = isset( $data[1] ) 
+                ? implode(':', array_slice( $data, 1 ) )
+                : 'anonymous';
+            
+            return Object( 'OneDB.Client', $data[0], $data[1] );
         }
     }
     

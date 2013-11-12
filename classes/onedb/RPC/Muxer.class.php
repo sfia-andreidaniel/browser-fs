@@ -1,4 +1,6 @@
 <?php
+
+    Object( 'Base.Undefined' );
     
     class RPC_Muxer {
         

@@ -45,6 +45,10 @@
             return Object( 'OneDB.Iterator', $out, $this->_server );
         }
         
+        public function __mux() {
+            return $this->_server->__mux();
+        }
+        
     }
     
     OneDB_Object_Root::prototype()->defineProperty( '_id', [

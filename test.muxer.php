@@ -21,5 +21,5 @@
     else
         echo "* NOT instantiated\n";
     
-    echo json_encode( $muxer->mux( $my->getElementByPath( '/' )->childNodes ) );
+    echo json_encode( $muxer->mux( $my ) );
 ?>
