@@ -5,6 +5,8 @@
         private $_values = [];
         private $_server = NULL;
         
+        public static $_muxer = NULL;
+        
         public function init( $data = NULL, OneDB_Client $server ) {
             
             $this->_server = $server;
@@ -152,7 +154,7 @@
                     return $resultSet;
                     break;
                 
-                case $hisLen == 0:
+                default:
                     return $this;
                     break;
             
@@ -215,7 +217,20 @@
             return $this->_server->find( $query );
         }
         
+        public function __mux() {
+            
+            $out = [];
+            
+            foreach ( $this->_values as $value ) {
+                $out[] = self::$_muxer->mux( $value );
+            }
+            
+            return [ $out, self::$_muxer->mux( $this->_server ) ];
+        }
+        
     }
+    
+    OneDB_Iterator::$_muxer = Object( 'RPC.Muxer' );
     
     OneDB_Iterator::prototype()->defineProperty( 'length', [
         "get" => function() {

@@ -203,6 +203,14 @@
             
             }
         }
+        
+        public function __mux() {
+            return [
+                "php" => $this->_php,
+                "html" => $this->_html,
+                "engine" => $this->_engine
+            ];
+        }
     }
     
     OneDB_Type_Widget::prototype()->defineProperty( 'php', [

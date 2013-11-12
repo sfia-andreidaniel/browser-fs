@@ -58,6 +58,13 @@
             return $out;
         }
         
+        public function __mux() {
+            return [
+                "paths" => $this->_paths,
+                "maxItems" => $this->_maxItems
+            ];
+        }
+        
     }
     
     OneDB_Type_Category_Aggregator::prototype()->defineProperty( 'paths', [

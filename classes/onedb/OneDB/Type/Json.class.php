@@ -48,6 +48,10 @@
             
         }
         
+        public function __mux() {
+            return $this->_fields;
+        }
+        
     }
     
 ?>

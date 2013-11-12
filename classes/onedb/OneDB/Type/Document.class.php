@@ -42,6 +42,17 @@
                 : FALSE;
             
         }
+        
+        public function __mux() {
+            
+            return [
+                "document" => $this->_document,
+                "title" => $this->_title,
+                "textContent" => $this->_textContent,
+                "isDocumentTemplate" => $this->_isDocumentTemplate
+            ];
+            
+        }
     }
     
     OneDB_Type_Document::prototype()->defineProperty( 'dom', [

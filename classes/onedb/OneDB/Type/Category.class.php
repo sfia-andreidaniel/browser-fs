@@ -30,6 +30,10 @@
             
             return Object( 'OneDB.Iterator', $out, $this->_root->server );
         }
+        
+        public function __mux() {
+            return [];
+        }
     }
     
 ?>

@@ -30,6 +30,14 @@
         
         }
         
+        public function __mux() {
+            
+            return [
+                "query" => $this->_query
+            ];
+            
+        }
+        
     }
     
     OneDB_Type_Category_Search::prototype()->defineProperty( 'query', [

@@ -201,6 +201,20 @@
             return parent::getChildNodes();
         }
         
+        public function __mux() {
+            return [
+                'webserviceMaxObjects' => $this->_webserviceMaxObjects,
+                'webserviceUrl'        => $this->_webserviceUrl,
+                'webserviceTtl'        => $this->_webserviceTtl,
+                'webserviceConf'       => $this->_webserviceConf,
+                'webserviceUsername'   => $this->_webserviceUsername,
+                'webservicePassword'   => $this->_webservicePassword,
+                'webserviceLastHit'    => $this->_webserviceLastHit,
+                'webserviceObjectPath' => $this->_webserviceObjectPath,
+                'webserviceTimeout'    => $this->_webserviceTimeout
+            ];
+        }
+        
     }
     
     OneDB_Type_Category_Webservice::prototype()->defineProperty( "webserviceMaxObjects", [

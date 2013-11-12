@@ -28,6 +28,10 @@
             
         }
         
+        public function __mux() {
+            return $this->_websiteName . ':' . $this->_runAs;
+        }
+        
         private function getDatabaseName( $str ) {
             
             if ( preg_match( '/\/([a-z\d\-_]+)$/i', $str, $matches ) )

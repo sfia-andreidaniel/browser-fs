@@ -56,6 +56,32 @@
             'online'
         ];
         
+        public static $_muxer = NULL;
+        
+        public function __mux() {
+            
+            if ( $this->_type ) {
+                $props = $this->_type->__mux();
+            } else $props = [];
+            
+            $props[ 'id' ] = $this->_id;
+            $props[ 'parent'] = $this->_parent === NULL ? NULL : $this->_parent->id;
+            $props[ 'type' ] = $this->type;
+            $props[ 'name' ] = $this->_name;
+            $props[ 'created' ] = $this->_created;
+            $props[ 'modified' ] = $this->_modified;
+            $props[ 'owner' ] = $this->_owner;
+            $props[ 'modifier' ] = $this->_modifier;
+            $props[ 'description' ] = $this->_description;
+            $props[ 'icon' ] = $this->_icon;
+            $props[ 'keywords' ] = $this->_keywords;
+            $props[ 'tags' ] = $this->_tags;
+            $props[ 'online' ] = $this->_online;
+            
+            return self::$_muxer->mux( [ $this->_server, $props ] );
+            
+        }
+        
         /* Initializes the object. This is the constructor of the object 
          */
         public function init( OneDB_Client $client, $objectId = NULL, $loadFromProperties = NULL ) {
@@ -633,5 +659,7 @@
         }
         
     ] );
+    
+    OneDB_Object::$_muxer = Object('RPC.Muxer');
 
 ?>
