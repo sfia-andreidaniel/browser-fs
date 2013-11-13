@@ -1,29 +1,22 @@
-/* Tips:
-
-    // __mux() and __demux() idea camed from the muxers / demuxers - see wikipedia article
-    // about these terms.
-
-    .__mux()
-    
-    // Converts the instance to an object that can be instantiated on the server side in it's
-    // native implementation
-    
-    .__demux()
-    
-    // instantiates an local object based on a server serialized representation
-    
-*/
-
+/* ONEDB VERSION 2 BASE CLASS
+ *
+ * author: sfia.andreidaniel@gmail.com
+ */
 ( function() {
 
     function OneDB_RPC() {
     
+        /* return true if value is of type: null, number, boolean, string
+           - meaning that is a primitive value
+         */
         this.is_primitive_type = function( value ) {
             var t = typeof value;
             return value === null || t == 'number' ||
                    t == 'boolean' || t == 'string';
         };
         
+        /* returns true if value is of type window.Array or window.Object
+         */
         this.is_composed_type = function( value ) {
             var t = typeof value;
             
@@ -31,10 +24,16 @@
                    ( value instanceof window.Array ) ) ? true : false;
         };
         
+        /* If the @param value is a value created with new ..., returns
+           true, otherwise returns false.
+         */
         this.is_instantiated_type = function( value ) {
             return typeof value == 'object' && value.constructor && /^function /.test( String( value.constructor ) );
         };
         
+        /* returns the name of a class ( works only with OneDB classes )
+           or a null value
+         */
         this.get_class_name = function( value ) {
             
             if ( !this.is_instantiated_type( value ) )
@@ -45,6 +44,13 @@
             
             return value.__class;
         };
+        
+        /* Performs a post request to url, using the query from
+           the data object.
+         
+           @param callback = optional, = function( err, response ) => makes the request async.
+
+         */
         
         this.post = function( url, data, callback ) {
             
@@ -71,7 +77,7 @@
             query = query.length 
                 ? query.join( '&' )
                 : '';
-            
+
             HTTP.open( 'POST', url, !isSync );
             HTTP.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
             HTTP.send( query );
@@ -82,7 +88,7 @@
                 return HTTP.status == 200 ? HTTP.responseText : null;
             }
         };
-        
+
         // Creates a POST ajax request to URL with query contained in data object,
         // parse result and calls the callback if the callback is specified, or
         // returns the JSON parsed value of the response on success or NULL on error.
@@ -138,6 +144,10 @@
             
         }
         
+        /* Encodes something ( class, mixed_type, primitive_type ) into
+           a serialzeable native js data, which transferred in another place (on server
+           for example) can produce the same instance of the data type
+         */
         this.mux = function( mixed ) {
             
             //console.log( "muxing: ", mixed );
@@ -208,9 +218,9 @@
             
         };
         
+        /* transforms a serialized data into it's native javascript implementation
+         */
         this.demux = function( mixed ) {
-            
-//            console.log( "Demuxer: ", mixed );
             
             var type, v;
             
@@ -233,15 +243,11 @@
                         
                         v = mixed.v;
                         
-//                        console.log( "decoding "+  type + ", from: ", v );
-                        
                         switch ( true ) {
                             
                             case type == 'window.Array':
                                 // good, we're demuxing every element of the array
                                 // v, and return the data.
-                                
-//                                console.log( "array branch", this );
                                 
                                 if ( !( v instanceof window.Array ) )
                                     throw "Expected value in 'v' is not an array!";
@@ -273,6 +279,7 @@
                                 return out;
                                 
                                 break;
+
                             default:
                                 // we're trying to instantiate a class instance.
                                 
@@ -357,8 +364,6 @@
                 throw result.reason || 'unkonwn problem occured on server side';
                 
             }
-            
-            //console.log( "RPC Send: ", data, result );
         }
         
         /* Fetches a property ( usually defined by a getter ) of a class instance
@@ -388,7 +393,7 @@
                 return this.demux( result.result );
             
             } else {
-                
+            
                 throw result.reason || 'unknown problem occured on server side';
             
             }
@@ -396,10 +401,10 @@
     
     };
 
-    var odb = new OneDB_RPC();
+    var _ = new OneDB_RPC();
 
     Object.defineProperty( window, "OneDB", {
-        "get": function() { return odb; }
+        "get": function() { return _; }
     });
 
 })();

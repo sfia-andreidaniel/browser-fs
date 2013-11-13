@@ -5,7 +5,8 @@
     class OneDB_Type_Json extends OneDB_Type {
         
         static $_isContainer = FALSE;
-        static $_isReadOnly  = FALSE;
+        static $_isReadOnly  = TRUE;
+        static $_isLive      = TRUE;
         
         private $_fields = [];
         

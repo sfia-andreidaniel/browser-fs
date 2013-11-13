@@ -11,6 +11,7 @@
         protected $_modifier = 'noone';
         
         static protected $_isContainer = TRUE;
+        static private   $_singletons  = [];
 
         public function init( OneDB_Client $client, $objectId = NULL, $loadFromProperties = NULL ) {
             $this->_server = $client;
@@ -56,12 +57,21 @@
             if ( !is_string( $data ) )
                 throw Object('Exception.RPC', "Failed to demux instance: data is not string!" );
             
+            if ( isset( self::$_singletons[ $data ] ) )
+                return self::$_singletons[ $data ];
+            
             $params = explode(':', $data );
             
             $params[1] = isset( $params[1] ) ? implode( ':', array_slice( $params, 1 ) ) : 'anonymous';
             
-            return Object( 'OneDB.Object.Root', Object( 'OneDB.Client', $params[0], $params[1] ) );
+            return ( self::$_singletons[ $data ] = Object( 'OneDB.Object.Root', Object( 'OneDB.Client', $params[0], $params[1] ) ) );
 
+        }
+        
+        protected function getFlags() {
+            
+            return ONEDB_OBJECT_ROOT ^ ONEDB_OBJECT_CONTAINER;
+            
         }
         
     }

@@ -97,6 +97,15 @@ function OneDB_Object_Root( server ) {
             }
         });
         
+        Object.defineProperty( this, "_flags", {
+            "get": function() {
+                return 22; // CONTAINER ^ ROOT ^ READONLY
+            },
+            "set": function() {
+                return "The '_flags' property of a OneDB_Object_Root is read-only!";
+            }
+        } );
+        
         this.addServerMethod( 'find', [
             {
                 "name": "query",
@@ -115,6 +124,10 @@ function OneDB_Object_Root( server ) {
             }
         ] );
         
+        this.save = function() {
+            throw "The root object cannot be saved!";
+        };
+        
     }
     
     // initialize the class
@@ -129,6 +142,18 @@ OneDB_Object_Root.prototype = new OneDB_Class();
 
 // Each onedb client has a single Root. So we're singletoning them
 OneDB_Object_Root.prototype.__singletons = {};
+
+/* Test flags ... */
+OneDB_Object_Root.prototype.has_flag = function( what ) {
+    if ( typeof what == 'string' ) {
+
+        return ( ( OneDB_Object.prototype._flags_list[ what.toUpperCase() ] || 0 ) & this._flags )
+            ? true
+            : false;
+
+    } else return false;
+}
+
 
 // Demuxer method.
 OneDB_Object_Root.prototype.__demux = function( muxedData ) {

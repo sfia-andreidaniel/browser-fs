@@ -1,5 +1,5 @@
-// we prefer this method in order to avoid accidentally altering this
-// constant.
+// we prefer this method of defining the rpc path in the window namespace, 
+// in order to avoid accidentally altering this constant.
 Object.defineProperty( window, "OneDBRpc", {
     "get": function() {
         

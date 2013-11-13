@@ -2,9 +2,13 @@
 
     require_once __DIR__ . '/Client.class.php';
 
-    define( 'ONEDB_OBJECT_READONLY',  2 );
-    define( 'ONEDB_OBJECT_CONTAINER', 4 );
-    define( 'ONEDB_OBJECT_UNLINKED',  8 );
+    define( 'ONEDB_OBJECT_NOFLAG' ,    0 );
+    define( 'ONEDB_OBJECT_READONLY'  , 2 );
+    define( 'ONEDB_OBJECT_CONTAINER' , 4 );
+    define( 'ONEDB_OBJECT_UNLINKED',   8 );
+    define( 'ONEDB_OBJECT_ROOT',      16 );
+    define( 'ONEDB_OBJECT_UNSTABLE',  32 );
+    define( 'ONEDB_OBJECT_LIVE',      64 );
 
     // In v2, all the objects are stored in a single collection
     // called objects.
@@ -438,6 +442,7 @@
             $props[ 'tags' ]        = $this->_tags;
             $props[ 'online' ]      = $this->_online;
             $props[ 'url' ]         = $this->url;
+            $props[ '_flags' ]      = $this->getObjectFlags();
         
             return $props;
         }
@@ -462,6 +467,7 @@
             $props[ 'tags' ]        = $this->_tags;
             $props[ 'online' ]      = $this->_online;
             $props[ 'url' ]         = $this->url;
+            $props[ '_flags' ]      = $this->getObjectFlags();
             
             return self::$_muxer->mux( [ $this->_server, $props ] );
             
@@ -471,6 +477,18 @@
             
             return OneDB_Client::__demux( $data[1] )->getElementById( $data[0] === NULL ? NULL : new MongoId( $data[0] ) );
 
+        }
+        
+        /* Returns an integer value with all the flags of the object
+         */
+        protected function getObjectFlags() {
+
+            return ONEDB_OBJECT_NOFLAG
+                   ^ ( $this->isReadOnly()  ? ONEDB_OBJECT_READONLY  : ONEDB_OBJECT_NOFLAG )
+                   ^ ( $this->isContainer() ? ONEDB_OBJECT_CONTAINER : ONEDB_OBJECT_NOFLAG )
+                   ^ ( $this->_unlinked     ? ONEDB_OBJECT_UNLINKED  : ONEDB_OBJECT_NOFLAG )
+                   ^ ( $this->_changed      ? ONEDB_OBJECT_UNSTABLE  : ONEDB_OBJECT_NOFLAG )
+                   ^ ( $this->isLive()      ? ONEDB_OBJECT_LIVE      : ONEDB_OBJECT_NOFLAG );
         }
         
     }
