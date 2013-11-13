@@ -1,9 +1,15 @@
 <?php
 
+    require_once __DIR__ . '/Client.class.php';
+
+    define( 'ONEDB_OBJECT_READONLY',  2 );
+    define( 'ONEDB_OBJECT_CONTAINER', 4 );
+    define( 'ONEDB_OBJECT_UNLINKED',  8 );
+
     // In v2, all the objects are stored in a single collection
     // called objects.
 
-    class OneDB_Object extends Object {
+    class OneDB_Object extends Object implements IDemuxable {
         
         protected $_server      = NULL;
         
@@ -57,30 +63,6 @@
         ];
         
         public static $_muxer = NULL;
-        
-        public function __mux() {
-            
-            if ( $this->_type ) {
-                $props = $this->_type->__mux();
-            } else $props = [];
-            
-            $props[ 'id' ] = $this->_id;
-            $props[ 'parent'] = $this->_parent === NULL ? NULL : $this->_parent->id;
-            $props[ 'type' ] = $this->type;
-            $props[ 'name' ] = $this->_name;
-            $props[ 'created' ] = $this->_created;
-            $props[ 'modified' ] = $this->_modified;
-            $props[ 'owner' ] = $this->_owner;
-            $props[ 'modifier' ] = $this->_modifier;
-            $props[ 'description' ] = $this->_description;
-            $props[ 'icon' ] = $this->_icon;
-            $props[ 'keywords' ] = $this->_keywords;
-            $props[ 'tags' ] = $this->_tags;
-            $props[ 'online' ] = $this->_online;
-            
-            return self::$_muxer->mux( [ $this->_server, $props ] );
-            
-        }
         
         /* Initializes the object. This is the constructor of the object 
          */
@@ -400,6 +382,95 @@
             
             if ( $this->_type && method_exists( $this->_type, 'refresh' ) )
                 $this->_type->refresh();
+        }
+        
+        public function __commit( $anotherObjectData ) {
+        
+            if ( !is_array( $anotherObjectData ) )
+                throw Object( 'Exception.OneDB', "Expected array argument!" );
+            
+            if ( count( $anotherObjectData ) ) {
+            
+                // First update the type if any
+                for ( $i=0, $len = count( $anotherObjectData ); $i<$len; $i++ ) {
+                    
+                    if ( $anotherObjectData[ $i ][ 'name' ] == 'type' ) {
+                        $this->type = $anotherObjectData[$i]['type'];
+                        array_splice( $anotherObjectData, $i, 1 );
+                        break;
+                    }
+                    
+                }
+                
+                // Update the rest of the properties.
+                foreach ( $anotherObjectData as $prop ) {
+                
+                    switch ( TRUE ) {
+                        case strpos( $prop['name'], '.' ) === FALSE:
+                            $this->{$prop['name']} = $prop['value'];
+                            break;
+                        case substr( $prop['name'], 0, 5 ) == 'data.':
+                            $this->data->{substr( $prop['name'], 5 )} = $prop['value'];
+                            break;
+                    }
+                }
+
+                // Save the object after modifications
+                $this->save();
+            }
+            
+            
+            if ( $this->_type ) {
+                $props = $this->_type->__mux();
+            } else $props = [];
+            
+            $props[ 'id' ]          = $this->_id;
+            $props[ 'parent']       = $this->_parent === NULL ? NULL : $this->_parent->id;
+            $props[ 'type' ]        = $this->type;
+            $props[ 'name' ]        = $this->_name;
+            $props[ 'created' ]     = $this->_created;
+            $props[ 'modified' ]    = $this->_modified;
+            $props[ 'owner' ]       = $this->_owner;
+            $props[ 'modifier' ]    = $this->_modifier;
+            $props[ 'description' ] = $this->_description;
+            $props[ 'icon' ]        = $this->_icon;
+            $props[ 'keywords' ]    = $this->_keywords;
+            $props[ 'tags' ]        = $this->_tags;
+            $props[ 'online' ]      = $this->_online;
+            $props[ 'url' ]         = $this->url;
+        
+            return $props;
+        }
+        
+        public function __mux() {
+            
+            if ( $this->_type ) {
+                $props = $this->_type->__mux();
+            } else $props = [];
+            
+            $props[ 'id' ]          = $this->_id;
+            $props[ 'parent']       = $this->_parent === NULL ? NULL : $this->_parent->id;
+            $props[ 'type' ]        = $this->type;
+            $props[ 'name' ]        = $this->_name;
+            $props[ 'created' ]     = $this->_created;
+            $props[ 'modified' ]    = $this->_modified;
+            $props[ 'owner' ]       = $this->_owner;
+            $props[ 'modifier' ]    = $this->_modifier;
+            $props[ 'description' ] = $this->_description;
+            $props[ 'icon' ]        = $this->_icon;
+            $props[ 'keywords' ]    = $this->_keywords;
+            $props[ 'tags' ]        = $this->_tags;
+            $props[ 'online' ]      = $this->_online;
+            $props[ 'url' ]         = $this->url;
+            
+            return self::$_muxer->mux( [ $this->_server, $props ] );
+            
+        }
+        
+        public static function __demux( $data ) {
+            
+            return OneDB_Client::__demux( $data[1] )->getElementById( $data[0] === NULL ? NULL : new MongoId( $data[0] ) );
+
         }
         
     }

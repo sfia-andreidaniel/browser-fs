@@ -195,9 +195,14 @@
         $o = new $packageClassName;
         
         if ( method_exists( $o, 'init' ) )
-            call_user_func_array( [ $o, 'init' ], array_slice( func_get_args( ), 1 ) );
         
-        return $o;
+            $result = call_user_func_array( [ $o, 'init' ], array_slice( func_get_args( ), 1 ) );
+        
+        else
+        
+            $result = NULL;
+        
+        return $result === NULL ? $o : $result;
     }
 
     require_once __DIR__ . "/@/ListenerInterface.trait.php";

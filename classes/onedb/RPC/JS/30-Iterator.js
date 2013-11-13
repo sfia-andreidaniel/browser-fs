@@ -213,3 +213,14 @@ function OneDB_Iterator( data, server ) {
 };
 
 OneDB_Iterator.prototype = new OneDB_Class();
+
+
+// @param data = [ [ muxed OneDB_Object[], muxed OneDB_Object[], ... ], muxed OneDB_Client ]
+OneDB_Iterator.prototype.__demux = function( data ) {
+    //console.log( data );
+    
+    for ( var i=0, len = data[0].length; i<len; i++ )
+        data[0][i] = OneDB.demux( data[0][i] );
+    
+    return new OneDB_Iterator( data[0], OneDB.demux( data[1] ) );
+}

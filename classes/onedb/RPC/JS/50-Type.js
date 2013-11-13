@@ -4,7 +4,7 @@ function OneDB_Type( ) {
     
     this.init = function( rootObject, properties ) {
     
-        console.log( "new OneDB Type (" + this.__class + "): ", rootObject, properties );
+        //console.log( "new OneDB Type (" + this.__class + "): ", rootObject, properties );
     
         Object.defineProperty( this, "_root", {
             "get": function() {
@@ -26,7 +26,7 @@ function OneDB_Type( ) {
     
                         ( function( propName, config ) {
     
-                            console.log( "Defining property " + propName + "..." );
+                            //console.log( "Defining property " + propName + "..." );
     
                             var local = config.get 
                                 ? undefined
@@ -64,7 +64,7 @@ function OneDB_Type( ) {
                             // of the this._root is called
                             me.bind('property-resync', function( data ) {
                                 if ( data.name == propName ) {
-                                    console.log( "Updating data." + propName + " on the local object..." );
+                                    //console.log( "Updating data." + propName + " on the local object..." );
                                     local = data.value;
                                 } else console.log( "proxy.skyp: ", data.name );
                             });
@@ -75,6 +75,8 @@ function OneDB_Type( ) {
     
                 } )( this );
     
+            } else {
+                console.log( "Warning: The " + this.__class + " does not have a binding in OneDB_Types" );
             }
     
         }

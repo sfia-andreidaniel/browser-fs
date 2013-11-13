@@ -14,7 +14,7 @@
     
 */
 
-window.OneDB = ( function() {
+( function() {
 
     function OneDB_RPC() {
     
@@ -210,6 +210,8 @@ window.OneDB = ( function() {
         
         this.demux = function( mixed ) {
             
+//            console.log( "Demuxer: ", mixed );
+            
             var type, v;
             
             try {
@@ -231,19 +233,25 @@ window.OneDB = ( function() {
                         
                         v = mixed.v;
                         
+//                        console.log( "decoding "+  type + ", from: ", v );
+                        
                         switch ( true ) {
                             
                             case type == 'window.Array':
                                 // good, we're demuxing every element of the array
                                 // v, and return the data.
                                 
+//                                console.log( "array branch", this );
+                                
                                 if ( !( v instanceof window.Array ) )
                                     throw "Expected value in 'v' is not an array!";
                                 
                                 var out = [];
                                 
-                                for ( var i=0, len = v.length; i<len; i++ )
-                                    out.push( this.demux[ v[i] ] );
+                                for ( var i=0, len = v.length; i<len; i++ ) {
+                                    //console.log( "Demuxing: #", i, this.demux( v[i] ) );
+                                    out.push( this.demux( v[i] ) );
+                                }
                                 
                                 return out;
                                 
@@ -283,12 +291,13 @@ window.OneDB = ( function() {
                         break;
 
                     default:
-                        throw "Undemuxable content!";
+                        //console.log( mixed );
+                        throw "Undemuxable content: !";
                         break;
                 }
                 
             } catch ( error ) {
-                throw "Failed to demux data: " + error;
+                throw error;
             }
         }
 
@@ -325,17 +334,17 @@ window.OneDB = ( function() {
                 throw "Failed to run the method '" + methodName + "': The object in not a OneDB instance!";
             
             var data = {
-                "do": "run-method",
-                "on": className,
-                "method": methodName,
+                "do"      : "run-method",
+                "on"      : className,
+                "method"  : methodName,
                 "instance": this.encode( instance ),
-                "args": this.encode( methodArgs )
+                "args"    : this.encode( methodArgs )
             };
             
             var result = this.jpost( window.OneDBRpc, data );
             
             if ( result === null )
-                throw "The server returned a non-decodable response. This might be due to errors on the php / apache installation or a bug";
+                throw "The server returned a non-decodable response. This might be due to errors on the php / webserver, or a bug";
             
             if ( result.ok ) {
                 
@@ -351,8 +360,46 @@ window.OneDB = ( function() {
             
             //console.log( "RPC Send: ", data, result );
         }
+        
+        /* Fetches a property ( usually defined by a getter ) of a class instance
+           from server-side and returns it
+         */
+        this.getRemoteProperty = function( instance, propertyName ) {
+            
+            var className = this.get_class_name( instance );
+            
+            if ( !className )
+                throw "Failed to get property '" + propertyName + "': The object in not a OneDB instance!";
+            
+            var data = {
+                "do"       : "get-property",
+                "on"       : className,
+                "instance" : this.encode( instance ),
+                "property" : propertyName
+            };
+            
+            result = this.jpost( window.OneDBRpc, data );
+            
+            if ( result === null )
+                throw "The server returned a non-decodable response. This might be due to errors on the php / webserver, or a bug";
+            
+            if ( result.ok ) {
+                
+                return this.demux( result.result );
+            
+            } else {
+                
+                throw result.reason || 'unknown problem occured on server side';
+            
+            }
+        };
+    
     };
 
-    return new OneDB_RPC();
+    var odb = new OneDB_RPC();
+
+    Object.defineProperty( window, "OneDB", {
+        "get": function() { return odb; }
+    });
 
 })();

@@ -2,7 +2,7 @@
     
     require_once __DIR__ . '/../Object.class.php';
     
-    class OneDB_Object_Root extends OneDB_Object {
+    class OneDB_Object_Root extends OneDB_Object implements IDemuxable {
         
         protected $_server   = NULL;
         protected $_type     = NULL;   //Override the type
@@ -12,7 +12,7 @@
         
         static protected $_isContainer = TRUE;
 
-        public function init( OneDB_Client $client, $objectId = NULL ) {
+        public function init( OneDB_Client $client, $objectId = NULL, $loadFromProperties = NULL ) {
             $this->_server = $client;
         }
         
@@ -47,6 +47,21 @@
         
         public function __mux() {
             return $this->_server->__mux();
+        }
+        
+        /* @param data of type string in format websitename[:servername] */
+        
+        static public function __demux( $data ) {
+            
+            if ( !is_string( $data ) )
+                throw Object('Exception.RPC', "Failed to demux instance: data is not string!" );
+            
+            $params = explode(':', $data );
+            
+            $params[1] = isset( $params[1] ) ? implode( ':', array_slice( $params, 1 ) ) : 'anonymous';
+            
+            return Object( 'OneDB.Object.Root', Object( 'OneDB.Client', $params[0], $params[1] ) );
+
         }
         
     }

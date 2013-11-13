@@ -20,6 +20,54 @@
         
         switch ( $do ) {
             
+            case 'get-property':
+                
+                $on = isset( $_POST['on'] ) // Instance class name
+                    ? $_POST['on']
+                    : NULL;
+                
+                if ( !is_string( $on ) || !strlen( $on ) )
+                    throw Object( 'Exception.RPC', "Illegal 'on' clause!" );
+                
+                $instance = isset( $_POST['instance'] ) // Muxed instance data
+                    ? $_POST['instance']
+                    : NULL;
+                
+                if ( !is_string( $instance ) || !strlen( $instance ) )
+                    throw Object( 'Exception.RPC', "Illegal 'instance' clause!" );
+                
+                $instance = @json_decode( $instance, TRUE );
+                
+                if ( !is_array( $instance ) )
+                    throw Object( 'Exception.RPC', "Illegal json data in 'instance'" );
+                
+                $property = isset( $_POST['property'] ) // Name of property to retrieve
+                    ? $_POST['property']
+                    : NULL;
+                
+                if ( !is_string( $property ) || !strlen( $property ) )
+                    throw Object( 'Exception.RPC', "Illegal property name" );
+                
+                // Demux class instance
+                
+                $instance = $demuxer->demux( $instance, DEMUX_ENSURE_INSTANCE );
+                
+                if ( ( $inst = get_class( $instance ) ) !== $on )
+                    throw Object('Exception.RPC', 'The resulted demux class instance is not an instance of a "' . $on . '" class but an instance of "' . $inst . '"' );
+                
+                $property = explode( '.', $property );
+                $result   = $instance->{$property[0]};
+                
+                for ( $i = 1, $len = count( $property ); $i<$len; $i++ )
+                    $result = $result->{$property[$i]};
+                
+                echo json_encode( [
+                    'ok' => TRUE,
+                    'result' => $muxer->mux( $result )
+                ] );
+                
+                break;
+            
             case 'run-method':
             
                 $on = isset( $_POST['on'] )
@@ -88,8 +136,7 @@
         die( json_encode([
             'ok' => FALSE,
             'error' => TRUE,
-            'reason' => Object( 'Utils.Parsers.Exception' )->explainException( $e ),
-            'request' => $_POST
+            'reason' => Object( 'Utils.Parsers.Exception' )->explainException( $e, 128 )
         ]) );
         
     }

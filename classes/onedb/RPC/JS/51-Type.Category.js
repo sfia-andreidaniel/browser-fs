@@ -1,6 +1,6 @@
 function OneDB_Type_Category( ) {
     
-    console.log( "new category: ", arguments );
+    //console.log( "new category: ", arguments );
     
     this.__class = 'OneDB_Type_Category';
     

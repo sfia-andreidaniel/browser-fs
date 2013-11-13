@@ -2,24 +2,24 @@
 
     require_once __DIR__ . '/bootstrap.php';
     
-    $my = Object( 'OneDB.Client', 'loopback', 'andrei' );
+    //$my = Object( 'OneDB.Client', 'loopback', 'andrei' );
     
-    $muxer = Object( 'RPC.Muxer' );
+    $muxer = Object( 'RPC.Demuxer' );
     
-    if ( $muxer->is_primitive_type( $my ) )
-        echo "* IS primitive!\n";
-    else
-        echo "* NOT primitive\n";
     
-    if ( $muxer->is_composed_type( $my ) )
-        echo "* IS composed\n";
-    else
-        echo "* NOT composed\n";
+    for ( $i=0; $i<2; $i++ ) {
     
-    if ( $muxer->is_instantiated_type( $my ) )
-        echo "* IS instantiated\n";
-    else
-        echo "* NOT instantiated\n";
+        $muxer->demux( [
+            "type"=>"OneDB_Object",
+            "v"=>[
+                "type"=>"window.Array",
+                "v"=>[
+                    "5280fd2c888218b8348b4567",
+                    "loopback:andrei"
+                ]
+            ]
+        ] );
     
-    echo json_encode( $muxer->mux( $my ) );
+    }
+    
 ?>

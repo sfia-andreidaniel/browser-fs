@@ -11,9 +11,11 @@ function OneDB_Client( websiteName, runAs ) {
 
     }
     
+    /*
     this.__mux = function() {
         return this._initArgs[0] + ':' + ( this._initArgs[1] || '' );
     };
+    */
     
     this.addServerMethod( "getElementByPath", [
         {
@@ -28,6 +30,24 @@ function OneDB_Client( websiteName, runAs ) {
             "type": "nullable string"
         }
     ]);
+    
+    this.addServerMethod( "find", [
+        {
+            "name"   : "query",
+            "type"   : "window.Object",
+            "default": {}
+        },
+        {
+            "name"    : "limit",
+            "type"    : "nullable integer",
+            "default" : null
+        },
+        {
+            "name"    : "orderBy",
+            "type"    : "nullable window.Object",
+            "default" : null
+        }
+    ] );
     
     this.__create();
     
@@ -57,3 +77,8 @@ OneDB_Client.prototype.__demux = function( muxedData ) {
         = new OneDB_Client( siteName, runAs );
     
 }
+
+OneDB_Client.prototype.__mux = function() {
+    return this._initArgs[0] + ':' + ( this._initArgs[1] || '' );
+}
+

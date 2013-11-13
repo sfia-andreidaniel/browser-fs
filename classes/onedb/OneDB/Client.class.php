@@ -13,17 +13,19 @@
         
         public function init( $websiteName, $runAsUserName = 'anonymous' ) {
             
+            // singleton
+            if ( isset( self::$_sites[ $websiteName . ':' . $runAsUserName ] ) )
+                return self::$_sites[ $websiteName . ':' . $runAsUserName ];
+            
             if ( !isset( self::$_cfg ) )
                 self::$_cfg = Utils_Parsers_OneDBCfg::create();
             
             $this->_websiteName = $websiteName;
             $this->_runAs       = $runAsUserName;
             
-            if ( !isset( self::$_sites[ $websiteName ] ) ) {
-                
+            if ( !isset( self::$_sites[ $websiteName . ':' . $runAsUserName ] ) ) {
                 $this->connect();
-                
-                self::$_sites[ $websiteName ] = $this;
+                self::$_sites[ $websiteName . ':' . $runAsUserName ] = $this;
             }
             
         }
@@ -56,12 +58,6 @@
             } catch ( Exception $e ) {
                 throw Object('Exception.OneDB', "Failed to connect to mongo!", 0, $e );
             }
-        }
-        
-        public function get() {
-            
-            return self::$_sites[ $this->_websiteName ];
-            
         }
         
         /* Returns an element by it's mongoID.

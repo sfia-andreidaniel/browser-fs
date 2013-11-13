@@ -13,6 +13,21 @@ function OneDB_Object( server, properties ) {
         
         _server = server;
         
+        Object.defineProperty( this, "_server", {
+            "get": function() {
+                return server;
+            },
+            "set": function() {
+                throw "The '_server' property of a OneDB_Object is read-only";
+            }
+        });
+        
+        Object.defineProperty( this, "childNodes", {
+            "get": function() {
+                return OneDB.getRemoteProperty( this, "childNodes" );
+            }
+        } );
+        
         // In the properties we expect to have a OneDB_Object serialization
         
         for ( var i=0, len = this._nativeProperties.length; i<len; i++ ) {
@@ -25,15 +40,22 @@ function OneDB_Object( server, properties ) {
                     "get": function() {
                         return localProperty;
                     },
-                    "set": function( data ) {
-                        localProperty = data;
-                        me.__change( property, data );
-                    }
+                    "set": ( function() {
+                            
+                            if ( [ 'id', 'modifier', 'owner', 'created', 'modified', 'url' ].indexOf( property ) >= 0 )
+                            return function( v ) {
+                                throw "The '" + property + "' of a OneDB_Object is read-only!";
+                            }; else
+                            return function( data ) {
+                                localProperty = data;
+                                me.__change( property, data );
+                            }
+                    } )()
                 });
                 
                 me.bind( 'property-resync', function( data ) {
                     if ( data.name == property ) {
-                        console.log( 'resync prop: ' + property + ' on root object!' );
+                        console.log( 'resync prop: ' + property + ' on root object with: ', data.value );
                         localProperty = data.value;
                     }
                 } );
@@ -121,11 +143,25 @@ function OneDB_Object( server, properties ) {
             }
         ] );
         
+        this.addServerMethod( 'find', [
+            {
+                "name": "query",
+                "type": "window.Object",
+                "default": {}
+            },
+            {
+                "name": "limit",
+                "type": "nullable integer",
+                "default": null
+            },
+            {
+                "name": "orderBy",
+                "type": "nullable window.Object",
+                "default": {}
+            }
+        ] );
+        
     }
-    
-    this.__mux = function() {
-        return [ this.id ];
-    };
     
     // resynchronize object with the information sent by the server
     // after the .save() is issued.
@@ -175,7 +211,47 @@ function OneDB_Object( server, properties ) {
     
 }
 
+/* The OneDB_Object is extending a OneDB_Class
+ */
 OneDB_Object.prototype = new OneDB_Class();
 
-OneDB_Object.prototype._nativeProperties = [ 'id', 'parent', /* 'type', */ 'name', 'created', 'modified', 'owner', 'modifier', 'description', 'icon', 'keywords', 'tags', 'online' ];
 
+
+/* A list of properties that are defined automatically
+   to the object on creation.
+   
+   These are called native properties, because no matter
+   which data type the object implements, it will have in
+   it's root these properties.
+*/
+
+OneDB_Object.prototype._nativeProperties = [ 
+    'id',
+    'parent',
+    /* 'type', */
+    'name',
+    'created',
+    'modified',
+    'owner',
+    'modifier',
+    'description',
+    'icon',
+    'keywords',
+    'tags',
+    'online',
+    'url'
+];
+
+// Object muxer
+OneDB_Object.prototype.__mux   = function() {
+    return OneDB.mux( [ this.id ? this.id.__mux() : null, this._server.__mux() ] );
+};
+
+// Object demuxer
+// @param data => muxed [ OneDB_Client client, Object properties ]
+OneDB_Object.prototype.__demux = function( data ) {
+    
+    data = OneDB.demux( data );
+
+    return new OneDB_Object( data[0], data[1] );
+};

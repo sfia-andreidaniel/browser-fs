@@ -134,7 +134,9 @@
                                 if ( !$reflection->implementsInterface( 'IDemuxable' ) )
                                     throw Object( 'Exception.RPC', "The class '$className' is not a demuxable one!" );
                                 
-                                return $className::__demux( $this->demux( $v ) );
+                                $demuxedValue = $this->demux( $v );
+                                
+                                return $className::__demux( $demuxedValue );
                                 
                             } catch ( Exception $e ) {
                                 throw Object( 'Exception.RPC', "Failed to demux class instance '$className'", 0, $e );

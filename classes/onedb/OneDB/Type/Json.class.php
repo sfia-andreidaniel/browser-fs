@@ -17,7 +17,7 @@
             
         }
         
-        public function importOwnProperties( $properties ) {
+        public function importOwnProperties( array $properties ) {
             
             foreach ( array_keys( $properties ) as $key )
                 if ( !in_array( $key, OneDB_Object::$_nativeProperties ) )

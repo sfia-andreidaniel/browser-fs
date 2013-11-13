@@ -1,5 +1,9 @@
 <?php
 
+    ini_set( 'display_errors', 'on' );
+    
+    error_reporting( E_ALL );
+
     // Require core class
     require_once __DIR__ . '/classes/onedb/Object.class.php';
 
