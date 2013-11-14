@@ -6,13 +6,9 @@ function OneDB_Iterator( data, server ) {
     var _server= null;
     
     this.__mux = function() {
-        var out = [];
-        
-        for ( var i=0, len = _items.length; i<len; i++ ) {
-            out.push( _items[i].id );
-        }
-        
-        return [ out, OneDB.mux( _server ) ];
+
+        return OneDB.mux( [ _items,  _server ] );
+
     }
     
     this.init = function() {
@@ -58,7 +54,7 @@ function OneDB_Iterator( data, server ) {
             
             for ( var i=0, len = _items.length; i<len; i++ ) {
                 
-                if ( callback( _items[i], i, this ) === false )
+                if ( callback.apply( _items[i], [ _items[i], i, this ] ) === false )
                     break;
                 
             }
@@ -206,6 +202,23 @@ function OneDB_Iterator( data, server ) {
         
     };
     
+    this.addServerMethod("find", [
+        {
+            "name": "query",
+            "type": "window.Object"
+        },
+        {
+            "name": "limit",
+            "type": "nullable integer",
+            "default": null
+        },
+        {
+            "name": "orderBy",
+            "type": "nullable window.Object",
+            "default": null
+        }
+    ]);
+    
     this.__create();
     
     return this;
@@ -213,7 +226,6 @@ function OneDB_Iterator( data, server ) {
 };
 
 OneDB_Iterator.prototype = new OneDB_Class();
-
 
 // @param data = [ [ muxed OneDB_Object[], muxed OneDB_Object[], ... ], muxed OneDB_Client ]
 OneDB_Iterator.prototype.__demux = function( data ) {

@@ -1,5 +1,6 @@
 <?php
     
+    require_once __DIR__ . '/../Type.class.php';
     require_once __DIR__ . '/../Object.class.php';
     
     class OneDB_Type_Json extends OneDB_Type {

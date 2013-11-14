@@ -20,6 +20,69 @@
         
         switch ( $do ) {
             
+            case 'set-property':
+                
+                $on = isset( $_POST['on'] ) // Instance class name
+                    ? $_POST['on']
+                    : NULL;
+                
+                if ( !is_string( $on ) || !strlen( $on ) )
+                    throw Object( 'Exception.RPC', "Illegal 'on' clause!" );
+                
+                $instance = isset( $_POST['instance'] ) // Muxed instance data
+                    ? $_POST['instance']
+                    : NULL;
+                
+                if ( !is_string( $instance ) || !strlen( $instance ) )
+                    throw Object( 'Exception.RPC', "Illegal 'instance' clause!" );
+                
+                $instance = @json_decode( $instance, TRUE );
+                
+                if ( !is_array( $instance ) )
+                    throw Object( 'Exception.RPC', "Illegal json data in 'instance'" );
+                
+                $property = isset( $_POST['property'] ) // Name of property to retrieve
+                    ? $_POST['property']
+                    : NULL;
+                
+                if ( !is_string( $property ) || !strlen( $property ) )
+                    throw Object( 'Exception.RPC', "Illegal property name" );
+                
+                $value = isset( $_POST['value'] )
+                    ? $_POST['value']
+                    : NULL;
+                
+                if ( !is_string( $value ) || !strlen( $value ) )
+                    throw Object('Exception.RPC', "Illegal 'value' clause!" );
+                
+                $value = @json_decode( $value, TRUE );
+                
+                // Demux class instance
+                
+                $instance = $demuxer->demux( $instance, DEMUX_ENSURE_INSTANCE );
+                
+                if ( ( $inst = get_class( $instance ) ) !== $on )
+                    throw Object('Exception.RPC', 'The resulted demux class instance is not an instance of a "' . $on . '" class but an instance of "' . $inst . '"' );
+                
+                // Demux property value
+                $value = $demuxer->demux( $value );
+                
+                $property = explode( '.', $property );
+                $result   = $instance->{$property[0]};
+                
+                for ( $i = 1, $len = count( $property ) - 1; $i<$len; $i++ )
+                    $result = $result->{$property[$i]};
+                
+                // Set value
+                $result->{$property[ count( $property ) - 1 ]} = $value;
+                
+                echo json_encode( [
+                    'ok' => TRUE,
+                    'result' => $muxer->mux( $result )
+                ] );
+                
+                break;
+
             case 'get-property':
                 
                 $on = isset( $_POST['on'] ) // Instance class name
@@ -113,8 +176,17 @@
                 
                 if ( get_class( $instance ) != $on )
                     throw Object( 'Exception.RPC', 'The demuxed instance snapshot is not a "' . $on . '"' );
-            
-                $result = call_user_func_array( [ $instance, $method ], $args );
+                
+                if ( strpos( $method, '.' ) === FALSE )
+                    $result = call_user_func_array( [ $instance, $method ], $args );
+                else {
+                    $path = explode( '.', $method );
+                    
+                    for ( $i=0, $len = count( $path ) - 1; $i<$len; $i++ )
+                        $instance = $instance->{$path[$i]};
+                    
+                    $result = call_user_func_array( [ $instance, $path[ count($path ) - 1 ] ], $args );
+                }
             
                 echo json_encode([
                     'ok' => TRUE,

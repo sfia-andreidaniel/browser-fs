@@ -6,6 +6,8 @@
 
     function OneDB_RPC() {
     
+        this.__class = 'OneDB';
+    
         /* return true if value is of type: null, number, boolean, string
            - meaning that is a primitive value
          */
@@ -175,7 +177,7 @@
                             out.push( this.mux( mixed[i] ) );
                         }
                         return {
-                            "type": "window.Array",
+                            "t": "[",
                             "v": out
                         };
                     } else {
@@ -185,7 +187,7 @@
                             if ( mixed.propertyIsEnumerable( k ) && mixed.hasOwnProperty( k ) )
                                 out[k] = this.mux( mixed[k] );
                         return {
-                            "type": "window.Object",
+                            "t": "{",
                             "v": out
                         };
                     }
@@ -203,7 +205,7 @@
                         throw "Attempted to mux an instance of " + iName + " but it don't implement a __mux() method!";
                     
                     return {
-                        "type": iName,
+                        "t": iName,
                         "v": mixed.__mux()
                     };
                     
@@ -236,7 +238,7 @@
                             throw "Unexpected native Array!";
 
                         // Only objects are allowed
-                        type = mixed.type || '';
+                        type = mixed.t || '';
 
                         if ( !type )
                             throw "Expected data 'type' key in object!";
@@ -245,7 +247,7 @@
                         
                         switch ( true ) {
                             
-                            case type == 'window.Array':
+                            case type == '[':
                                 // good, we're demuxing every element of the array
                                 // v, and return the data.
                                 
@@ -263,7 +265,7 @@
                                 
                                 break;
                             
-                            case type == 'window.Object':
+                            case type == '{':
                                 // good, we're demuxing every key of the object in
                                 // v, and return the data.
                                 
@@ -398,6 +400,57 @@
             
             }
         };
+        
+        /* Sets a property ( usually defined by a setter ) of a class instance from
+           server-side
+         */
+        this.setRemoteProperty = function( instance, propertyName, propertyValue ) {
+            
+            var className = this.get_class_name( instance );
+            
+            if ( !className )
+                throw "Failed to set property '" + propertyName + "': the object is not a OneDB instance!";
+            
+            var data = {
+                "do": "set-property",
+                "on": className,
+                "instance": this.encode( instance ),
+                "property": propertyName,
+                "value"   : this.encode( propertyValue )
+            };
+            
+            result = this.jpost( window.OneDBRpc, data );
+            
+            if ( result === null )
+                throw "The server returned a non-decodable response. This might be due to errors in the php / webserver, or a bug";
+            
+            if ( !result.ok )
+                throw "The property '" + propertyName + "' could not be set on server " + ( result.reason || "because of a server error" );
+            
+            return true;
+        };
+        
+        // Returns a OneDB_Client connection to the website websiteName
+        this.login = function( websiteName, userName, password ) {
+            userName = userName || 'anonymous';
+            password = password || '';
+            return this.runEndpointMethod( this, 'login', [ websiteName, userName, password] );
+        };
+        
+        // Returns the list of websites.
+        Object.defineProperty(this, 'websites', {
+            "get": function() {
+                return this.getRemoteProperty( this, 'websites' );
+            }
+        });
+        
+        this.__mux = function() {
+            return '';
+        }
+        
+        this.__demux = function() {
+            return this;
+        }
     
     };
 

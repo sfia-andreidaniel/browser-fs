@@ -114,6 +114,16 @@
             
         }
         
+        public function getWebsitesNames() {
+            
+            $out = [];
+            
+            foreach( self::$inis[ $this->_file ][ 'website' ] as $website )
+                $out[] = $website['name'];
+            
+            return $out;
+        }
+        
         static public function create() {
             return self::$instance;
         }

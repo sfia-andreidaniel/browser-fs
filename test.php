@@ -7,7 +7,11 @@
     
     try {
     
-        $my = Object( 'OneDB.Client', 'loopback', 'andrei' );
+        print_r( Object( 'OneDB')->websites );
+    
+        //$my = Object( 'OneDB' )->login( 'loopback', 'andrei' );
+        
+        // $my->getElementByPath( '/' )->create( 'Widget', 'widget' )->save();
         
         /*
         $myWidget = $my->getElementByPath( '/A widget' );
@@ -83,6 +87,7 @@
         } );
         */
         
+        /*
         if ( ( $ag = $my->getElementByPath( '/ag' ) ) === NULL ) {
             
             $ag = $my->getElementByPath( '/' )->create( 'Category.Aggregator', 'ag' );
@@ -103,6 +108,7 @@
             echo $item->url, "\n";
             
         } );
+        */
     
     } catch (Exception $e) {
         

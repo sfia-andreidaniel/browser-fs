@@ -11,11 +11,13 @@ function OneDB_Client( websiteName, runAs ) {
 
     }
     
-    /*
-    this.__mux = function() {
-        return this._initArgs[0] + ':' + ( this._initArgs[1] || '' );
-    };
-    */
+    Object.defineProperty( this, "root", {
+        
+        "get": function() {
+            return new OneDB_Object_Root( this );
+        }
+        
+    } );
     
     this.addServerMethod( "getElementByPath", [
         {

@@ -50,7 +50,7 @@
                         }
 
                         return [ 
-                            'type'  => $indexed ? 'window.Array' : 'window.Object',
+                            't'  => $indexed ? '[' : '{',
                             'v' => $indexed ? array_values( $out ) : $out
                         ];
                         
@@ -66,7 +66,7 @@
                             $out[ $key ] = $this->mux( $mixed->{$key} );
                         
                         return [
-                            'type' => 'window.Object',
+                            't' => '{',
                             'v' => $out
                         ];
                         
@@ -81,21 +81,21 @@
                         // If the class implements a __mux method, we return that method
                         case method_exists( $mixed, '__mux' ):
                             return [
-                                'type' => $className,
+                                't' => $className,
                                 'v'    => $mixed->__mux()
                             ];
                             break;
                         
                         case method_exists( $mixed, '__toString' ):
                             return [
-                                'type' => $className,
+                                't' => $className,
                                 'v'    => $mixed->__toString()
                             ];
                             break;
                         
                         default:
                             return [
-                                'type' => $className,
+                                't' => $className,
                                 'v'    => NULL
                             ];
                             break;

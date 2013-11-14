@@ -1,6 +1,6 @@
 <?php
 
-    class OneDB_Iterator extends Object {
+    class OneDB_Iterator extends Object implements IDemuxable {
         
         private $_values = [];
         private $_server = NULL;
@@ -191,7 +191,7 @@
         }
         
         // Performs a fast mongo search
-        public function find( $query ) {
+        public function find( $query, $limit = NULL, $orderBy = NULL ) {
             
             $query = is_array( $query ) ? $query : [];
             
@@ -214,7 +214,7 @@
             
             //print_r( $query );
             
-            return $this->_server->find( $query );
+            return $this->_server->find( $query, $limit, $orderBy );
         }
         
         public function __mux() {
@@ -228,6 +228,11 @@
             return [ $out, self::$_muxer->mux( $this->_server ) ];
         }
         
+        static public function __demux( $data ) {
+            
+            return Object('OneDB.Iterator', $data[0], $data[1] );
+            
+        }
     }
     
     OneDB_Iterator::$_muxer = Object( 'RPC.Muxer' );

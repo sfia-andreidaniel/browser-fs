@@ -109,8 +109,7 @@ function OneDB_Object_Root( server ) {
         this.addServerMethod( 'find', [
             {
                 "name": "query",
-                "type": "window.Object",
-                "default": {}
+                "type": "window.Object"
             },
             {
                 "name": "limit",
@@ -120,7 +119,19 @@ function OneDB_Object_Root( server ) {
             {
                 "name": "orderBy",
                 "type": "nullable window.Object",
-                "default": {}
+                "default": null
+            }
+        ] );
+        
+        this.addServerMethod( 'create', [
+            {
+                "name": "objectType",
+                "type": "string"
+            },
+            {
+                "name": "objectName",
+                "type": "nullable string",
+                "default": null
             }
         ] );
         
@@ -169,3 +180,8 @@ OneDB_Object_Root.prototype.__mux = function() {
     return this._server.__mux();
 }
 
+Object.defineProperty( OneDB_Object_Root.prototype, "childNodes", {
+    "get": function() {
+        return OneDB.getRemoteProperty( this, "childNodes" );
+    }
+});

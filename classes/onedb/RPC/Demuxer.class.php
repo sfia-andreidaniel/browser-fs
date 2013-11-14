@@ -7,6 +7,10 @@
     
     class RPC_Demuxer {
         
+        static $_customClasses = [
+            'MongoId' => 1
+        ];
+        
         public function is_primitive_type( $data ) {
             
             return $data === NULL || is_bool( $data ) ||
@@ -27,6 +31,11 @@
                 return $className;
             
             return FALSE;
+        }
+        
+        // The MongoId class is part of another project, so we're implement it here
+        public function _demuxer_MongoId_( $value ) {
+            die( "Demuxing a MongoId!" );
         }
         
         public function ensure_class_loaded( $className ) {
@@ -68,8 +77,8 @@
                 
                 case is_array( $mixed ):
                     
-                    $type = isset( $mixed[ 'type' ] )
-                        ? $mixed[ 'type' ]
+                    $type = isset( $mixed[ 't' ] )
+                        ? $mixed[ 't' ]
                         : "";
                     
                     if ( !is_string( $type ) || empty( $type ) )
@@ -84,7 +93,7 @@
                     
                     switch ( TRUE ) {
                         
-                        case $type == 'window.Array':
+                        case $type == '[':
                             // Good, we demux an array
                             
                             if ( $flag != NULL && $flag != DEMUX_ENSURE_ARRAY )
@@ -100,7 +109,7 @@
                             
                             break;
                         
-                        case $type == 'window.Object':
+                        case $type == '{':
                             // Good, we demux an object
                             
                             if ( $flag != NULL && $flag != DEMUX_ENSURE_OBJECT )
@@ -129,14 +138,22 @@
                                 
                                 $className = $this->ensure_class_loaded( $type );
                                 
-                                $reflection = new ReflectionClass( $className );
+                                if ( isset( self::$_customClasses[ $className ] ) ) {
                                 
-                                if ( !$reflection->implementsInterface( 'IDemuxable' ) )
-                                    throw Object( 'Exception.RPC', "The class '$className' is not a demuxable one!" );
+                                    return call_user_func_array( [ $this, '_demuxer_' . $type . '_' ], $v );
                                 
-                                $demuxedValue = $this->demux( $v );
+                                } else {
                                 
-                                return $className::__demux( $demuxedValue );
+                                    $reflection = new ReflectionClass( $className );
+                                    
+                                    if ( !$reflection->implementsInterface( 'IDemuxable' ) )
+                                        throw Object( 'Exception.RPC', "The class '$className' is not a demuxable one!" );
+                                    
+                                    $demuxedValue = $this->demux( $v );
+                                    
+                                    return $className::__demux( $demuxedValue );
+                                
+                                }
                                 
                             } catch ( Exception $e ) {
                                 throw Object( 'Exception.RPC', "Failed to demux class instance '$className'", 0, $e );

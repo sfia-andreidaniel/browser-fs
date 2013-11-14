@@ -57,20 +57,30 @@ function OneDB_Object( server, properties ) {
                     },
                     "set": ( function() {
                             
-                            if ( [ 'id', 'modifier', 'owner', 'created', 'modified', 'url', '_flags' ].indexOf( property ) >= 0 )
-                            return function( v ) {
-                                throw "The '" + property + "' of a OneDB_Object is read-only!";
-                            }; else
-                            return function( data ) {
-                                localProperty = data;
-                                me.__change( property, data );
-                            }
+                        if ( property != '_flags' ) {
+                            
+                            if ( [ 'id', 'modifier', 'owner', 'created', 'modified', 'url' ].indexOf( property ) >= 0 )
+                                return function( v ) {
+                                    throw "The '" + property + "' of a OneDB_Object is read-only!";
+                                };
+                            else
+                                return function( data ) {
+                                    localProperty = data;
+                                    me.__change( property, data );
+                                };
+                        } else {
+                            // The '_flags' property will always be forced to be an integer, and not
+                            // commited to the server on change
+                            return function( ival ) {
+                                localProperty = ~~ival;
+                            };
+                        }
                     } )()
                 });
                 
                 me.bind( 'property-resync', function( data ) {
                     if ( data.name == property ) {
-                        console.log( 'resync prop: ' + property + ' on root object with: ', data.value );
+                        //console.log( 'resync prop: ' + property + ' on root object with: ', data.value );
                         localProperty = data.value;
                     }
                 } );
@@ -158,13 +168,25 @@ function OneDB_Object( server, properties ) {
             }
         ] );
         
+        this.addServerMethod( 'create', [
+            {
+                "name": "objectType",
+                "type": "string"
+            },
+            {
+                "name": "objectName",
+                "type": "nullable string",
+                "default": null
+            }
+        ] );
+        
     }
     
     // resynchronize object with the information sent by the server
     // after the .save() is issued.
     this.__resync = function( obj ) {
         
-        console.log( 'resynchronizing object...' );
+        //console.log( 'resynchronizing object...' );
         
         obj = obj || {};
         
@@ -195,6 +217,10 @@ function OneDB_Object( server, properties ) {
         
         switch ( true ) {
             
+            case this.has_flag('unlinked'):
+                throw "The object was previously deleted from the database, and cannot be saved!";
+                break;
+            
             case !this.changed:
                 return;
                 break;
@@ -216,7 +242,6 @@ function OneDB_Object( server, properties ) {
         //resynchronize object with the value returned by
         //the __commit method on the server side.
         this.__resync( this.__commit( _batch ) );
-
     }
     
     this.__create();
@@ -231,13 +256,14 @@ OneDB_Object.prototype = new OneDB_Class();
 
 /* Possible object internal flags */
 OneDB_Object.prototype._flags_list = {
-    "NOFLAG": 0,
-    "READONLY": 2,
-    "CONTAINER": 4,
-    "UNLINKED": 8,
-    "ROOT": 16,
-    "UNSTABLE": 32,
-    "LIVE": 64
+    "NOFLAG"    :   0,  // DEFAULT FLAG. NO FLAGS.
+    "READONLY"  :   2,  // WEATHER THE OBJECT IS READONLY OR NOT
+    "CONTAINER" :   4,  // WEATHER THE OBJECT IS A CONTAINER (CAN HOLD ITEMS) OR NOT
+    "UNLINKED"  :   8,  // WEATHER THE OBJECT HAS BEEN UNLINKED
+    "ROOT"      :  16,  // WEATHER THE OBJECT IS THE ROOT OBJECT
+    "UNSTABLE"  :  32,  // WEATHER THE SERVER SENT THE OBJECT IN AN UNSTABLE STATE
+    "LIVE"      :  64,  // WEATHER THE OBJECT IS A LIVE OBJECT OR NOT
+    "FLUSH"     : 128   // RPC ONLY. WEATHER A PROPERTY IMPLIES A SAVE BEFORE SETTER OR GETTER
 };
 
 /* A list of properties that are defined automatically
@@ -285,8 +311,17 @@ OneDB_Object.prototype.__mux   = function() {
 // Object demuxer
 // @param data => muxed [ OneDB_Client client, Object properties ]
 OneDB_Object.prototype.__demux = function( data ) {
-    
     data = OneDB.demux( data );
-
     return new OneDB_Object( data[0], data[1] );
 };
+
+OneDB_Object.prototype.delete = function() {
+    if ( this.has_flag( 'unlinked' ) )
+        throw "Object is allready deleted!";
+    
+    OneDB.runEndpointMethod( this, 'delete', [] );
+    
+    // Add the deleted flag
+    this._flags = ( this._flags ^ this._flags_list.UNLINKED );
+};
+
