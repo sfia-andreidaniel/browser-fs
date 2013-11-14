@@ -32,6 +32,10 @@
         public function getChildNodes() {
             return Object( 'OneDB.Iterator', [], $this->_root->server );
         }
+        
+        protected function on_unlink() {
+            // should be exported on ancestors if needed
+        }
     }
     
     OneDB_Type::prototype()->defineProperty( 'name', [
