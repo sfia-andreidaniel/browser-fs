@@ -15,7 +15,6 @@
             $properties[ 'fileVersions' ] = $this->_fileVersions;
             $properties[ 'fileSize' ]     = $this->_fileSize;
             $properties[ 'fileType' ]     = $this->_fileType;
-            
         }
         
         public function importOwnProperties( array $properties ) {
@@ -29,10 +28,10 @@
         
         public function __mux() {
             return [
-                'fileId'       => $this->_fileId,
-                'fileVersions' => $this->_fileVersions,
-                'fileSize'     => $this->_fileSize,
-                'fileType'     => $this->_fileType
+                'fileId'          => $this->_fileId,
+                'fileVersions'    => $this->_fileVersions,
+                'fileSize'        => $this->_fileSize,
+                'fileType'        => $this->_fileType
             ];
         }
         
@@ -53,7 +52,7 @@
            - on not found:   NULL
         */
         public function getFileFormat( $format ) {
-            
+            return $this->_root->server->storage->getBestFileMatchVersion( $this->_fileVersions, $format );
         }
     }
     
@@ -87,6 +86,23 @@
             return $this->_fileType;
         }
         
+    ] );
+    
+    // Use this property to initialize a file
+    OneDB_Type_File::prototype()->defineProperty( "storageResponseData", [
+        
+        "get" => function() {
+            
+        },
+        
+        "set" => function( $storageApiResponse ) {
+        
+            if ( !is_array( $storageApiResponse ) )
+                throw Object( 'Exception.Storage', 'Invalid property. Expected array!' );
+            
+            throw Object( 'Exception.Storage', 'Not implemented. Need to determine a standard api response for all engines' );
+        
+        }
     ] );
     
 ?>

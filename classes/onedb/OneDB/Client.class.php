@@ -2,14 +2,16 @@
 
     class OneDB_Client extends Object implements IDemuxable {
         
-        protected static $_cfg   = NULL;   // @type Utils.Parsers.OneDBCfg
-        protected static $_sites = [];     // @type OneDB_Client[]
+        protected static $_cfg   = NULL;   // @type Utils.Parsers.OneDBCfg - The configuration parser singleton
+        protected static $_sites = [];     // @type OneDB_Client[] - OneDB_Client for each site singletons
         
-        protected $_connection  = NULL;
-        protected $_websiteName = NULL;
+        protected $_connection  = NULL;    // the connection this client is using
+        protected $_websiteName = NULL;    // name of the website this client is connected
+        protected $_storageName = NULL;    // storage name
+        protected $_storage     = NULL;    // storage instance
         
-        protected $_runAs       = NULL;
-        protected $_objects     = NULL;
+        protected $_runAs       = NULL;    // the name of the user that's using this website
+        protected $_objects     = NULL;    // a link to connection db.objects MongoDB collection
         
         public function init( $websiteName, $runAsUserName = 'anonymous' ) {
             
@@ -22,16 +24,25 @@
             
             $this->_websiteName = $websiteName;
             $this->_runAs       = $runAsUserName;
-            
+            $this->_storageName = self::$_cfg->{$this->_websiteName}->connection->storage_engine;
+
             if ( !isset( self::$_sites[ $websiteName . ':' . $runAsUserName ] ) ) {
+                
+                // Connect to database
                 $this->connect();
+                
+                // Initialize the storage engine
+                $this->_storage = Object( 'OneDB.Storage.' . $this->_storageName, $this );
+            
+                // Setup a singleton for the instance in order to obtain it quickly next time
                 self::$_sites[ $websiteName . ':' . $runAsUserName ] = $this;
             }
             
+            //print_r( self::$_cfg );
         }
         
         public function __mux() {
-            return $this->_websiteName . ':' . $this->_runAs;
+            return $this->_websiteName . ':' . $this->_runAs . ':' . $this->_storageName;
         }
         
         private function getDatabaseName( $str ) {
@@ -234,6 +245,7 @@
             
             return Object( 'OneDB.Client', $data[0], $data[1] );
         }
+        
     }
     
     OneDB_Client::prototype()->defineProperty( 'runAs', [
@@ -247,5 +259,11 @@
             return $this->_objects;
         }
     ]);
+
+    OneDB_Client::prototype()->defineProperty( 'storage', [
+        "get" => function() {
+            return $this->_storage;
+        }
+    ] );
 
 ?>

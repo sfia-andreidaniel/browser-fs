@@ -7,7 +7,7 @@
         
         function __construct( &$callable, $funcName = 'anonymous' ) {
             if (!is_callable( $callable ) )
-                throw new Exception("Argument not callable!");
+                throw new Exception("Argument  not callable!");
             $this->callable = $callable;
             $this->name = $funcName;
         }

@@ -1,15 +1,37 @@
-function OneDB_Client( websiteName, runAs ) {
+function OneDB_Client( websiteName, userName, storageEngine ) {
     
     this.__class = "OneDB_Client";
+    this.__storage = null;
     
     this.init = function() {
         
         this._initArgs = [
             websiteName,
-            runAs
+            userName,
+            storageEngine
         ];
 
     }
+    
+    Object.defineProperty( this, "runAs", {
+        "get": function() {
+            return this._initArgs[1];
+        }
+    });
+    
+    Object.defineProperty( this, "websiteName", {
+        "get": function() {
+            return this._initArgs[0];
+        }
+    });
+    
+    Object.defineProperty( this, "storage", {
+        
+        "get": function() {
+            return this.__storage || ( this.__storage = new OneDB_Storage( this, this._initArgs[2] ) );
+        }
+        
+    } );
     
     Object.defineProperty( this, "root", {
         
@@ -70,13 +92,14 @@ OneDB_Client.prototype.__demux = function( muxedData ) {
     
     var args = muxedData.split( ':' );
     
-    args[1] = args.slice( 1 ).join(':');
+    //args[1] = args.slice( 1 ).join(':');
     
-    var siteName = args[0];
-    var runAs    = args[1] || '';
+    var siteName    = args[0],
+        runAs       = args[1] || '';
+        storageName = args[2] || '';
     
     return this.__singletons[ muxedData ]
-        = new OneDB_Client( siteName, runAs );
+        = new OneDB_Client( siteName, runAs, storageName );
     
 }
 
