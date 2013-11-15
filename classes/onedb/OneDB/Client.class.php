@@ -2,10 +2,12 @@
 
     class OneDB_Client extends Object implements IDemuxable {
         
-        protected static $_cfg   = NULL;   // @type Utils.Parsers.OneDBCfg - The configuration parser singleton
-        protected static $_sites = [];     // @type OneDB_Client[] - OneDB_Client for each site singletons
+        protected static $_cfg      = NULL;   // @type Utils.Parsers.OneDBCfg - The configuration parser singleton
+        protected static $_sites    = [];     // @type OneDB_Client[] - OneDB_Client for each site singletons
+        private          $_counters = [];     // @type MongoCounter[] - MongoCounter singletons
         
         protected $_connection  = NULL;    // the connection this client is using
+        protected $_databaseName= NULL;    // the name of the mongodb database that this client is using
         protected $_websiteName = NULL;    // name of the website this client is connected
         protected $_storageName = NULL;    // storage name
         protected $_storage     = NULL;    // storage instance
@@ -58,13 +60,13 @@
             try {
             
                 $uri    = self::$_cfg->{$this->_websiteName}->connection->server;
-                $dbName = $this->getDatabaseName( $uri );
+                $this->_databaseName = $this->getDatabaseName( $uri );
             
-                if ( $dbName === NULL )
+                if ( $this->_databaseName === NULL )
                     throw Object( 'Exception.OneDB', "The connection setting from the ini file does not ends up in a database name!" );
             
-                $this->_connection = new MongoClient( $uri );
-                $this->_objects = $this->_connection->selectDB( $dbName )->objects;
+                $this->_connection   = new MongoClient( $uri );
+                $this->_objects      = $this->_connection->selectDB( $this->_databaseName )->objects;
                 
             } catch ( Exception $e ) {
                 throw Object('Exception.OneDB', "Failed to connect to mongo!", 0, $e );
@@ -231,6 +233,19 @@
                 $out[] = Object( 'OneDB.Object', $this, $item['_id'], $item );
             
             return Object( 'OneDB.Iterator', $out, $this );
+        }
+        
+        /* This method is intended for internal usage, and should not be
+           exposed via rpc.
+         */
+        public function createCounter( $counterName ) {
+            
+            if ( isset( $this->_counters[ $counterName ] ) )
+                return $this->_counters[ $counterName ];
+            
+            else
+                return $this->_counters[ $counterName ] = Object( 'Mongo.Counter', $this->_connection->selectDB( $this->_databaseName ), $counterName );
+            
         }
         
         public static function __demux( $data ) {

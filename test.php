@@ -10,7 +10,14 @@
         $connection = Object('OneDB')->connect( 'loopback', 'andrei' );
         
         echo $connection->storage->name, "\n";
-    
+        
+        $counter = $connection->createCounter( 'gid' );
+        
+        echo $counter->getNext(), "\n";
+        
+        $counter->setCounter( 4 );
+        
+        echo $counter->getNext(), "\n";
     
     } catch (Exception $e) {
         
