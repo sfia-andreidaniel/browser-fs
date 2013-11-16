@@ -2,33 +2,50 @@
 
     class OneDB_Client extends Object implements IDemuxable {
         
-        protected static $_cfg      = NULL;   // @type Utils.Parsers.OneDBCfg - The configuration parser singleton
-        protected static $_sites    = [];     // @type OneDB_Client[] - OneDB_Client for each site singletons
-        private          $_counters = [];     // @type MongoCounter[] - MongoCounter singletons
+        protected static $_cfg      = NULL; // <Utils_Parsers_OneDBCfg>  configuration parser singleton
+        protected static $_sites    = [];   // <OneDB_Client[]>          singletons to this class instance
+        private          $_counters = [];   // <MongoCounter[]>          MongoCounter singletons
         
-        protected $_connection  = NULL;    // the connection this client is using
-        protected $_databaseName= NULL;    // the name of the mongodb database that this client is using
-        protected $_websiteName = NULL;    // name of the website this client is connected
-        protected $_storageName = NULL;    // storage name
-        protected $_storage     = NULL;    // storage instance
+        protected $_connection  = NULL;     // <MongoClient>             the connection this client is using
+        protected $_databaseName= NULL;     // <string>                  mongodb database name
+        protected $_websiteName = NULL;     // <string>                  website name
+        protected $_storageName = NULL;     // <string>                  storage name type
+
+        protected $_storage     = NULL;     // <OneDB_Storage>           instance of the <OneDB_Storage> of this server
         
-        protected $_runAs       = NULL;    // the name of the user that's using this website
-        protected $_objects     = NULL;    // a link to connection db.objects MongoDB collection
+        protected $_runAs       = NULL;     // <string>                  the name of the user that's using this website
+        protected $_password    = NULL;     // <string>                  md5ed password this user is using
+
+        protected $_objects     = NULL;     // <MongoCollection>         link to connection db.objects MongoDB collection
+
+        protected $_user        = NULL;     // <Sys_Security_User>       instance of the user this website is operating
+        protected $_sys         = NULL;     // <Sys_Security_Management> local server accounts enumerator
         
-        public function init( $websiteName, $runAsUserName = 'anonymous' ) {
+        public function init( $websiteName, $userName = 'anonymous', $password = '' ) {
             
             // singleton
-            if ( isset( self::$_sites[ $websiteName . ':' . $runAsUserName ] ) )
-                return self::$_sites[ $websiteName . ':' . $runAsUserName ];
+            if ( isset( self::$_sites[ $websiteName . ':' . $userName ] ) )
+                return self::$_sites[ $websiteName . ':' . $userName ];
             
             if ( !isset( self::$_cfg ) )
                 self::$_cfg = Utils_Parsers_OneDBCfg::create();
             
             $this->_websiteName = $websiteName;
-            $this->_runAs       = $runAsUserName;
+            $this->_runAs       = $userName;
+            
+            if ( !is_string( $password ) )
+                throw Object( 'Exception.OneDB', 'the password parameter should be of type string!' );
+            else {
+
+                $this->_password = strlen( $password )
+                    ? md5( $password )
+                    : '';
+
+            }
+            
             $this->_storageName = self::$_cfg->{$this->_websiteName}->connection->storage_engine;
 
-            if ( !isset( self::$_sites[ $websiteName . ':' . $runAsUserName ] ) ) {
+            if ( !isset( self::$_sites[ $websiteName . ':' . $userName ] ) ) {
                 
                 // Connect to database
                 $this->connect();
@@ -37,14 +54,17 @@
                 $this->_storage = Object( 'OneDB.Storage.' . $this->_storageName, $this );
             
                 // Setup a singleton for the instance in order to obtain it quickly next time
-                self::$_sites[ $websiteName . ':' . $runAsUserName ] = $this;
+                self::$_sites[ $websiteName . ':' . $userName ] = $this;
             }
             
             //print_r( self::$_cfg );
         }
         
+        // @mux format sample: <string> = loopback:andrei:Cloud:31c84aa266b7b60067cbea82d6eafeea
+        // THE RPC IS RESPONSIBLE FOR STORING IT'S SHADOW KEY AND SEND IT AS CHALLENGE WHEN
+        // MUXING THE CLIENT INSTANCE NEXT TIME!!!
         public function __mux() {
-            return $this->_websiteName . ':' . $this->_runAs . ':' . $this->_storageName;
+            return $this->_websiteName . ':' . $this->_runAs . ':' . $this->_storageName . ':' . $this->_user->shadowKey;
         }
         
         private function getDatabaseName( $str ) {
@@ -56,7 +76,11 @@
             
         }
         
-        protected function connect() {
+        /* - connects to MongoDB server
+         * - instantiates the storage engine on this server
+         * - creates the user instance on this server
+         */
+        protected function connect( ) {
             try {
             
                 $uri    = self::$_cfg->{$this->_websiteName}->connection->server;
@@ -66,11 +90,28 @@
                     throw Object( 'Exception.OneDB', "The connection setting from the ini file does not ends up in a database name!" );
             
                 $this->_connection   = new MongoClient( $uri );
-                $this->_objects      = $this->_connection->selectDB( $this->_databaseName )->objects;
+                
+                // select database
+                $db = $this->_connection->selectDB( $this->_databaseName );
+                
+                // initialize connections
+                $this->_objects      = $db->objects;
+                $this->_user         = Object( 'Sys.Security.User', $this, $db->shadow, $this->_runAs, $this->_password );
+                $this->_sys          = Object( 'Sys.Security.Management', $this, $db->shadow );
                 
             } catch ( Exception $e ) {
                 throw Object('Exception.OneDB', "Failed to connect to mongo!", 0, $e );
             }
+        }
+        
+        /* Get an instance to the shadow collection on server. The instance
+           is returned only if the local authenticated user is called onedb.
+         */
+        
+        public function get_shadow_collection() {
+            if ( $this->_runAs != 'onedb' && $this->_runAs != 'root' )
+                throw Object('Exception.Security', 'access to shadow collection is forbidden for user ' . $this->_runAs );
+            return $this->_connection->selectDB( $this->_databaseName )->shadow;
         }
         
         /* Returns an element by it's mongoID.
@@ -254,11 +295,22 @@
             
             $data = explode( ':', $data );
             
+            // $data[0] = <websitename>
+            
+            // username
             $data[1] = isset( $data[1] ) 
-                ? implode(':', array_slice( $data, 1 ) )
+                ? $data[1]
                 : 'anonymous';
             
-            return Object( 'OneDB.Client', $data[0], $data[1] );
+            // when demuxing, we're not authenticating via password,
+            // but via shadow challenge mechanism
+            
+            // shadow key challenge
+            $data[2] = isset( $data[2] )
+                ? $data[2]
+                : '';
+            
+            return Object( 'OneDB.Client', $data[0], $data[1], '', $data[2] );
         }
         
     }
@@ -274,10 +326,28 @@
             return $this->_objects;
         }
     ]);
-
+    
     OneDB_Client::prototype()->defineProperty( 'storage', [
         "get" => function() {
             return $this->_storage;
+        }
+    ] );
+    
+    OneDB_Client::prototype()->defineProperty( 'user', [
+        "get" => function() {
+            return $this->_user;
+        }
+    ] );
+    
+    OneDB_Client::prototype()->defineProperty( 'sys', [
+        "get" => function() {
+            return $this->_sys;
+        }
+    ]);
+    
+    OneDB_Client::prototype()->defineProperty( 'websiteName', [
+        "get" => function() {
+            return $this->_websiteName;
         }
     ] );
 

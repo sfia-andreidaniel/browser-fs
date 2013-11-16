@@ -2,14 +2,14 @@
 
     class OneDB extends Object implements IDemuxable {
         
-        public function login( $websiteName, $connectAs = 'anonymous', $password = '' ) {
+        public function login( $websiteName, $connectAs = 'anonymous', $password = '', $shadowKeyChallenge = '' ) {
             // passwords are not implemented
-            return self::connect( $websiteName, $connectAs, $password );
+            return self::connect( $websiteName, $connectAs, $password, $shadowKeyChallenge );
         }
         
-        static public function connect( $websiteName, $connectAs = 'anonymous', $password = '' ) {
+        static public function connect( $websiteName, $userName = 'anonymous', $password = '', $shadowKeyChallenge = '' ) {
             
-            return Object( 'OneDB.Client', $websiteName, $connectAs, $password );
+            return Object( 'OneDB.Client', $websiteName, $userName, $password, $shadowKeyChallenge );
             
         }
         

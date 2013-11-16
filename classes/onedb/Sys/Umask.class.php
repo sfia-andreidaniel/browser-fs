@@ -425,6 +425,9 @@
         }
     }
     
+    // A class alias, cause we're going to use a lot this class
+    class Umask extends Sys_Umask {}
+    
     /*
     $test = '770';
     $mask = Sys_Umask::UR ^ Sys_Umask::UW ^ Sys_Umask::UX ^ Sys_Umask::GX;

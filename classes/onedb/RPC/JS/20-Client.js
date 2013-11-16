@@ -1,4 +1,4 @@
-function OneDB_Client( websiteName, userName, storageEngine ) {
+function OneDB_Client( websiteName, userName, storageEngine, shadowChallenge ) {
     
     this.__class = "OneDB_Client";
     this.__storage = null;
@@ -8,8 +8,11 @@ function OneDB_Client( websiteName, userName, storageEngine ) {
         this._initArgs = [
             websiteName,
             userName,
-            storageEngine
+            storageEngine,
+            shadowChallenge || ''
         ];
+        
+        //console.log( "Got shadow challenge: ", shadowChallenge );
 
     }
     
@@ -94,16 +97,19 @@ OneDB_Client.prototype.__demux = function( muxedData ) {
     
     //args[1] = args.slice( 1 ).join(':');
     
-    var siteName    = args[0],
-        runAs       = args[1] || '';
-        storageName = args[2] || '';
+    var siteName        = args[0],
+        runAs           = args[1] || '';
+        storageName     = args[2] || '',
+        shadowChallenge = args[3] || '';
     
     return this.__singletons[ muxedData ]
-        = new OneDB_Client( siteName, runAs, storageName );
+        = new OneDB_Client( siteName, runAs, storageName, shadowChallenge );
     
 }
 
 OneDB_Client.prototype.__mux = function() {
-    return this._initArgs[0] + ':' + ( this._initArgs[1] || '' );
+    var mux = this._initArgs[0] + ':' + ( this._initArgs[1] || '' ) + ':' + this._initArgs[3];
+    //console.log( "muxing: ", mux );
+    return mux;
 }
 

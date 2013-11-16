@@ -5,25 +5,26 @@
 
     require_once __DIR__ . '/bootstrap.php';
     
+    require_once __DIR__ . '/classes/onedb/Sys/Security/User.class.php';
+    require_once __DIR__ . '/classes/onedb/Sys/Security/Group.class.php';
+    
     try {
     
-        $connection = Object('OneDB')->connect( 'loopback', 'andrei' );
+        $connection = Object('OneDB')->connect( 'loopback', 'root', 's34g4t3' );
         
-        echo $connection->storage->name, "\n";
+        //echo $connection->__mux(), "\n";
         
-        $counter = $connection->createCounter( 'gid' );
-        
-        echo $counter->getNext(), "\n";
-        
-        $counter->setCounter( 4 );
-        
-        echo $counter->getNext(), "\n";
+        // echo $connection->get_shadow_collection(), "\n";
     
-    } catch (Exception $e) {
+        //Sys_Security_User::useradd( 'loopback', 'root', 's34g4t3' );
         
-        die("Exception: " . $e->getMessage() . "\nline: " . $e->getLine() . "\nfile: " . $e->getFile() );
+        //Sys_Security_Group::groupadd( 'loopback', 'root' );
         
-        print_r( $e->getTrace() );
+        echo $connection->sys->user( 'root' ), "\n";
+    
+    } catch ( Exception $e ) {
+        
+        echo Object( 'Utils.Parsers.Exception' )->explainException( $e, 128 ), "\n";
         
     }
     
