@@ -1,8 +1,0 @@
-{
-    "plugin": {
-        "hasPanel"   : true,
-        "panelName"  : "Storage Migration",
-        "panelClass" : "OneDB_Storage_Plugin_Panel",
-        "main"       : "OneDB_Storage_Plugin_Main"
-    }
-}

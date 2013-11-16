@@ -1,4 +1,0 @@
-The cdn source files used to cache OneDB video and pictures, and assure
-content seeking on MP4 and FLV files
-
-It also includes the lighttpd source
