@@ -2,18 +2,20 @@
 
     require_once __DIR__ . '/Client.class.php';
 
-    define( 'ONEDB_OBJECT_NOFLAG' ,    0 );
-    define( 'ONEDB_OBJECT_READONLY'  , 2 );
-    define( 'ONEDB_OBJECT_CONTAINER' , 4 );
-    define( 'ONEDB_OBJECT_UNLINKED',   8 );
-    define( 'ONEDB_OBJECT_ROOT',      16 );
-    define( 'ONEDB_OBJECT_UNSTABLE',  32 );
-    define( 'ONEDB_OBJECT_LIVE',      64 );
-
     // In v2, all the objects are stored in a single collection
     // called objects.
 
     class OneDB_Object extends Object implements IDemuxable {
+        
+        const F_NOFLAG       = 0;   // no flags
+        const F_READONLY     = 2;   // if the object is not modifiable ( is read only )
+        const F_CONTAINER    = 4;   // if the object can holds another objects ( is a folder )
+        const F_UNLINKED     = 8;   // If the object has been unlinked ...
+        const F_ROOT         = 16;  // Object is root if is instanceof OneDB_Object_Root
+        const F_UNSTABLE     = 32;  // Object is in an unstable state if it was created and not saved.
+        const F_LIVE         = 64;  // Live object. If this object is child of a Webservice category usual
+        const F_FLUSH        = 128; // RPC client-side flag only - Save object after set a property
+        
         
         protected $_server      = NULL;
         
@@ -23,6 +25,10 @@
 
         protected $_created     = NULL;
         protected $_modified    = NULL;
+
+        protected $_uid         = NULL; // OWNER USER ID
+        protected $_gid         = NULL; // OWNER GROUP ID
+        protected $_muid        = NULL; // LAST USER ID THAT MODIFIED THIS OBJECT
 
         protected $_description = NULL;
         protected $_icon        = NULL;
@@ -113,6 +119,15 @@
             // if ( $this->_owner === NULL )
             //    $this->_owner = $this->_server->runAs;
             
+            if ( $this->_uid === NULL )
+                $this->_uid = $this->_server->user->uid;
+            
+            if ( $this->_gid === NULL )
+                $this->_gid = $this->_server->user->gid;
+            
+            if ( $this->_muid === NULL )
+                $this->_muid = $this->_server->user->uid;
+            
             // $this->_modifier = $this->_server->runAs;
             
             if ( $this->_created === NULL )
@@ -133,6 +148,10 @@
                 : $this->_type->name;
 
             $saveProperties[ '_parent' ]     = $this->_parent->_id;
+
+            $saveProperties[ 'uid' ]         = $this->_uid;
+            $saveProperties[ 'gid' ]         = $this->_gid;
+            $saveProperties[ 'muid' ]        = $this->_muid;
 
             $saveProperties[ 'name' ]        = $this->_name;
             $saveProperties[ 'created' ]     = $this->_created;
@@ -202,6 +221,10 @@
             if ( $this->_type != NULL )
                 $out['_type'] = $this->_type->name;
 
+            $out[ 'uid' ]         = $this->_uid;
+            $out[ 'gid' ]         = $this->_gid;
+            $out[ 'muid' ]        = $this->_muid;
+
             $out[ 'name' ]        = $this->_name;
             $out[ 'created' ]     = $this->_created;
             $out[ 'modified' ]    = $this->_modified;
@@ -255,6 +278,10 @@
             $this->_tags        = $fromData[ 'tags' ];
             $this->_online      = $fromData[ 'online' ];
             
+            $this->_uid         = $fromData[ 'uid' ];
+            $this->_gid         = $fromData[ 'gid' ];
+            $this->_muid        = $fromData[ 'muid' ];
+            
             $this->_parent      = $fromData[ '_parent' ] === NULL
                 ? Object( 'OneDB.Object.Root', $this->_server, NULL )
                 : Object( 'OneDB.Object', $this->_server, $fromData[ '_parent' ] );
@@ -293,8 +320,9 @@
                 
                 $item->type = $objectType;
                 
-                if ( $objectName )
+                if ( $objectName ) {
                     $item->name = $objectName;
+                }
                 
                 return $item;
                 
@@ -399,6 +427,11 @@
                 foreach ( $anotherObjectData as $prop ) {
                 
                     switch ( TRUE ) {
+                    
+                        // FROM RPC SIDE WE DON'T UPDATE THE UID AND GID OF THE OBJECT
+                        case in_array( $prop['name'], [ 'uid', 'gid' ] ):
+                            break;
+                        
                         case strpos( $prop['name'], '.' ) === FALSE:
                             $this->{$prop['name']} = $prop['value'];
                             break;
@@ -420,6 +453,11 @@
             $props[ 'id' ]          = $this->_id;
             $props[ 'parent']       = $this->_parent === NULL ? NULL : $this->_parent->id;
             $props[ 'type' ]        = $this->type;
+            
+            $props[ 'uid' ]         = $this->_uid;
+            $props[ 'gid' ]         = $this->_gid;
+            $props[ 'muid' ]        = $this->_muid;
+            
             $props[ 'name' ]        = $this->_name;
             $props[ 'created' ]     = $this->_created;
             $props[ 'modified' ]    = $this->_modified;
@@ -443,7 +481,13 @@
             $props[ 'id' ]          = $this->_id;
             $props[ 'parent']       = $this->_parent === NULL ? NULL : $this->_parent->id;
             $props[ 'type' ]        = $this->type;
+            
+            $props[ 'uid' ]         = $this->_uid;
+            $props[ 'gid' ]         = $this->_gid;
+            $props[ 'muid' ]        = $this->_muid;
+            
             $props[ 'name' ]        = $this->_name;
+            
             $props[ 'created' ]     = $this->_created;
             $props[ 'modified' ]    = $this->_modified;
             $props[ 'description' ] = $this->_description;
@@ -468,12 +512,11 @@
          */
         protected function getObjectFlags() {
 
-            return ONEDB_OBJECT_NOFLAG
-                   ^ ( $this->isReadOnly()  ? ONEDB_OBJECT_READONLY  : ONEDB_OBJECT_NOFLAG )
-                   ^ ( $this->isContainer() ? ONEDB_OBJECT_CONTAINER : ONEDB_OBJECT_NOFLAG )
-                   ^ ( $this->_unlinked     ? ONEDB_OBJECT_UNLINKED  : ONEDB_OBJECT_NOFLAG )
-                   ^ ( $this->_changed      ? ONEDB_OBJECT_UNSTABLE  : ONEDB_OBJECT_NOFLAG )
-                   ^ ( $this->isLive()      ? ONEDB_OBJECT_LIVE      : ONEDB_OBJECT_NOFLAG );
+            return   ( $this->isReadOnly()  ? self::F_READONLY  : 0 )
+                   + ( $this->isContainer() ? self::F_CONTAINER : 0 )
+                   + ( $this->_unlinked     ? self::F_UNLINKED : 0 )
+                   + ( $this->_changed      ? self::F_UNSTABLE : 0 )
+                   + ( $this->isLive()      ? self::F_LIVE : 0 );
         }
         
     }
@@ -552,6 +595,24 @@
         }
         
     ]);
+    
+    OneDB_Object::prototype()->defineProperty( 'uid', [
+        "get" => function() {
+            return $this->_uid;
+        }
+    ] );
+    
+    OneDB_Object::prototype()->defineProperty( 'gid', [
+        "get" => function() {
+            return $this->_gid;
+        }
+    ] );
+    
+    OneDB_Object::prototype()->defineProperty( 'muid', [
+        "get" => function() {
+            return $this->_muid;
+        }
+    ] );
     
     OneDB_Object::prototype()->defineProperty( 'data', [
         

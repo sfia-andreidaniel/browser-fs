@@ -11,7 +11,7 @@
     
     try {
     
-        $connection = Object('OneDB')->connect( 'loopback', 'andrei', 'new password' );
+        //$connection = Object('OneDB')->connect( 'loopback', 'andrei', 'new password' );
         
         //echo $connection->__mux(), "\n";
         
@@ -44,26 +44,24 @@
             
         ] );
         */
-        /*
         Sys_Security_Management::groupmod( 'loopback', 'root', [
             
             'users' => [
-                '+andrei',
-                '-root',
                 ':root'
             ],
             'flags' => 512
             
         ] );
-        */
         
-        echo "the gid of the user $connection->user is ", $connection->user->gid, "\n";
+        // echo "the gid of the user $connection->user is ", $connection->user->gid, "\n";
         
-        foreach ( $connection->user->groups as $member ) {
-            echo implode( ', ', $member->users ), "\n";
-        };
+        // foreach ( $connection->user->groups as $member ) {
+        //     echo implode( ', ', $member->users ), "\n";
+        // };
         
         //print_r( $connection->user->groups );
+    
+        //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
     
     } catch ( Exception $e ) {
         

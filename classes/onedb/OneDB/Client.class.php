@@ -15,13 +15,14 @@
         
         protected $_runAs       = NULL;     // <string>                  the name of the user that's using this website
         protected $_password    = NULL;     // <string>                  md5ed password this user is using
+        protected $_shChallenge = NULL;     // <string>                  shadow challenge string sent from client
 
         protected $_objects     = NULL;     // <MongoCollection>         link to connection db.objects MongoDB collection
 
         protected $_user        = NULL;     // <Sys_Security_User>       instance of the user this website is operating
         protected $_sys         = NULL;     // <Sys_Security_Management> local server accounts enumerator
         
-        public function init( $websiteName, $userName = 'anonymous', $password = '' ) {
+        public function init( $websiteName, $userName = 'anonymous', $password = '', $shadowChallenge = '' ) {
             
             // singleton
             if ( isset( self::$_sites[ $websiteName . ':' . $userName ] ) )
@@ -97,7 +98,7 @@
                 // initialize connections
                 $this->_objects      = $db->objects;
                 $this->_sys          = Object( 'Sys.Security.Management', $this, $db->shadow );
-                $this->_user         = Object( 'Sys.Security.User', $this, $db->shadow, $this->_runAs, $this->_password );
+                $this->_user         = Object( 'Sys.Security.User', $this, $db->shadow, $this->_runAs, $this->_password, $this->_shChallenge );
                 
             } catch ( Exception $e ) {
                 throw Object('Exception.OneDB', "Failed to connect to mongo!", 0, $e );
@@ -292,6 +293,7 @@
         public static function __demux( $data ) {
             if ( !is_string( $data ) )
                 throw Object( 'Exception.RPC', "Bad demuxing input. Expected a string!" );
+            
             
             $data = explode( ':', $data );
             

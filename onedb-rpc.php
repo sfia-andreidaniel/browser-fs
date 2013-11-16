@@ -9,6 +9,39 @@
     
     require_once __DIR__ . "/bootstrap.php";
     
+    $stdout = '';
+    
+    // setup a rpc exception handler to modify the output of the rpc
+    // if an async exception occurs
+    set_exception_handler( function( $e ) use ( &$stdout ) {
+    
+        $stdout = json_encode([
+            'ok' => FALSE,
+            'error' => TRUE,
+            'reason' => Object( 'Utils.Parsers.Exception' )->explainException( $e, 128 )
+        ]);
+        
+    });
+    
+    // on shutdown, we dump the stdout to client
+    register_shutdown_function( function() use ( &$stdout ) {
+        
+        // suppress error reporting. in case we'll get an exception
+        // after this point it will be suppressed.
+        
+        
+        // error_reporting( 0 );
+        // ini_set( 'display_errors', 'off' );
+        
+        // send an aditional status 200 code, in case the server
+        // will encounter an exception to enable the rpc to decode
+        // the json response
+        header( 'X-RPC-STATUS: 200' );
+        header( 'Content-Type: application/json' );
+        
+        echo $stdout;
+    } );
+    
     try {
     
         $demuxer = Object( 'RPC.Demuxer' );
@@ -76,7 +109,7 @@
                 // Set value
                 $result->{$property[ count( $property ) - 1 ]} = $value;
                 
-                echo json_encode( [
+                $stdout = json_encode( [
                     'ok' => TRUE,
                     'result' => $muxer->mux( $result )
                 ] );
@@ -124,7 +157,7 @@
                 for ( $i = 1, $len = count( $property ); $i<$len; $i++ )
                     $result = $result->{$property[$i]};
                 
-                echo json_encode( [
+                $stdout = json_encode( [
                     'ok' => TRUE,
                     'result' => $muxer->mux( $result )
                 ] );
@@ -132,7 +165,7 @@
                 break;
             
             case 'run-method':
-            
+                
                 $on = isset( $_POST['on'] )
                     ? $_POST['on']
                     : NULL;
@@ -188,7 +221,7 @@
                     $result = call_user_func_array( [ $instance, $path[ count($path ) - 1 ] ], $args );
                 }
             
-                echo json_encode([
+                $stdout = json_encode([
                     'ok' => TRUE,
                     'result' => $muxer->mux( $result )
                 ]);
@@ -205,11 +238,11 @@
     
     } catch  ( Exception $e ) {
         
-        die( json_encode([
+        $stdout = json_encode([
             'ok' => FALSE,
             'error' => TRUE,
             'reason' => Object( 'Utils.Parsers.Exception' )->explainException( $e, 128 )
-        ]) );
+        ]);
         
     }
 ?>

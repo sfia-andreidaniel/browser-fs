@@ -410,6 +410,9 @@
                 if ( $group === NULL )
                     throw Object( 'Exception.Security', "Group " . $groupName . " not found!");
                 
+                if ( in_array( $group->name, [ 'anonymous', 'root' ] ) )
+                    throw Object( 'Exception.Security', 'this is a built-in user account and cannot be deleted' );
+                
                 $conn = $server->get_shadow_collection();
                 
                 // delete group from shadow
@@ -452,6 +455,9 @@
                 
                 if ( $user === NULL )
                     throw Object( 'Exception.Security', "User " . $userName . " not found!");
+                
+                if ( in_array( $user->name, [ 'anonymous', 'root' ] ) )
+                    throw Object( 'Exception.Security', 'this is a built-in user account and cannot be deleted' );
                 
                 $conn = $server->get_shadow_collection();
                 

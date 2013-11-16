@@ -28,6 +28,12 @@ function OneDB_Client( websiteName, userName, storageEngine, shadowChallenge ) {
         }
     });
     
+    Object.defineProperty( this, "shadowChallenge", {
+        "get": function() {
+            return this._initArgs[3] || '';
+        }
+    } );
+    
     Object.defineProperty( this, "storage", {
         
         "get": function() {

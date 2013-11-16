@@ -31,6 +31,24 @@ function OneDB_Object_Root( server ) {
             }
         } );
         
+        Object.defineProperty( this, 'uid', {
+            "get": function() {
+                return 1; // hardcoded user id of the root account
+            }
+        } );
+        
+        Object.defineProperty( this, 'gid', {
+            "get": function() {
+                return 3; // hradcoded group id of the root account
+            }
+        } );
+        
+        Object.defineProperty( this, 'muid', {
+            "get": function() {
+                return 1; // hardcoded user id of the root account
+            }
+        } );
+        
         Object.defineProperty( this, "parent", {
             "get": function() {
                 return null;

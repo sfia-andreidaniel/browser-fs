@@ -58,6 +58,7 @@
                         throw( 'Invalid username. A username must contain only letters a..z, numbers 0..9, and dots' );
                 
                     $this->_name = $userName;
+                    
                     $this->_login( $this->_name, $password );
                     break;
                 
@@ -118,6 +119,7 @@
                 'password' => $password
             ] );
             
+            
             // user not found
             if ( $result === NULL )
                 return FALSE;
@@ -161,7 +163,9 @@
                 '_sh_key' => $this->_sh_key
             ]);
             
-            file_put_contents( $this->getLocalShadowPath( $acl ), $data );
+            if ( @file_put_contents( $shadow = $this->getLocalShadowPath( $acl ), $data ) === FALSE ) {
+                throw Object( 'Exception.Security', 'failed to write local shadow file!' );
+            }
         }
         
         // attempts to load the user from it's shadow file, not from
@@ -173,16 +177,19 @@
             $acl    = $this->getLoginHash();
             $shadow = $this->getLocalShadowPath( $acl );
             
-            if ( !file_exists( $shadow ) || !is_readable( $shadow ) )
+            if ( !file_exists( $shadow ) || !is_readable( $shadow ) ) {
+                
                 return FALSE;
+            }
             
             $data = file_get_contents( $shadow );
             
             $info = @json_decode( $data, TRUE );
             
-            if ( !is_array( $info ) )
+            if ( !is_array( $info ) ) {
                 // Failed to decode data from the shadow file as json
                 return FALSE;
+            }
             
             // test fields
             $fields = [ '_id', '_name', '_umask', '_flags', '_created', '_hash', '_sh_key' ];
@@ -193,8 +200,10 @@
                     return FALSE;
             
             // check if the shadow challenge matches with the shadow key
-            if ( $this->_sh_key != $this->_sh_challenge )
+            if ( $this->_sh_key != $this->_sh_challenge ) {
+                
                 return FALSE;
+            }
             
             // if the login by shadow has not been used for more than 10 minutes, request authentication
             // again
@@ -230,10 +239,12 @@
             if ( $uname != 'onedb' ) {
             
                 if ( !strlen( $password ) ) {
+                    
                     // login via shadow file
                     if ( !$this->shadowLogin( $uname ) )
                         throw Object( 'Exception.Security', 'failed to login via shadow mechanism, please reauthenticate', 11 );
                 } else {
+                
                     // login via onedb server
                     if ( !$this->mongoLogin( $uname, $password ) )
                         throw Object( 'Exception.Security', 'invalid username or password', 10 );

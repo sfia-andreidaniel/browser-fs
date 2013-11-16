@@ -185,7 +185,7 @@
                     
                     break;
                 
-                case preg_match('/^[r|\-][w|\-][x|\-][r|\-][w|\-][x|\-][r|\-][w|\-][x|\-]([r|\-])?/', $str ) ? TRUE : FALSE:
+                case preg_match('/^[r|\-][w|\-][x|\-][r|\-][w|\-][x|\-][r|\-][w|\-][x|\-]([t|\-])?/', $str ) ? TRUE : FALSE:
                     if ( $str[0] == 'r' ) $out ^= self::UR;
                     if ( $str[1] == 'w' ) $out ^= self::UW;
                     if ( $str[2] == 'x' ) $out ^= self::UX;
@@ -198,7 +198,7 @@
                     if ( $str[7] == 'w' ) $out ^= self::AW;
                     if ( $str[8] == 'x' ) $out ^= self::AX;
             
-                    if ( strlen( $str ) == 10 && $out[9] == 't' ) $out ^= self::ST;
+                    if ( strlen( $str ) == 10 && $str[9] == 't' ) $out ^= self::ST;
                     
                     return $out;
                     

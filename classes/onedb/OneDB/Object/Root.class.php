@@ -41,7 +41,9 @@
                 
             }
             
-            return Object( 'OneDB.Iterator', $out, $this->_server );
+            $out = Object( 'OneDB.Iterator', $out, $this->_server );
+            
+            return $out;
         }
         
         public function __mux() {
@@ -60,9 +62,12 @@
             
             $params = explode(':', $data );
             
-            $params[1] = isset( $params[1] ) ? implode( ':', array_slice( $params, 1 ) ) : 'anonymous';
+            //$params[1] = isset( $params[1] ) ? implode( ':', array_slice( $params, 1 ) ) : 'anonymous';
             
-            return ( self::$_singletons[ $data ] = Object( 'OneDB.Object.Root', Object( 'OneDB.Client', $params[0], $params[1] ) ) );
+            $params[1] = isset( $params[1] ) ? $params[1] : 'anonymous';
+            $params[2] = isset( $params[2] ) ? $params[2] : '';
+            
+            return ( self::$_singletons[ $data ] = Object( 'OneDB.Object.Root', Object( 'OneDB.Client', $params[0], $params[1], '', $params[2] ) ) );
 
         }
         
@@ -91,6 +96,24 @@
             return NULL;
         }
     ]);
+    
+    OneDB_Object_Root::prototype()->defineProperty( 'uid', [
+        "get" => function() {
+            return 1; // hardcoded uid of the "root" account
+        }
+    ] );
+    
+    OneDB_Object_Root::prototype()->defineProperty( 'gid', [
+        "get" => function() {
+            return 3; // hardcoded gid of the "root" account
+        }
+    ] );
+    
+    OneDB_Object_Root::prototype()->defineProperty( 'muid', [
+        "get" => function() {
+            return 1; // hardcoded uid of the "root" account
+        }
+    ] );
     
     OneDB_Object_Root::prototype()->defineProperty( 'created', [
         "get" => function() {

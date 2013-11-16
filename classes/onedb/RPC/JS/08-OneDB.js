@@ -63,8 +63,25 @@
             
             if ( callback )
                 HTTP.onreadystatechange = function() {
-                    if ( HTTP.readyState == 4 )
-                            callback( HTTP.status != 200 ? HTTP.status : false, HTTP.status == 200 ? HTTP.responseText : '' );
+                    if ( HTTP.readyState == 4 ) {
+                        
+                        var error = false,
+                            response = '';
+                        
+                        if ( HTTP.status === 200 )
+                            response = HTTP.responseText || '';
+                        else {
+                            var hdr = HTTP.getResponseHeader('X-RPC-STATUS');
+                            
+                            if ( ~~hdr == 200 ) {
+                                response = HTTP.responseText || '';
+                            } else {
+                                error = HTTP.status;
+                            }
+                        }
+                        
+                        callback( error, response );
+                    }
                 };
             
             data = data || {};
@@ -87,7 +104,13 @@
             if ( !isSync ) {
                 return true;
             } else {
-                return HTTP.status == 200 ? HTTP.responseText : null;
+                return HTTP.status == 200 ? HTTP.responseText : (function() {
+                    var hdr = HTTP.getResponseHeader('X-RPC-STATUS');
+                    if ( ~~hdr == 200 )
+                        return HTTP.responseText || '';
+                    else
+                        return null;
+                })();
             }
         };
 

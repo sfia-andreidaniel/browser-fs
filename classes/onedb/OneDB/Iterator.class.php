@@ -225,7 +225,9 @@
                 $out[] = self::$_muxer->mux( $value );
             }
             
-            return [ $out, self::$_muxer->mux( $this->_server ) ];
+            $out = [ $out, self::$_muxer->mux( $this->_server ) ];
+
+            return $out;
         }
         
         static public function __demux( $data ) {
