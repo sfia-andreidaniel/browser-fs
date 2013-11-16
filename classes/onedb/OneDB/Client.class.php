@@ -96,8 +96,8 @@
                 
                 // initialize connections
                 $this->_objects      = $db->objects;
-                $this->_user         = Object( 'Sys.Security.User', $this, $db->shadow, $this->_runAs, $this->_password );
                 $this->_sys          = Object( 'Sys.Security.Management', $this, $db->shadow );
+                $this->_user         = Object( 'Sys.Security.User', $this, $db->shadow, $this->_runAs, $this->_password );
                 
             } catch ( Exception $e ) {
                 throw Object('Exception.OneDB', "Failed to connect to mongo!", 0, $e );

@@ -26,6 +26,7 @@
         protected $_name         = NULL;     // USER NAME
         protected $_umask        = 0;        // DEFAULT USER WRITE MASK
         protected $_flags        = 0;        // ADDITIONAL USER FLAGS. NOT USED AT THIS POINT
+        protected $_members      = NULL;     // USER MEMBERS ID LIST
 
         protected $_sh_key       = '';       // SHADOW KEY, GENERATED WHEN LOGIN IS DONE VIA THE MONGO DATABASE.
         protected $_sh_challenge = '';    // SHADOW KEY CHALLENGE
@@ -64,6 +65,7 @@
                     throw Object( 'Exception.Security', 'Bad username: expected uid or uname!' );
                     break;
             }
+            
         }
 
         // BEGIN PUBLIC METHODS
@@ -251,6 +253,12 @@
             
         }
         
+        // retrieves the local onedb username password from the etc/onedb.shadow.gen.
+        // that file should be created by the onedb installer, and it's content should
+        // be randomly generated.
+        static protected function getOneDBPassword() {
+            return @file_get_contents( __DIR__ . '/../../../../etc/onedb.shadow.gen' );
+        }
     }
     
     Sys_Security_User::prototype()->defineProperty( 'id', [
@@ -282,5 +290,32 @@
             return $this->_sh_key;
         }
     ]);
+    
+    Sys_Security_User::prototype()->defineProperty( 'groups', [
+        'get' => function() {
+
+            if ( $this->_members === NULL ) {
+                return ( $this->_members = $this->_client->sys->getMembers(
+                    'user', $this->_id, TRUE
+                ) );
+            } else return $this->_members;
+        }
+    ] );
+
+    Sys_Security_User::prototype()->defineProperty( 'uid', [
+        'get' => function() {
+            return $this->_id;
+        }
+    ] );
+
+    Sys_Security_User::prototype()->defineProperty( 'gid', [
+        'get' => function() {
+            if ( $this->_members === NULL )
+                $this->_members = $this->_client->sys->getMembers(
+                    'user', $this->_id, TRUE
+                );
+            return count( $this->_members ) ? $this->_members[0]->id : NULL;
+        }
+    ] );
     
 ?>

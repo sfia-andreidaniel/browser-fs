@@ -48,5 +48,31 @@
         }
     ]);
 
+    Sys_Security_User_Unauthenticated::prototype()->defineProperty( 'groups', [
+        'get' => function() {
+
+            if ( $this->_members === NULL ) {
+                return ( $this->_members = $this->_client->sys->getMembers(
+                    'user', $this->_id, TRUE
+                ) );
+            } else return $this->_members;
+        }
+    ] );
+
+    Sys_Security_User_Unauthenticated::prototype()->defineProperty( 'uid', [
+        'get' => function() {
+            return $this->_id;
+        }
+    ] );
+
+    Sys_Security_User_Unauthenticated::prototype()->defineProperty( 'gid', [
+        'get' => function() {
+            if ( $this->_members === NULL )
+                $this->_members = $this->_client->sys->getMembers(
+                    'user', $this->_id, TRUE
+                );
+            return count( $this->_members ) ? $this->_members[0]->id : NULL;
+        }
+    ] );
 
 ?>

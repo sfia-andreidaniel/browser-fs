@@ -24,6 +24,7 @@
         protected $_id      = 0;       // THE id ( gid ) of this group
         protected $_name    = '';      // THE NAME OF THIS GROUP
         protected $_flags   = 0;       // THE LIST WITH THE FLAGS FOR THIS GROUP
+        protected $_members = NULL;    // THE LIST WITH THE USERS THAT ARE MEMBERS OF THIS GROUP
         
         protected $_client  = NULL;    // A LINK TO ONEDB CLIENT
         
@@ -63,4 +64,12 @@
             return $this->_flags;
         }
     ]);
+    
+    Sys_Security_Group::prototype()->defineProperty( 'users', [
+        'get' => function() {
+            return $this->_members === NULL
+                ? ( $this->_members = $this->_client->sys->getMembers( 'group', $this->_id, TRUE ) )
+                : $this->_members;
+        }
+    ] );
 ?>
