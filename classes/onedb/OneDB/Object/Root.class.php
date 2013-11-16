@@ -7,8 +7,6 @@
         protected $_server   = NULL;
         protected $_type     = NULL;   //Override the type
         protected $_online   = TRUE;
-        protected $_owner    = 'everybody';
-        protected $_modifier = 'noone';
         
         static protected $_isContainer = TRUE;
         static private   $_singletons  = [];
@@ -103,18 +101,6 @@
     OneDB_Object_Root::prototype()->defineProperty( 'modified', [
         "get" => function() {
             return FALSE;
-        }
-    ]);
-    
-    OneDB_Object_Root::prototype()->defineProperty( 'owner', [
-        "get" => function() {
-            return 'everybody';
-        }
-    ]);
-    
-    OneDB_Object_Root::prototype()->defineProperty( 'modifier', [
-        "get" => function() {
-            return 'noone';
         }
     ]);
     

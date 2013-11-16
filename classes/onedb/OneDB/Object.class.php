@@ -24,9 +24,6 @@
         protected $_created     = NULL;
         protected $_modified    = NULL;
 
-        protected $_owner       = NULL;
-        protected $_modifier    = NULL;
-
         protected $_description = NULL;
         protected $_icon        = NULL;
         protected $_keywords    = [];
@@ -57,8 +54,6 @@
             'name',
             'created',
             'modified',
-            'owner',
-            'modifier',
             'description',
             'icon',
             'keywords',
@@ -115,10 +110,10 @@
             
             //echo "saving...\n";
             
-            if ( $this->_owner === NULL )
-                $this->_owner = $this->_server->runAs;
+            // if ( $this->_owner === NULL )
+            //    $this->_owner = $this->_server->runAs;
             
-            $this->_modifier = $this->_server->runAs;
+            // $this->_modifier = $this->_server->runAs;
             
             if ( $this->_created === NULL )
                 $this->_created = time();
@@ -142,8 +137,6 @@
             $saveProperties[ 'name' ]        = $this->_name;
             $saveProperties[ 'created' ]     = $this->_created;
             $saveProperties[ 'modified' ]    = $this->_modified;
-            $saveProperties[ 'owner' ]       = $this->_owner;
-            $saveProperties[ 'modifier' ]    = $this->_modifier;
             $saveProperties[ 'description' ] = $this->_description;
             $saveProperties[ 'icon' ]        = $this->_icon;
             $saveProperties[ 'keywords' ]    = $this->_keywords;
@@ -212,8 +205,6 @@
             $out[ 'name' ]        = $this->_name;
             $out[ 'created' ]     = $this->_created;
             $out[ 'modified' ]    = $this->_modified;
-            $out[ 'owner' ]       = $this->_owner;
-            $out[ 'modifier' ]    = $this->_modifier;
             $out[ 'description' ] = $this->_description;
             $out[ 'icon' ]        = $this->_icon;
             $out[ 'keywords' ]    = $this->_keywords;
@@ -258,8 +249,6 @@
             $this->_name        = urldecode( $fromData[ 'name' ] );
             $this->_created     = $fromData[ 'created' ];
             $this->_modified    = $fromData[ 'modified' ];
-            $this->_owner       = $fromData[ 'owner' ];
-            $this->_modifier    = $fromData[ 'modifier' ];
             $this->_description = $fromData[ 'description' ];
             $this->_icon        = $fromData[ 'icon' ];
             $this->_keywords    = $fromData[ 'keywords' ];
@@ -434,8 +423,6 @@
             $props[ 'name' ]        = $this->_name;
             $props[ 'created' ]     = $this->_created;
             $props[ 'modified' ]    = $this->_modified;
-            $props[ 'owner' ]       = $this->_owner;
-            $props[ 'modifier' ]    = $this->_modifier;
             $props[ 'description' ] = $this->_description;
             $props[ 'icon' ]        = $this->_icon;
             $props[ 'keywords' ]    = $this->_keywords;
@@ -459,8 +446,6 @@
             $props[ 'name' ]        = $this->_name;
             $props[ 'created' ]     = $this->_created;
             $props[ 'modified' ]    = $this->_modified;
-            $props[ 'owner' ]       = $this->_owner;
-            $props[ 'modifier' ]    = $this->_modifier;
             $props[ 'description' ] = $this->_description;
             $props[ 'icon' ]        = $this->_icon;
             $props[ 'keywords' ]    = $this->_keywords;
@@ -594,26 +579,6 @@
     
     ]);
 
-    OneDB_Object::prototype()->defineProperty( 'owner', [
-        "get" => function() {
-            return $this->_owner;
-        },
-        
-        "set" => function( $newOwner ) {
-            $this->_owner = $newOwner . '';
-            
-            $this->_changed = TRUE;
-        }
-    ]);
-    
-    OneDB_Object::prototype()->defineProperty( 'modifier', [
-        
-        "get" => function() {
-            return $this->_modifier;
-        }
-    
-    ]);
-    
     OneDB_Object::prototype()->defineProperty( 'description', [
     
         "get" => function( ) {

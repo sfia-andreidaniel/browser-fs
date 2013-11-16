@@ -49,18 +49,6 @@ function OneDB_Object_Root( server ) {
             }
         });
         
-        Object.defineProperty( this, "owner", {
-            "get": function() {
-                return 'system';
-            }
-        });
-        
-        Object.defineProperty( this, "modifier", {
-            "get": function() {
-                return 'system';
-            }
-        });
-        
         Object.defineProperty( this, "description", {
             "get": function() {
                 return 'This is the uppermost node in the database tree';
