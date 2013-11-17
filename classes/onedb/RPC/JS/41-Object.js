@@ -28,6 +28,22 @@ function OneDB_Object( server, properties ) {
             }
         } );
         
+        Object.defineProperty( this, 'owner', {
+            "get": function() {
+                return this.uid === null
+                    ? null
+                    : this._server.sys.user( this.uid );
+            }
+        } );
+        
+        Object.defineProperty( this, 'group', {
+            "get": function() {
+                return this.gid === null
+                    ? null
+                    : this._server.sys.group( this.gid );
+            }
+        });
+        
         Object.defineProperty( this, "_server", {
             "get": function() {
                 return server;

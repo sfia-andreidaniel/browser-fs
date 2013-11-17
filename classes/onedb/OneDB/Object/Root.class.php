@@ -109,6 +109,18 @@
         }
     ] );
     
+    OneDB_Object_Root::prototype()->defineProperty( 'owner', [
+        "get" => function() {
+            return $this->_server->sys->user( 'root' );
+        }
+    ]);
+    
+    OneDB_Object_Root::prototype()->defineProperty( 'group', [
+        "get" => function() {
+            return $this->_server->sys->group( 'root' );
+        }
+    ]);
+    
     OneDB_Object_Root::prototype()->defineProperty( 'muid', [
         "get" => function() {
             return 1; // hardcoded uid of the "root" account

@@ -775,6 +775,22 @@
         
     ] );
     
+    OneDB_Object::prototype()->defineProperty( 'owner', [
+        "get" => function() {
+            return $this->_uid === NULL
+                ? NULL
+                : $this->_server->sys->user( $this->_uid );
+        }
+    ]);
+    
+    OneDB_Object::prototype()->defineProperty( 'group', [
+        "get" => function() {
+            return $this->_gid === NULL
+                ? NULL
+                : $this->_server->sys->group( $this->_gid );
+        }
+    ]);
+    
     OneDB_Object::$_muxer = Object('RPC.Muxer');
 
 ?>
