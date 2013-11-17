@@ -115,15 +115,15 @@
         }
     ] );
     
-    OneDB_Object_Root::prototype()->defineProperty( 'created', [
+    OneDB_Object_Root::prototype()->defineProperty( 'ctime', [
         "get" => function() {
-            return NULL;
+            return 0;
         }
     ]);
     
-    OneDB_Object_Root::prototype()->defineProperty( 'modified', [
+    OneDB_Object_Root::prototype()->defineProperty( 'mtime', [
         "get" => function() {
-            return FALSE;
+            return 0;
         }
     ]);
     

@@ -59,7 +59,7 @@ function OneDB_Object( server, properties ) {
                             
                         if ( property != '_flags' ) {
                             
-                            if ( [ 'id', 'created', 'modified', 'url', 'gid', 'uid', 'muid' ].indexOf( property ) >= 0 )
+                            if ( [ 'id', 'ctime', 'mtime', 'url', 'gid', 'uid', 'muid' ].indexOf( property ) >= 0 )
                                 return function( v ) {
                                     throw "The '" + property + "' of a OneDB_Object is read-only!";
                                 };
@@ -282,8 +282,8 @@ OneDB_Object.prototype._nativeProperties = [
     'uid',
     'gid',
     'muid',
-    'created',
-    'modified',
+    'ctime',
+    'mtime',
     'description',
     'icon',
     'keywords',

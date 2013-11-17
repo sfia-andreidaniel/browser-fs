@@ -55,13 +55,13 @@ function OneDB_Object_Root( server ) {
             }
         } );
         
-        Object.defineProperty( this, "created", {
+        Object.defineProperty( this, "ctime", {
             "get": function() {
                 return 0;
             }
         });
         
-        Object.defineProperty( this, "modified", {
+        Object.defineProperty( this, "mtime", {
             "get": function() {
                 return 0;
             }

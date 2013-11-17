@@ -23,8 +23,8 @@
         protected $_id          = NULL;
         protected $_name        = NULL;
 
-        protected $_created     = NULL;
-        protected $_modified    = NULL;
+        protected $_ctime       = NULL;
+        protected $_mtime       = NULL;
 
         protected $_uid         = NULL; // OWNER USER ID
         protected $_gid         = NULL; // OWNER GROUP ID
@@ -58,8 +58,8 @@
             '_parent',
             '_type',
             'name',
-            'created',
-            'modified',
+            'ctime',
+            'mtime',
             'description',
             'icon',
             'keywords',
@@ -130,10 +130,10 @@
             
             // $this->_modifier = $this->_server->runAs;
             
-            if ( $this->_created === NULL )
-                $this->_created = time();
+            if ( $this->_ctime === NULL )
+                $this->_ctime = time();
             
-            $this->_modified = time();
+            $this->_mtime = time();
             
             if ( $this->_name === NULL )
                 throw Object( 'Exception.OneDB', "Cannot save object, because it don't have a name set!" );
@@ -154,8 +154,8 @@
             $saveProperties[ 'muid' ]        = $this->_muid;
 
             $saveProperties[ 'name' ]        = $this->_name;
-            $saveProperties[ 'created' ]     = $this->_created;
-            $saveProperties[ 'modified' ]    = $this->_modified;
+            $saveProperties[ 'ctime' ]       = $this->_ctime;
+            $saveProperties[ 'mtime' ]       = $this->_mtime;
             $saveProperties[ 'description' ] = $this->_description;
             $saveProperties[ 'icon' ]        = $this->_icon;
             $saveProperties[ 'keywords' ]    = $this->_keywords;
@@ -226,8 +226,8 @@
             $out[ 'muid' ]        = $this->_muid;
 
             $out[ 'name' ]        = $this->_name;
-            $out[ 'created' ]     = $this->_created;
-            $out[ 'modified' ]    = $this->_modified;
+            $out[ 'ctime' ]       = $this->_ctime;
+            $out[ 'mtime' ]       = $this->_mtime;
             $out[ 'description' ] = $this->_description;
             $out[ 'icon' ]        = $this->_icon;
             $out[ 'keywords' ]    = $this->_keywords;
@@ -270,8 +270,8 @@
             
             $this->_id          = $fromData[ '_id' ];
             $this->_name        = urldecode( $fromData[ 'name' ] );
-            $this->_created     = $fromData[ 'created' ];
-            $this->_modified    = $fromData[ 'modified' ];
+            $this->_ctime       = $fromData[ 'ctime' ];
+            $this->_mtime       = $fromData[ 'mtime' ];
             $this->_description = $fromData[ 'description' ];
             $this->_icon        = $fromData[ 'icon' ];
             $this->_keywords    = $fromData[ 'keywords' ];
@@ -429,7 +429,7 @@
                     switch ( TRUE ) {
                     
                         // FROM RPC SIDE WE DON'T UPDATE THE UID AND GID OF THE OBJECT
-                        case in_array( $prop['name'], [ 'uid', 'gid' ] ):
+                        case in_array( $prop['name'], [ 'uid', 'gid', 'muid', 'ctime', 'mtime' ] ):
                             break;
                         
                         case strpos( $prop['name'], '.' ) === FALSE:
@@ -459,8 +459,8 @@
             $props[ 'muid' ]        = $this->_muid;
             
             $props[ 'name' ]        = $this->_name;
-            $props[ 'created' ]     = $this->_created;
-            $props[ 'modified' ]    = $this->_modified;
+            $props[ 'ctime' ]       = $this->_ctime;
+            $props[ 'mtime' ]       = $this->_mtime;
             $props[ 'description' ] = $this->_description;
             $props[ 'icon' ]        = $this->_icon;
             $props[ 'keywords' ]    = $this->_keywords;
@@ -488,8 +488,8 @@
             
             $props[ 'name' ]        = $this->_name;
             
-            $props[ 'created' ]     = $this->_created;
-            $props[ 'modified' ]    = $this->_modified;
+            $props[ 'ctime' ]       = $this->_ctime;
+            $props[ 'mtime' ]       = $this->_mtime;
             $props[ 'description' ] = $this->_description;
             $props[ 'icon' ]        = $this->_icon;
             $props[ 'keywords' ]    = $this->_keywords;
@@ -624,18 +624,18 @@
         
     ] );
     
-    OneDB_Object::prototype()->defineProperty( 'created', [
+    OneDB_Object::prototype()->defineProperty( 'ctime', [
 
         "get" => function() {
-            return $this->_created;
+            return $this->_ctime;
         }
 
     ]);
     
-    OneDB_Object::prototype()->defineProperty( 'modified', [
+    OneDB_Object::prototype()->defineProperty( 'mtime', [
         
         "get" => function() {
-            return $this->_modified;
+            return $this->_mtime;
         }
     
     ]);
