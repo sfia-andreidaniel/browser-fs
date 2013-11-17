@@ -5,8 +5,11 @@ apt-get install \
     php5-curl \
     php5-gd \
     php5-memcache \
-    php5-memcached
-
+    php5-memcached \
+    ncurses-dev \
+    libncurses5-dev
+    
+pecl install ncurses
 pecl install mongo
 
 echo "extension=mongo.so" > /etc/php5/mods-available/mongo.ini
