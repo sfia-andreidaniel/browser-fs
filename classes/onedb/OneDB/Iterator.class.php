@@ -222,7 +222,9 @@
             $out = [];
             
             foreach ( $this->_values as $value ) {
-                $out[] = self::$_muxer->mux( $value );
+                // FILESYSTEM SECURITY -> SEND TO SERVER ONLY THE READABLE OBJECTS
+                if ( $value->isReadable() )
+                    $out[] = self::$_muxer->mux( $value );
             }
             
             $out = [ $out, self::$_muxer->mux( $this->_server ) ];

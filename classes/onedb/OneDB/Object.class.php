@@ -339,6 +339,9 @@
             if ( $this->_changed )
                 throw Object( 'Exception.OneDB', "Object is in an unsaved state, save it first before creating something inside it!" );
             
+            if ( !$this->isWritable() )
+                throw Object( 'Exception.Security', 'Not enough rights to create object ( onedb filesystem rejected your request )!' );
+            
             if ( !$this->isContainer() )
                 throw Object( 'Exception.OneDB', "Object is not a container, and it cannot hold stuff inside!" );
             

@@ -167,7 +167,7 @@ function OneDB_Object( server, properties ) {
             
             _batch.push( data );
             
-            console.log( "saved batch is: ", _batch );
+            //console.log( "saved batch is: ", _batch );
             
         } );
         
@@ -232,9 +232,12 @@ function OneDB_Object( server, properties ) {
     this.save = function() {
         
         switch ( true ) {
+            case !this.has_flag( 'writable' ):
+                throw Exception( 'Exception.Object', "Not enough filesystem permissions to complete this operation" );
+                break;
             
             case this.has_flag('unlinked'):
-                throw "The object was previously deleted from the database, and cannot be saved!";
+                throw Exception( 'Exception.Object', "The object was previously deleted from the database, and cannot be saved!" );
                 break;
             
             case !this.changed:
@@ -242,15 +245,15 @@ function OneDB_Object( server, properties ) {
                 break;
             
             case this.has_flag( 'readonly' ):
-                throw "The object cannot be saved because it is read-only!";
+                throw Exception( 'Exception.Object', "The object cannot be saved because it is read-only!" );
                 break;
             
             case this.has_flag( 'live' ):
-                throw "Live objects cannot be saved!";
+                throw Exception( 'Exceptoin.Object', "Live objects cannot be saved!" );
                 break;
             
             case this.has_flag( 'unstable' ):
-                throw "The object cannot be saved because it has been retrieved from server in an unstable state!";
+                throw Exception( 'Exception.Object', "The object cannot be saved because it has been retrieved from server in an unstable state!" );
                 break;
         
         }

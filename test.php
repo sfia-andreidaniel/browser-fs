@@ -44,6 +44,8 @@
             
         ] );
         */
+        
+        /*
         Sys_Security_Management::groupmod( 'loopback', 'root', [
             
             'users' => [
@@ -52,6 +54,7 @@
             'flags' => 512
             
         ] );
+        */
         
         // echo "the gid of the user $connection->user is ", $connection->user->gid, "\n";
         
@@ -62,6 +65,11 @@
         //print_r( $connection->user->groups );
     
         //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
+        
+        // Sys_Security_Management::useradd( 'loopback', 'andrei', 'test' );
+        Sys_Security_Management::usermod( 'loopback', 'andrei', [
+            'groups' => [ 'root' ]
+        ] );
     
     } catch ( Exception $e ) {
         

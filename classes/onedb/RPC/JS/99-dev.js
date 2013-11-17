@@ -1,1 +1,1 @@
-var client = OneDB.login( "loopback", "root", "s34g4t3" );
+var client = OneDB.login( "loopback", "andrei", "test" );

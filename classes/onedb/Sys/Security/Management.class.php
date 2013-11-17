@@ -160,7 +160,7 @@
             if ( $super ) return TRUE;
             
             // is anonymous?
-            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_ANONYMOUS ) || in_array( self::GID_ANONYMOUS, $userGIDS );
+            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_NOBODY ) || in_array( self::GID_ANONYMOUS, $userGIDS );
             
             // anonymous accounts can read only what they created
             if ( $anon ) return ( $uid == $userID && ( $mode & Umask::UR ) ) ? TRUE : FALSE;
@@ -202,7 +202,7 @@
             if ( $super ) return TRUE;
             
             // is anonymous?
-            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_ANONYMOUS ) || in_array( self::GID_ANONYMOUS, $userGIDS );
+            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_NOBODY ) || in_array( self::GID_ANONYMOUS, $userGIDS );
             
             // anonymous accounts can write only what they created
             if ( $anon ) return ( $uid == $userID && ( $mode & Umask::UW ) ) ? TRUE : FALSE;
@@ -244,7 +244,7 @@
             if ( $super ) return TRUE;
             
             // is anonymous?
-            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_ANONYMOUS ) || in_array( self::GID_ANONYMOUS, $userGIDS );
+            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_NOBODY ) || in_array( self::GID_ANONYMOUS, $userGIDS );
             
             // anonymous accounts can NEVER execute something
             if ( $anon ) return ( $uid == $userID && ( $mode & Umask::UW ) ) ? TRUE : FALSE;
