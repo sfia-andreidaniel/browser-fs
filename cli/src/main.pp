@@ -1,8 +1,8 @@
 program onedb;
 
-uses crt, libhistory, libterm;
+uses crt, libhistory, libterm, libosutils;
 
-var ch             : char = #0;          // current readed char from console
+var ch : char = #0;          // current readed char from console
 
 begin
 

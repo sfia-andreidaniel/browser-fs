@@ -16,17 +16,26 @@ procedure on_key( c: char );
 procedure on_command();
 
 function parse_command( command: string ): TStringList;
+procedure term_update();
+
+function get_connection: string;
 
 procedure die();
 
 implementation
 
-uses crt, libhistory;
+uses crt, libhistory, libosutils, liberror;
 
 var command  : string  = '';
     wr_index : integer = 0;
     prefix   : string  = '';
     cursor   : string  = '$ ';
+    phpbin   : string  = '';
+
+function get_connection: string;
+begin
+    get_connection := prefix;
+end;
 
 procedure die();
 begin
@@ -53,7 +62,7 @@ begin
 
 end;
 
-procedure update();
+procedure term_update();
 begin
     gotoxy( 1, wherey() );
     clreol();
@@ -77,7 +86,7 @@ begin
         delete( command, wr_index, 1 );
         wr_index -= 1;
     end;
-    update();
+    term_update();
 end;
 
 // when pressing the up key, we update
@@ -89,7 +98,7 @@ begin
 //    writeln( #13#10'up_pressed'#13#10 );
     command  := prev_history();
     wr_index := length( command );
-    update();
+    term_update();
 end;
 
 procedure on_down;
@@ -97,7 +106,7 @@ begin
 //    writeln( #13#10'down_pressed'#13#10 );
     command  := next_history();
     wr_index := length( command );
-    update();
+    term_update();
 end;
 
 procedure on_left;
@@ -105,7 +114,7 @@ begin
     if ( wr_index > 0 ) then
     begin
         wr_index -= 1;
-        update();
+        term_update();
     end;
 end;
 
@@ -114,7 +123,7 @@ begin
     if ( wr_index < length( command ) ) then
     begin
         wr_index += 1;
-        update();
+        term_update();
     end;
 end;
 
@@ -122,16 +131,19 @@ procedure on_key( c: char );
 begin
     wr_index += 1;
     insert( c, command, wr_index );
-    update();
+    term_update();
 end;
 
 procedure on_command();
 
 var tcommand: string = '';
     args    : TStringList;
+    handled : boolean = false;
 
 begin
     wr_index := 0;
+    
+    handled := false;
     
     if ( command <> '' ) then
     begin
@@ -146,7 +158,7 @@ begin
         reset_history_index();
     end;
     
-    write( #13#10 );
+    //write( #13#10 );
     
     // execute tcommand
     
@@ -161,25 +173,100 @@ begin
         1: begin
             
             if args[0] = 'exit' then begin
+                handled := true;
                 die();
             end;
+            
+            if args[0] = 'clear' then begin
+                clrscr();
+                handled := true;
+                term_update();
+            end;
+            
+            
             
         end;
         2: begin
             
             if args[0] = 'use' then begin
                 // use command
-                prefix := args[1];
+                prefix :=  args[1];
+                handled := true;
+                write( #10 );
+                writeln( #13'* using connection: ', args[1] );
+                term_update();
             end;
             
         end;
     end;
     
-    update();
+    if handled = false then begin
+        handled := run_command( args );
+        if handled then begin
+            term_update();
+        end;
+    end;
+    
+    if handled = false then
+    begin
+        textcolor( red );
+        write( #10#13'> ' );
+        textcolor( lightgray );
+        write( 'unrecognized command: ' );
+        textcolor( yellow );
+        writeln( tcommand );
+        textcolor( lightgray );
+        term_update();
+    end;
+    
 end;
 
 initialization
     
-    update();
+    textcolor( green );
+    
+    write( 'onedb command line interface' );
+    
+    textcolor( yellow );
+    
+    writeln( ' v 1.0' );
+    
+    textcolor( lightgray );
+    
+    write( '* press ' );
+    
+    textcolor( red );
+    
+    write( 'esc ' );
+    
+    textcolor( lightgray );
+    
+    write( 'or type ' );
+    
+    textcolor( red );
+    
+    write( 'exit ' );
+    
+    textcolor( lightgray );
+    
+    writeln( 'to exit console' );
+    
+    write( '* type ' );
+    
+    textcolor( yellow );
+    
+    write( 'help ' );
+    
+    textcolor( lightgray );
+    
+    writeln( 'to get help' );
+    
+    phpbin := which( 'php' );
+    
+    if phpbin <> '' then
+        writeln( '* using php binary: ', phpbin )
+    else error( 'php binary file not found!');
+    
+    term_update();
     
 end.
