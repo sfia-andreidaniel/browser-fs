@@ -1,3 +1,6 @@
+/* Data type functions for being able to implement strictness in the code
+ */
+
 ( function() {
     
     function Strict() {

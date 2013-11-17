@@ -1,3 +1,6 @@
+/* Unix inspired file mode mask tools
+ */
+
 ( function() {
     
     // Defines a constant into an object
@@ -18,17 +21,19 @@
         _const( this, 'MASK_VERBOSE',   1 );
         _const( this, 'MASK_OCTAL',     2 );
         
-        _const( this, 'UR',           512 ); // 1000000000 // user can read
-        _const( this, 'UW',           256 ); // 0100000000 // user can write
-        _const( this, 'UX',           128 ); // 0010000000 // user can execute
-        _const( this, 'GR',            64 ); // 0001000000 // group can read
-        _const( this, 'GW',            32 ); // 0000100000 // group can write
-        _const( this, 'GX',            16 ); // 0000010000 // group can execute
-        _const( this, 'AR',             8 ); // 0000001000 // anyone can read
-        _const( this, 'AW',             4 ); // 0000000100 // anyone can write
-        _const( this, 'AX',             2 ); // 0000000010 // anyone can execute
-        _const( this, 'ST',             1 ); // 0000000001 // sticky bit
+        _const( this, 'ST',           512 ); // 1000000000 // sticky bit
+        _const( this, 'UR',           256 ); // 0100000000 // user can read
+        _const( this, 'UW',           128 ); // 0010000000 // user can write
+        _const( this, 'UX',            64 ); // 0001000000 // user can execute
+        _const( this, 'GR',            32 ); // 0000100000 // group can read
+        _const( this, 'GW',            16 ); // 0000010000 // group can write
+        _const( this, 'GX',             8 ); // 0000001000 // group can execute
+        _const( this, 'AR',             4 ); // 0000000100 // anyone can read
+        _const( this, 'AW',             2 ); // 0000000010 // anyone can write
+        _const( this, 'AX',             1 ); // 0000000001 // anyone can execute
         _const( this, 'NUL',            0 ); // 0000000000 // no flag
+        
+        _const( this, 'MAX_UMASK',   1023 ); // 1111111111 // max possible umask
         
         _const( this, 'M777', this.UR + this.UW + this.UX +
                               this.GR + this.GW + this.GX +
@@ -46,8 +51,8 @@
             _throw = typeof _throw == 'undefined' ? true : !!_throw;
             mode   = Strict.is_int( mode ) ? mode : ( typeof mode == 'undefined' && arguments.length == 1 ? 1 : -1 );
             
-            if ( !Strict.is_int( umask ) || umask < 0 ) {
-                if ( _throw ) throw Exception('Exception.FS', 'umask must be int gte 0' );
+            if ( !Strict.is_int( umask ) || umask < 0 || umask > this.MAX_UMASK ) {
+                if ( _throw ) throw Exception('Exception.FS', 'umask must be int gte ' + this.MAX_UMASK );
                 else return false;
             }
             
@@ -79,69 +84,10 @@
 
                 case this.MASK_OCTAL:
 
-                    var out = '';
-
-                    if ( umask & this.ST ) out += '1'; // else $out .= '0';
-
-                    switch ( true ) {
-
-                        case ( ( umask & this.UR ) && ( umask & this.UW ) && ( umask & this.UX ) ) ? true : false:
-                            out += '7'; break;
-                        case ( ( umask & this.UR ) && ( umask & this.UW ) ) ? true : false:
-                            out += '6'; break;
-                        case ( ( umask & this.UR ) && ( umask & this.UX ) ) ? true : false:
-                            out += '5'; break;
-                        case ( ( umask & this.UW ) && ( umask & this.UX ) ) ? true : false:
-                            out += '3'; break;
-                        case ( umask & this.UR ) ? true : false:
-                            out += '4'; break;
-                        case ( umask & this.UW ) ? true : false:
-                            out += '2'; break;
-                        case ( umask & this.UX ) ? true : false:
-                            out += '1'; break;
-                        default:
-                            out += '0'; break;
-                    }
-
-                    switch ( true ) {
-
-                        case ( ( umask & this.GR ) && ( umask & this.GW ) && ( umask & this.GX ) ) ? true : false:
-                            out += '7'; break;
-                        case ( ( umask & this.GR ) && ( umask & this.GW ) ) ? true : false:
-                            out += '6'; break;
-                        case ( ( umask & this.GR ) && ( umask & this.GX ) ) ? true : false:
-                            out += '5'; break;
-                        case ( ( umask & this.GW ) && ( umask & this.GX ) ) ? true : false:
-                            out += '3'; break;
-                        case ( umask & this.UR ) ? true : false:
-                            out += '4'; break;
-                        case ( umask & this.GW ) ? true : false:
-                            out += '2'; break;
-                        case ( umask & this.GX ) ? true : false:
-                            out += '1'; break;
-                        default:
-                            out += '0'; break;
-                    }
-
-                    switch ( true ) {
-
-                        case ( ( umask & this.AR ) && ( umask & this.AW ) && ( umask & this.AX ) ) ? true : false:
-                            out += '7'; break;
-                        case ( ( umask & this.AR ) && ( umask & this.AW ) ) ? true : false:
-                            out += '6'; break;
-                        case ( ( umask & this.AR ) && ( umask & this.AX ) ) ? true : false:
-                            out += '5'; break;
-                        case ( ( umask & this.AW ) && ( umask & this.AX ) ) ? true : false:
-                            out += '3'; break;
-                        case ( umask & this.AR ) ? true : false:
-                            out += '4'; break;
-                        case ( umask & this.AW ) ? true : false:
-                            out += '2'; break;
-                        case ( umask & this.AX ) ? true : false:
-                            out += '1'; break;
-                        default:
-                            out += '0'; break;
-                    }
+                    var out = umask.toString(8);
+                    
+                    while ( out.length < 3 )
+                        out = '0' + out;
                     
                     return out;
 
@@ -199,60 +145,7 @@
                 
                 case ( matches = /^([0-1])?([0-7])([0-7])([0-7])$/.exec( str ) ) ? true : false:
                     
-                    if ( matches[1] == '1' ) out |= this.ST;
-                    
-                    switch ( ~~matches[2] ) {
-                        case 1: out ^= this.UX;
-                            break;
-                        case 2: out ^= this.UW;
-                            break;
-                        case 3: out ^= this.UW; out ^= this.UX;
-                            break;
-                        case 4: out ^= this.UR;
-                            break;
-                        case 5: out ^= this.UR; out ^= this.UX;
-                            break;
-                        case 6: out ^= this.UR; out ^= this.UW;
-                            break;
-                        case 7: out ^= this.UR; out ^= this.UW; out ^= this.UX;
-                            break;
-                    }
-
-                    switch ( ~~matches[3] ) {
-                        case 1: out ^= this.GX;
-                            break;
-                        case 2: out ^= this.GW;
-                            break;
-                        case 3: out ^= this.GW; out ^= this.GX;
-                            break;
-                        case 4: out ^= this.GR;
-                            break;
-                        case 5: out ^= this.GR; out ^= this.GX;
-                            break;
-                        case 6: out ^= this.GR; out ^= this.GW;
-                            break;
-                        case 7: out ^= this.GR; out ^= this.GW; out ^= this.GX;
-                            break;
-                    }
-
-                    switch ( ~~matches[4] ) {
-                        case 1: out ^= this.AX;
-                            break;
-                        case 2: out ^= this.AW;
-                            break;
-                        case 3: out ^= this.AW; out ^= this.AX;
-                            break;
-                        case 4: out ^= this.AR;
-                            break;
-                        case 5: out ^= this.AR; out ^= this.AX;
-                            break;
-                        case 6: out ^= this.AR; out ^= this.AW;
-                            break;
-                        case 7: out ^= this.AR; out ^= this.AW; out ^= this.AX;
-                            break;
-                    }
-                    
-                    return out;
+                    return parseInt( str, 8 );
                     
                     break;
                 

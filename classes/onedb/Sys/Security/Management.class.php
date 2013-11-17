@@ -224,7 +224,14 @@
             }
         }
         
-
+        
+        public function __mux() {
+            return [
+                "root"  => $this->_server->__mux(),
+                "users" => $this->_users,
+                "groups"=> $this->_groups
+            ];
+        }
         
         // BEGIN STATIC MANAGEMENT FUNCTIONS.
         // NOTE THAT THESE FUNCTIONS ARE WORKING ONLY ON root AND onedb ACCOUNTS.

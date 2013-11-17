@@ -12,7 +12,6 @@ function OneDB_Client( websiteName, userName, storageEngine, shadowChallenge ) {
             shadowChallenge || ''
         ];
         
-        //console.log( "Got shadow challenge: ", shadowChallenge );
 
     }
     
@@ -81,6 +80,28 @@ function OneDB_Client( websiteName, userName, storageEngine, shadowChallenge ) {
             "default" : null
         }
     ] );
+    
+    ( function( me ) {
+        var lsys = 0,
+            _cache= null;
+        
+        Object.defineProperty( me, "sys", {
+            "get": function() {
+                var now;
+                if ( _cache === null || ( ( ( now = new Date() ).getTime() ) - lsys ) > 60000 ) {
+                    lsys   = now;
+                    _cache = OneDB.getRemoteProperty( me, "sys" );
+                }
+                return _cache;
+            }
+        } );
+    } )( this );
+    
+    Object.defineProperty( this, 'user', {
+        "get": function() {
+            return this.sys.user( this.runAs );
+        }
+    });
     
     this.__create();
     

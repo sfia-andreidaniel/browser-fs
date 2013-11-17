@@ -1,3 +1,6 @@
+/* Exception types
+ */
+
 ( function() {
     
     var ETypes = {};

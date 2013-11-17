@@ -15,17 +15,19 @@
         const MASK_OCTAL        = 2;
         
         // BITMASK REPRESENTING MODE FLAGS
-        const UR                = 512; // 1000000000 // user can read
-        const UW                = 256; // 0100000000 // user can write
-        const UX                = 128; // 0010000000 // user can execute
-        const GR                =  64; // 0001000000 // group can read
-        const GW                =  32; // 0000100000 // group can write
-        const GX                =  16; // 0000010000 // group can execute
-        const AR                =   8; // 0000001000 // anyone can read
-        const AW                =   4; // 0000000100 // anyone can write
-        const AX                =   2; // 0000000010 // anyone can execute
-        const ST                =   1; // 0000000001 // sticky bit
-        const NUL               =   0; // 0000000000 // no flag
+        const ST                =  512; // 1000000000 // sticky bit
+        const UR                =  256; // 0100000000 // user can read
+        const UW                =  128; // 0010000000 // user can write
+        const UX                =   64; // 0001000000 // user can execute
+        const GR                =   32; // 0000100000 // group can read
+        const GW                =   16; // 0000010000 // group can write
+        const GX                =    8; // 0000001000 // group can execute
+        const AR                =    4; // 0000000100 // anyone can read
+        const AW                =    2; // 0000000010 // anyone can write
+        const AX                =    1; // 0000000001 // anyone can execute
+        const NUL               =    0; // 0000000000 // no flag
+        
+        const MAX_UMASK         = 1023; // 1111111111 // max umask size
         
         // PROVIDES:
         // 
@@ -53,8 +55,8 @@
         
         static public function mode_to_str( $umask, $mode = 1, $_throw = TRUE ) {
             
-            if ( !is_int( $umask ) || $umask < 0 ) {
-                if ( $_throw ) throw Object('Exception.FS', 'umask must be int gte 0' );
+            if ( !is_int( $umask ) || $umask < 0 || $umask > self::MAX_UMASK ) {
+                if ( $_throw ) throw Object('Exception.FS', 'umask must be int gte 0 lte 1023' );
                 else return FALSE;
             }
             
@@ -88,71 +90,11 @@
                 
                 case self::MASK_OCTAL:
                     
-                    $out = '';
+                    $out = decoct( $umask );
                     
-                    if ( $umask & self::ST ) $out .= '1'; // else $out .= '0';
-                    
-                    switch ( TRUE ) {
-                        
-                        case ( ( $umask & self::UR ) && ( $umask & self::UW ) && ( $umask & self::UX ) ) ? TRUE : FALSE:
-                            $out .= '7'; break;
-                        case ( ( $umask & self::UR ) && ( $umask & self::UW ) ) ? TRUE : FALSE:
-                            $out .= '6'; break;
-                        case ( ( $umask & self::UR ) && ( $umask & self::UX ) ) ? TRUE : FALSE:
-                            $out .= '5'; break;
-                        case ( ( $umask & self::UW ) && ( $umask & self::UX ) ) ? TRUE : FALSE:
-                            $out .= '3'; break;
-                        case ( $umask & self::UR ) ? TRUE : FALSE:
-                            $out .= '4'; break;
-                        case ( $umask & self::UW ) ? TRUE : FALSE:
-                            $out .= '2'; break;
-                        case ( $umask & self::UX ) ? TRUE : FALSE:
-                            $out .= '1'; break;
-                        default:
-                            $out .= '0'; break;
-                    }
-
-                    switch ( TRUE ) {
-                        
-                        case ( ( $umask & self::GR ) && ( $umask & self::GW ) && ( $umask & self::GX ) ) ? TRUE : FALSE:
-                            $out .= '7'; break;
-                        case ( ( $umask & self::GR ) && ( $umask & self::GW ) ) ? TRUE : FALSE:
-                            $out .= '6'; break;
-                        case ( ( $umask & self::GR ) && ( $umask & self::GX ) ) ? TRUE : FALSE:
-                            $out .= '5'; break;
-                        case ( ( $umask & self::GW ) && ( $umask & self::GX ) ) ? TRUE : FALSE:
-                            $out .= '3'; break;
-                        case ( $umask & self::GR ) ? TRUE : FALSE:
-                            $out .= '4'; break;
-                        case ( $umask & self::GW ) ? TRUE : FALSE:
-                            $out .= '2'; break;
-                        case ( $umask & self::GX ) ? TRUE : FALSE:
-                            $out .= '1'; break;
-                        default:
-                            $out .= '0'; break;
-                    }
-
-                    switch ( TRUE ) {
-                        
-                        case ( ( $umask & self::AR ) && ( $umask & self::AW ) && ( $umask & self::AX ) ) ? TRUE : FALSE:
-                            $out .= '7'; break;
-                        case ( ( $umask & self::AR ) && ( $umask & self::AW ) ) ? TRUE : FALSE:
-                            $out .= '6'; break;
-                        case ( ( $umask & self::AR ) && ( $umask & self::AX ) ) ? TRUE : FALSE:
-                            $out .= '5'; break;
-                        case ( ( $umask & self::AW ) && ( $umask & self::AX ) ) ? TRUE : FALSE:
-                            $out .= '3'; break;
-                        case ( $umask & self::AR ) ? TRUE : FALSE:
-                            $out .= '4'; break;
-                        case ( $umask & self::AW ) ? TRUE : FALSE:
-                            $out .= '2'; break;
-                        case ( $umask & self::AX ) ? TRUE : FALSE:
-                            $out .= '1'; break;
-                        default:
-                            $out .= '0'; break;
-                    }
-                    
-                    return $out;
+                    return strlen( $out ) == 4 && $out[0] == '0'
+                        ? substr( $out, 1 )
+                        : $out;
                     
                     break;
             }
@@ -204,60 +146,12 @@
                     
                     break;
                 
-                case preg_match('/^([0-1])?([0-7])([0-7])([0-7])$/', $str, $matches ) ? TRUE : FALSE:
+                case preg_match('/^([0-1])?([0-7])([0-7])([0-7])$/', $str ) ? TRUE : FALSE:
                     
-                    if ( $matches[1] == '1' ) $out |= self::ST;
+                    $out = octdec( $str );
                     
-                    switch ( ~~$matches[2] ) {
-                        case 1: $out ^= self::UX;
-                            break;
-                        case 2: $out ^= self::UW;
-                            break;
-                        case 3: $out ^= self::UW; $out ^= self::UX;
-                            break;
-                        case 4: $out ^= self::UR;
-                            break;
-                        case 5: $out ^= self::UR; $out ^= self::UX;
-                            break;
-                        case 6: $out ^= self::UR; $out ^= self::UW;
-                            break;
-                        case 7: $out ^= self::UR; $out ^= self::UW; $out ^= self::UX;
-                            break;
-                    }
-
-                    switch ( ~~$matches[3] ) {
-                        case 1: $out ^= self::GX;
-                            break;
-                        case 2: $out ^= self::GW;
-                            break;
-                        case 3: $out ^= self::GW; $out ^= self::GX;
-                            break;
-                        case 4: $out ^= self::GR;
-                            break;
-                        case 5: $out ^= self::GR; $out ^= self::GX;
-                            break;
-                        case 6: $out ^= self::GR; $out ^= self::GW;
-                            break;
-                        case 7: $out ^= self::GR; $out ^= self::GW; $out ^= self::GX;
-                            break;
-                    }
-
-                    switch ( ~~$matches[4] ) {
-                        case 1: $out ^= self::AX;
-                            break;
-                        case 2: $out ^= self::AW;
-                            break;
-                        case 3: $out ^= self::AW; $out ^= self::AX;
-                            break;
-                        case 4: $out ^= self::AR;
-                            break;
-                        case 5: $out ^= self::AR; $out ^= self::AX;
-                            break;
-                        case 6: $out ^= self::AR; $out ^= self::AW;
-                            break;
-                        case 7: $out ^= self::AR; $out ^= self::AW; $out ^= self::AX;
-                            break;
-                    }
+                    while ( strlen( $out ) < 3 )
+                        $out = '0'.$out;
                     
                     return $out;
                     
