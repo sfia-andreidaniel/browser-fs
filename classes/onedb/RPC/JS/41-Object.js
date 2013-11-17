@@ -75,7 +75,7 @@ function OneDB_Object( server, properties ) {
                             
                         if ( property != '_flags' ) {
                             
-                            if ( [ 'id', 'ctime', 'mtime', 'url', 'gid', 'uid', 'muid' ].indexOf( property ) >= 0 )
+                            if ( [ 'id', 'ctime', 'mtime', 'url', 'gid', 'uid', 'muid', 'mode' ].indexOf( property ) >= 0 )
                                 return function( v ) {
                                     throw "The '" + property + "' of a OneDB_Object is read-only!";
                                 };
@@ -272,14 +272,17 @@ OneDB_Object.prototype = new OneDB_Class();
 
 /* Possible object internal flags */
 OneDB_Object.prototype._flags_list = {
-    "NOFLAG"    :   0,  // DEFAULT FLAG. NO FLAGS.
-    "READONLY"  :   2,  // WEATHER THE OBJECT IS READONLY OR NOT
-    "CONTAINER" :   4,  // WEATHER THE OBJECT IS A CONTAINER (CAN HOLD ITEMS) OR NOT
-    "UNLINKED"  :   8,  // WEATHER THE OBJECT HAS BEEN UNLINKED
-    "ROOT"      :  16,  // WEATHER THE OBJECT IS THE ROOT OBJECT
-    "UNSTABLE"  :  32,  // WEATHER THE SERVER SENT THE OBJECT IN AN UNSTABLE STATE
-    "LIVE"      :  64,  // WEATHER THE OBJECT IS A LIVE OBJECT OR NOT
-    "FLUSH"     : 128   // RPC ONLY. WEATHER A PROPERTY IMPLIES A SAVE BEFORE SETTER OR GETTER
+    "NOFLAG"    :    0,  // DEFAULT FLAG. NO FLAGS.
+    "READONLY"  :    2,  // WEATHER THE OBJECT IS READONLY OR NOT
+    "CONTAINER" :    4,  // WEATHER THE OBJECT IS A CONTAINER (CAN HOLD ITEMS) OR NOT
+    "UNLINKED"  :    8,  // WEATHER THE OBJECT HAS BEEN UNLINKED
+    "ROOT"      :   16,  // WEATHER THE OBJECT IS THE ROOT OBJECT
+    "UNSTABLE"  :   32,  // WEATHER THE SERVER SENT THE OBJECT IN AN UNSTABLE STATE
+    "LIVE"      :   64,  // WEATHER THE OBJECT IS A LIVE OBJECT OR NOT
+    "FLUSH"     :  128,  // RPC ONLY. WEATHER A PROPERTY IMPLIES A SAVE BEFORE SETTER OR GETTER
+    "READABLE"  :  256,  // WEATHER THE OBJECT IS READABLE BY THE CURRENT USER
+    "WRITABLE"  :  512,  // WEATHER THE OBJECT IS WRITABLE BY THE CURRENT USER
+    "EXECUTABLE": 1024   // WEATHER THE OBJECT IS EXECUTABLE BY THE CURRENT USER
 };
 
 /* A list of properties that are defined automatically
@@ -300,6 +303,7 @@ OneDB_Object.prototype._nativeProperties = [
     'muid',
     'ctime',
     'mtime',
+    'mode',
     'description',
     'icon',
     'keywords',

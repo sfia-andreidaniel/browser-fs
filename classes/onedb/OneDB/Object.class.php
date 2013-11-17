@@ -7,14 +7,17 @@
 
     class OneDB_Object extends Object implements IDemuxable {
         
-        const F_NOFLAG       = 0;   // no flags
-        const F_READONLY     = 2;   // if the object is not modifiable ( is read only )
-        const F_CONTAINER    = 4;   // if the object can holds another objects ( is a folder )
-        const F_UNLINKED     = 8;   // If the object has been unlinked ...
-        const F_ROOT         = 16;  // Object is root if is instanceof OneDB_Object_Root
-        const F_UNSTABLE     = 32;  // Object is in an unstable state if it was created and not saved.
-        const F_LIVE         = 64;  // Live object. If this object is child of a Webservice category usual
-        const F_FLUSH        = 128; // RPC client-side flag only - Save object after set a property
+        const F_NOFLAG       = 0;    // no flags
+        const F_READONLY     = 2;    // if the object is not modifiable ( is read only )
+        const F_CONTAINER    = 4;    // if the object can holds another objects ( is a folder )
+        const F_UNLINKED     = 8;    // If the object has been unlinked ...
+        const F_ROOT         = 16;   // Object is root if is instanceof OneDB_Object_Root
+        const F_UNSTABLE     = 32;   // Object is in an unstable state if it was created and not saved.
+        const F_LIVE         = 64;   // Live object. If this object is child of a Webservice category usual
+        const F_FLUSH        = 128;  // RPC client-side flag only - Save object after set a property
+        const F_READABLE     = 256;  // weather the object is readable or not
+        const F_WRITABLE     = 512;  // weather the object is writable or not
+        const F_EXECUTABLE   = 1024; // weather the object can be executed or not
         
         
         protected $_server      = NULL;
@@ -29,6 +32,7 @@
         protected $_uid         = NULL; // OWNER USER ID
         protected $_gid         = NULL; // OWNER GROUP ID
         protected $_muid        = NULL; // LAST USER ID THAT MODIFIED THIS OBJECT
+        protected $_mode        = NULL; // OBJECT FILE MODE
 
         protected $_description = NULL;
         protected $_icon        = NULL;
@@ -57,9 +61,18 @@
             '_id',
             '_parent',
             '_type',
+            
             'name',
+            
             'ctime',
             'mtime',
+            
+            'gid',
+            'uid',
+            'muid',
+            
+            'mode',
+            
             'description',
             'icon',
             'keywords',
@@ -106,7 +119,19 @@
             else
                 return static::$_isReadOnly;
         }
-        
+
+        public function isReadable() {
+            return $this->_server->sys->canRead( $this->uid, $this->gid, $this->mode, $this->_server->user );
+        }
+
+        public function isWritable() {
+            return $this->_server->sys->canWrite( $this->uid, $this->gid, $this->mode, $this->_server->user );
+        }
+
+        public function isExecutable() {
+            return $this->_server->sys->canExecute( $this->uid, $this->gid, $this->mode, $this->_server->user );
+        }
+
         /* Saves the object in database
          */
         public function save() {
@@ -127,6 +152,9 @@
             
             if ( $this->_muid === NULL )
                 $this->_muid = $this->_server->user->uid;
+            
+            if ( $this->_mode === NULL )
+                $this->_mode = $this->_server->user->umask;
             
             // $this->_modifier = $this->_server->runAs;
             
@@ -152,10 +180,11 @@
             $saveProperties[ 'uid' ]         = $this->_uid;
             $saveProperties[ 'gid' ]         = $this->_gid;
             $saveProperties[ 'muid' ]        = $this->_muid;
-
-            $saveProperties[ 'name' ]        = $this->_name;
+            $saveProperties[ 'mode' ]        = $this->_mode;
             $saveProperties[ 'ctime' ]       = $this->_ctime;
             $saveProperties[ 'mtime' ]       = $this->_mtime;
+
+            $saveProperties[ 'name' ]        = $this->_name;
             $saveProperties[ 'description' ] = $this->_description;
             $saveProperties[ 'icon' ]        = $this->_icon;
             $saveProperties[ 'keywords' ]    = $this->_keywords;
@@ -221,13 +250,15 @@
             if ( $this->_type != NULL )
                 $out['_type'] = $this->_type->name;
 
+            $out[ 'name' ]        = $this->_name;
+
             $out[ 'uid' ]         = $this->_uid;
             $out[ 'gid' ]         = $this->_gid;
             $out[ 'muid' ]        = $this->_muid;
-
-            $out[ 'name' ]        = $this->_name;
             $out[ 'ctime' ]       = $this->_ctime;
             $out[ 'mtime' ]       = $this->_mtime;
+            $out[ 'mode' ]        = $this->_mode;
+            
             $out[ 'description' ] = $this->_description;
             $out[ 'icon' ]        = $this->_icon;
             $out[ 'keywords' ]    = $this->_keywords;
@@ -270,17 +301,19 @@
             
             $this->_id          = $fromData[ '_id' ];
             $this->_name        = urldecode( $fromData[ 'name' ] );
+
             $this->_ctime       = $fromData[ 'ctime' ];
             $this->_mtime       = $fromData[ 'mtime' ];
+            $this->_uid         = $fromData[ 'uid' ];
+            $this->_gid         = $fromData[ 'gid' ];
+            $this->_muid        = $fromData[ 'muid' ];
+            $this->_mode        = $fromData[ 'mode' ];
+
             $this->_description = $fromData[ 'description' ];
             $this->_icon        = $fromData[ 'icon' ];
             $this->_keywords    = $fromData[ 'keywords' ];
             $this->_tags        = $fromData[ 'tags' ];
             $this->_online      = $fromData[ 'online' ];
-            
-            $this->_uid         = $fromData[ 'uid' ];
-            $this->_gid         = $fromData[ 'gid' ];
-            $this->_muid        = $fromData[ 'muid' ];
             
             $this->_parent      = $fromData[ '_parent' ] === NULL
                 ? Object( 'OneDB.Object.Root', $this->_server, NULL )
@@ -428,8 +461,8 @@
                 
                     switch ( TRUE ) {
                     
-                        // FROM RPC SIDE WE DON'T UPDATE THE UID AND GID OF THE OBJECT
-                        case in_array( $prop['name'], [ 'uid', 'gid', 'muid', 'ctime', 'mtime' ] ):
+                        // FROM RPC SIDE WE DON'T UPDATE THE UID, GID, MUID, CTIME, MTIME, MODE OF THE OBJECT
+                        case in_array( $prop['name'], [ 'uid', 'gid', 'muid', 'ctime', 'mtime', 'mode' ] ):
                             break;
                         
                         case strpos( $prop['name'], '.' ) === FALSE:
@@ -457,10 +490,11 @@
             $props[ 'uid' ]         = $this->_uid;
             $props[ 'gid' ]         = $this->_gid;
             $props[ 'muid' ]        = $this->_muid;
-            
-            $props[ 'name' ]        = $this->_name;
             $props[ 'ctime' ]       = $this->_ctime;
             $props[ 'mtime' ]       = $this->_mtime;
+            $props[ 'mode' ]        = $this->_mode;
+            
+            $props[ 'name' ]        = $this->_name;
             $props[ 'description' ] = $this->_description;
             $props[ 'icon' ]        = $this->_icon;
             $props[ 'keywords' ]    = $this->_keywords;
@@ -481,15 +515,15 @@
             $props[ 'id' ]          = $this->_id;
             $props[ 'parent']       = $this->_parent === NULL ? NULL : $this->_parent->id;
             $props[ 'type' ]        = $this->type;
+            $props[ 'name' ]        = $this->_name;
             
             $props[ 'uid' ]         = $this->_uid;
             $props[ 'gid' ]         = $this->_gid;
             $props[ 'muid' ]        = $this->_muid;
-            
-            $props[ 'name' ]        = $this->_name;
-            
             $props[ 'ctime' ]       = $this->_ctime;
             $props[ 'mtime' ]       = $this->_mtime;
+            $props[ 'mode' ]        = $this->_mode;
+            
             $props[ 'description' ] = $this->_description;
             $props[ 'icon' ]        = $this->_icon;
             $props[ 'keywords' ]    = $this->_keywords;
@@ -516,7 +550,10 @@
                    + ( $this->isContainer() ? self::F_CONTAINER : 0 )
                    + ( $this->_unlinked     ? self::F_UNLINKED : 0 )
                    + ( $this->_changed      ? self::F_UNSTABLE : 0 )
-                   + ( $this->isLive()      ? self::F_LIVE : 0 );
+                   + ( $this->isLive()      ? self::F_LIVE : 0 )
+                   + ( $this->isReadable()  ? self::F_READABLE : 0 )
+                   + ( $this->isWritable()  ? self::F_WRITABLE : 0 )
+                   + ( $this->isExecutable()? self::F_EXECUTABLE : 0 );
         }
         
     }
@@ -613,6 +650,12 @@
             return $this->_muid;
         }
     ] );
+    
+    OneDB_Object::prototype()->defineProperty( 'mode', [
+        "get" => function() {
+            return $this->_mode;
+        }
+    ]);
     
     OneDB_Object::prototype()->defineProperty( 'data', [
         

@@ -25,6 +25,20 @@
             // The root object is not loadable
         }
         
+        
+        
+        public function isReadable() {
+            return $this->_server->sys->canRead( $this->uid, $this->gid, $this->mode, $this->_server->user );
+        }
+
+        public function isWritable() {
+            return $this->_server->sys->canWrite( $this->uid, $this->gid, $this->mode, $this->_server->user );
+        }
+
+        public function isExecutable() {
+            return FALSE;
+        }
+        
         protected function getChildNodes() {
             
             /* Fetch childs... */
@@ -136,6 +150,12 @@
     OneDB_Object_Root::prototype()->defineProperty( 'mtime', [
         "get" => function() {
             return 0;
+        }
+    ]);
+    
+    OneDB_Object_Root::prototype()->defineProperty( 'mode', [
+        "get" => function() {
+            return 484; // 'rwxr--r--'
         }
     ]);
     

@@ -79,6 +79,12 @@ function OneDB_Object_Root( server ) {
             }
         });
         
+        Object.defineProperty( this, 'mode', {
+            "get": function() {
+                return 484; // rwxr--r--
+            }
+        });
+        
         Object.defineProperty( this, "description", {
             "get": function() {
                 return 'This is the uppermost node in the database tree';

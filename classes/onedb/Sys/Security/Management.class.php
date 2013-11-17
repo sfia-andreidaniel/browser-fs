@@ -10,6 +10,13 @@
         const SHADOW_EXPIRE = 3; // After 30 seconds do a shadow resync with the database
         const FORMAT        = '/[a-z\d]+((\.[a-z\d]+)+)?$/'; // username or groupname format
         
+        const UID_ONEDB     = 0;
+        const UID_ROOT      = 1;
+        const UID_ANONYMOUS = 2;
+        
+        const GID_ROOT      = 3;
+        const GID_ANONYMOUS = 4;
+        
         private $_users  = [];
         private $_groups = [];
         
@@ -101,6 +108,9 @@
             
             try {
                 
+                if ( $entityId === NULL )
+                    return [];
+                
                 if ( !is_string( $entityType ) || !in_array( $entityType, [ 'user', 'group' ] ) )
                     throw Object( 'Exception.Security', 'getmembers: @param entityType must be string enum ("user", "group")');
                 
@@ -131,6 +141,136 @@
                 
                 throw Object( 'Exception.Security', 'failed to get members' );
                 
+            }
+            
+        }
+        
+        public function canRead( $uid, $gid, $mode, $user ) {
+            
+            $userID   = $user->id;
+
+            $userGIDS = $this->getMembers( 'user', $userID );
+
+            $flags    = $user->flags;
+            
+            // is superuser?
+            $super = $userID == self::UID_ONEDB || $userID == self::UID_ROOT || ( $flags & Umask::AC_SUPERUSER ) || in_array( self::GID_ROOT, $userGIDS );
+            
+            // superuser accounts can read everything
+            if ( $super ) return TRUE;
+            
+            // is anonymous?
+            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_ANONYMOUS ) || in_array( self::GID_ANONYMOUS, $userGIDS );
+            
+            // anonymous accounts can read only what they created
+            if ( $anon ) return ( $uid == $userID && ( $mode & Umask::UR ) ) ? TRUE : FALSE;
+            
+            // compute who wrote the file: owner, group, or others
+            $who = ( $uid == $userID )
+                ? 1 // owner
+                : (
+                    in_array( $gid, $userGIDS )
+                        ? 2 // group
+                        : 3 // others
+                );
+            
+            switch ( $who ) {
+                
+                case 1: // file has been created by owner
+                    return ( $mode & Umask::UR ) ? TRUE : FALSE;
+                    break;
+                
+                case 2: // file has been created by a person from the group of the owner
+                    return ( $mode & Umask::GR ) ? TRUE : FALSE;
+                    break;
+                
+                default: // file has been created by someone else
+                    return ( $mode & Umask::AR ) ? TRUE : FALSE;
+                    break;
+            }
+        }
+        
+        public function canWrite( $uid, $gid, $mode, $user ) {
+            $userID   = $user->id;
+            $userGIDS = $this->getMembers( 'user', $userID );
+            $flags    = $user->flags;
+            
+            // is superuser?
+            $super = $userID == self::UID_ONEDB || $userID == self::UID_ROOT || ( $flags & Umask::AC_SUPERUSER ) || in_array( self::GID_ROOT, $userGIDS );
+            
+            // superuser accounts can write allover the places
+            if ( $super ) return TRUE;
+            
+            // is anonymous?
+            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_ANONYMOUS ) || in_array( self::GID_ANONYMOUS, $userGIDS );
+            
+            // anonymous accounts can write only what they created
+            if ( $anon ) return ( $uid == $userID && ( $mode & Umask::UW ) ) ? TRUE : FALSE;
+            
+            // compute who wrote the file: owner, group, or others
+            $who = ( $uid == $userID )
+                ? 1 // owner
+                : (
+                    in_array( $gid, $userGIDS )
+                        ? 2 // group
+                        : 3 // others
+                );
+            
+            switch ( $who ) {
+                
+                case 1: // file has been created by owner
+                    return ( $mode & Umask::UW ) ? TRUE : FALSE;
+                    break;
+                
+                case 2: // file has been created by a person from the group of the owner
+                    return ( $mode & Umask::GW ) ? TRUE : FALSE;
+                    break;
+                
+                default: // file has been created by someone else
+                    return ( $mode & Umask::AW ) ? TRUE : FALSE;
+                    break;
+            }
+        }
+        
+        public function canExecute( $uid, $gid, $mode, $user ) {
+            $userID   = $user->id;
+            $userGIDS = $this->getMembers( 'user', $userID );
+            $flags    = $user->flags;
+            
+            // is superuser?
+            $super = $userID == self::UID_ONEDB || $userID == self::UID_ROOT || ( $flags & Umask::AC_SUPERUSER ) || in_array( self::GID_ROOT, $userGIDS );
+            
+            // superuser accounts can execute EVERYTHING
+            if ( $super ) return TRUE;
+            
+            // is anonymous?
+            $anon  = $userID == self::UID_ANONYMOUS || ( $flags & Umask::AC_ANONYMOUS ) || in_array( self::GID_ANONYMOUS, $userGIDS );
+            
+            // anonymous accounts can NEVER execute something
+            if ( $anon ) return ( $uid == $userID && ( $mode & Umask::UW ) ) ? TRUE : FALSE;
+            
+            // compute who wrote the file: owner, group, or others
+            $who = ( $uid == $userID )
+                ? 1 // owner
+                : (
+                    in_array( $gid, $userGIDS )
+                        ? 2 // group
+                        : 3 // others
+                );
+            
+            switch ( $who ) {
+                
+                case 1: // file has been created by owner
+                    return ( $mode & Umask::UX ) ? TRUE : FALSE;
+                    break;
+                
+                case 2: // file has been created by a person from the group of the owner
+                    return ( $mode & Umask::GX ) ? TRUE : FALSE;
+                    break;
+                
+                default: // file has been created by someone else
+                    return ( $mode & Umask::AX ) ? TRUE : FALSE;
+                    break;
             }
             
         }

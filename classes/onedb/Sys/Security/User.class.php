@@ -26,7 +26,7 @@
         protected $_name         = NULL;     // USER NAME
         protected $_umask        = 0;        // DEFAULT USER WRITE MASK
         protected $_flags        = 0;        // ADDITIONAL USER FLAGS. NOT USED AT THIS POINT
-        protected $_members      = NULL;     // USER MEMBERS ID LIST
+        protected $_members      = NULL;     // USER MEMBERS OBJECTS LIST
 
         protected $_sh_key       = '';       // SHADOW KEY, GENERATED WHEN LOGIN IS DONE VIA THE MONGO DATABASE.
         protected $_sh_challenge = '';    // SHADOW KEY CHALLENGE
@@ -255,7 +255,8 @@
                 $this->_id       = 0;
                 $this->_name     = 'onedb';
                 $this->_umask    = 0;
-                $this->_flags    = 0;
+                $this->_flags    = Umask::AC_SUPERUSER;
+                $this->_members  = [];
                 
                 if ( $password != md5( self::getOneDBPassword() ) )
                     throw Object( 'Exception.Security', 'failed to login as onedb: bad password', 13 );
@@ -312,7 +313,7 @@
             } else return $this->_members;
         }
     ] );
-
+    
     Sys_Security_User::prototype()->defineProperty( 'uid', [
         'get' => function() {
             return $this->_id;
