@@ -140,7 +140,12 @@ begin
         exit(false);
     end;
     
-    cmdline := which( 'php' ) + ' ' + escapeshellarg( testfile ) + ' ' + escapeshellarg( '-ENV=site:' + term_get_env( 'site' ) ) + ' ' + escapeshellarg('-ENV=path:' + term_get_env('path') );
+    cmdline := which( 'php' ) + ' ' 
+        + escapeshellarg( testfile ) + ' ' 
+        + escapeshellarg( '-ENV=site:' + term_get_env( 'site' ) ) + ' ' 
+        + escapeshellarg( '-ENV=path:' + term_get_env('path') ) + ' ' 
+        + escapeshellarg( '-ENV=user:' + term_get_env( 'user' ) ) + ' '
+        + escapeshellarg( '-ENV=password:' + term_get_env( 'password' ) );
     
     len := args.count;
     

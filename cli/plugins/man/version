@@ -1,0 +1,11 @@
+<white>synopsys:</>
+    the command <green>version</> is used to display the version of the 
+    software (onedb, and onedb console client).
+
+<white>usage: </><green>version</>
+
+<white>arguments:</>
+    this command has no arguments.
+
+<white>examples:</>
+    <green>version</>

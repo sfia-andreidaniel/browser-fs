@@ -5,83 +5,13 @@
 
     require_once __DIR__ . '/bootstrap.php';
     
-    require_once __DIR__ . '/classes/onedb/Sys/Security/User.class.php';
-    require_once __DIR__ . '/classes/onedb/Sys/Security/Group.class.php';
-    require_once __DIR__ . '/classes/onedb/Sys/Security/Management.class.php';
-    
     try {
     
-        //$connection = Object('OneDB')->connect( 'loopback', 'andrei', 'new password' );
+        $path = Object( 'Utils.Parsers.Path' );
         
-        //echo $connection->__mux(), "\n";
+        var_dump( $path->isAbsolute( '/mar' ) );
         
-        // echo $connection->get_shadow_collection(), "\n";
-    
-        //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
-        
-        //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
-        
-        //echo $connection->sys->user( 'root' ), "\n";
-        
-        //Sys_Security_Management::userdel( 'loopback', 'test' );
-    
-        //$members = $connection->sys->getMembers( 'user', 7 );
-        
-        //assert( 'is_array( $members )' );
-        
-        //echo count( $members ), " members\n";
-        //print_r( $members );
-        
-        /*
-        Sys_Security_Management::useradd( 'loopback', 'root', 'root' );
-        Sys_Security_Management::useradd( 'loopback', 'anonymous', 'anonymous' );
-        
-        Sys_Security_Management::groupadd( 'loopback', 'root' );
-        Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
-        */
-
-        Sys_Security_Management::usermod( 'loopback', 'root', [
-            
-            'groups' => [
-                ':root'
-            ]
-            
-        ] );
-        
-        Sys_Security_Management::usermod( 'loopback', 'anonymous', [
-            
-            'groups' => [
-                ':anonymous'
-            ]
-            
-        ] );
-        
-        /*
-        Sys_Security_Management::groupmod( 'loopback', 'root', [
-            
-            'users' => [
-                ':root'
-            ],
-            'flags' => 512
-            
-        ] );
-        */
-        
-        // echo "the gid of the user $connection->user is ", $connection->user->gid, "\n";
-        
-        // foreach ( $connection->user->groups as $member ) {
-        //     echo implode( ', ', $member->users ), "\n";
-        // };
-        
-        //print_r( $connection->user->groups );
-    
-        //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
-        
-        // Sys_Security_Management::useradd( 'loopback', 'andrei', 'test' );
-        /* Sys_Security_Management::usermod( 'loopback', 'andrei', [
-            'groups' => [ 'root' ]
-        ] );*/
-        
+        var_dump( $path->append( '/foo/bar/.././car/../bar/', '/mar' ) );
         
     
     } catch ( Exception $e ) {

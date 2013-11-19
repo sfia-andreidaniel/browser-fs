@@ -14,12 +14,18 @@
     try {
         
         if ( count( $argv ) > 1 ) {
+
             $client = Object( 'OneDB' )->connect( $argv[1], 'onedb', onedbpass() );
             term_set_env( 'site', $argv[1] );
             term_set_env( 'path', '/' );
+            term_set_env( 'user', 'onedb' );
+            term_set_env( 'password', '' );
+            
         } else {
             term_set_env( 'site', '' );
             term_set_env( 'path', '' );
+            term_set_env( 'user', '' );
+            term_set_env( 'password', '' );
         }
     
     } catch ( Exception $e ) {

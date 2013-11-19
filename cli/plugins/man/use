@@ -1,0 +1,17 @@
+<white>synopsys:</>
+    the command <green>use</> is used to change current website.
+
+<white>usage: </><green>use</> <yellow>$website</>
+
+<white>arguments:</>
+    <yellow>$website</> - the website name.
+
+<white>examples:</>
+    <green>use</> <yellow>example.com</>
+
+<white>notes:</>
+    after changing the current website, some commands will be available 
+    for you, like: <green>su</>, <green>useradd</>, etc.
+    
+    these commands require a "website context" in order to function 
+    properly.

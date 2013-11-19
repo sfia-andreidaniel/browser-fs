@@ -1,0 +1,37 @@
+<white>synopsys:</>
+    the command <green>show</> is used to display informations about 
+    usernames, groups, and configured websites.
+
+<white>usage: </>
+    <green>show</> <yellow>users</>
+    or
+    <green>show</> <yellow>groups</>
+    or
+    <green>show</> <yellow>websites</>
+    
+<white>arguments:</>
+    <yellow>users</>  - display the list of available users <red>in the 
+            current website context</>.
+            
+            <red>!</> <cyan>by using this argument, it is assumed that you 
+            allready </><green>use</><cyan>d a website before.</>
+            
+    <yellow>groups</> - display the list of available groups <red>in the 
+            current website context</>.
+            
+            <red>!</> <cyan>by using this argument, it is assumed that you 
+            allready </><green>use</><cyan>d a website before.</>
+            
+    <yellow>websites</> - displays the list of configured onedb 
+            websites.
+            
+            this argument does not require a website context to run.
+
+<white>examples:</>
+    <green>show</> <yellow>users</>
+    <green>show</> <yellow>groups</>
+    <green>show</> <yellow>websites</>
+
+<white>notes:</>
+    this command supports only one argument. <red>you cannot</> issue a 
+    <green>show</> <yellow>users</> <yellow>websites</>.

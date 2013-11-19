@@ -33,7 +33,20 @@
         }
         
         $args = array_values( $args );
+
+        if ( isset( $_ENV_['site'] ) ) {
+        
+            if ( isset( $_ENV_['user'] ) && ( $_ENV_['user'] == 'onedb' || $_ENV_['user'] == '' ) ) {
+                
+                $_ENV_['user'] = 'onedb';
+                $_ENV_['password'] = file_get_contents( __DIR__ . '/../../../etc/onedb.shadow.gen' );
+                
+            }
+            
+        }
+
     }
+    
     
     function term_get_env( $varname ) {
         
@@ -76,5 +89,64 @@
         echo "\n\n";
         
     } );
+    
+    function term_manual( $command, $abort = TRUE ) {
+        
+        if ( file_exists( __DIR__ . '/../man/' . $command ) ) {
+            $buffer = @file_get_contents( __DIR__ . '/../man/' . $command );
+        }
+        
+        if ( empty( $buffer ) )
+            $buffer = '<red>MAN:</> manual page for command <green>' . $command . '</> was not found';
+        
+        $color   = [];
+        $colst   = 0;
+        $buffers = [];
+        
+        $term = Object( 'Utils.Terminal' );
+        
+        for ( $i=0, $len = strlen( $buffer ); $i<$len; $i++ ) {
+            
+            switch ( TRUE ) {
+                
+                case ( $buffer[$i] != '<' ):
+                    if ( $colst == 0 ) {
+                        echo $buffer[$i];
+                    } else {
+                        $buffers[ $colst - 1 ] .= $buffer[$i];
+                    }
+                    break;
+                
+                case $buffer[$i] == '<':
+                
+                    switch ( TRUE ) {
+                
+                        case preg_match( '/^\<([a-z_]+?)\>/', substr( $buffer, $i, 30 ), $matches ) ? TRUE : FALSE:
+                            $color[ $colst ] = $matches[1];
+                            $buffers[ $colst ] = '';
+                            $colst++;
+                            $i += ( strlen( $matches[0] ) - 1 );
+                            break;
+                        case ( $colst > 0 && preg_match( '/^\<\/\>/', substr( $buffer, $i, 10 ), $matches ) ) ? TRUE : FALSE:
+                            echo $term->color( $buffers[ $colst - 1 ], $color[ $colst - 1 ] );
+                            $colst--;
+                            $i += ( strlen( $matches[0] ) - 1 );
+                            break;
+                        default:
+                            if ( $colst > 0 )
+                                $buffers[ $colst - 1 ] .= $buffer[$i];
+                            else
+                                echo $buffer[$i];
+                            break;
+                    }
+                    
+                    break;
+            }
+            
+        }
+        
+        if ( $abort )
+            die(1);
+    }
     
 ?>

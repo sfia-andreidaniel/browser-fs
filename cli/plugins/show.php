@@ -39,7 +39,7 @@
                 die(1);
             }
 
-            $cmd         = 'users';
+            $cmd = 'users';
             
             break;
 
@@ -51,13 +51,13 @@
                 die(1);
             }
             
-            $cmd         = 'groups';
+            $cmd = 'groups';
             
             break;
         
         case $arglen == 2 && $argv[ 1 ] == 'websites':
             
-            $cmd         = 'websites';
+            $cmd = 'websites';
             
             break;
         
@@ -85,17 +85,24 @@
                 
                 $users = $client->sys->users;
                 
-                echo "\rusername         uid   umask          flags\r";
-                echo "-------------------------------------------\r";
+                $longestName = 0;
+                $longestUid  = 0;
+                
+                foreach ( $users as $user ) {
+                    if ( ( $len = strlen( $user->name ) ) > $longestName )
+                        $longestName = $len;
+                    if ( ( $len = strlen( $user->uid . '' ) ) > $longestUid )
+                        $longestUid = $len;
+                }
+                
+                echo ( $len = count( $users ) ), " user" . ( $len != 1 ? 's' : '' ), ". showing: uid, umask, flags, name, groups\r";
                 
                 foreach ( $users as $user ) {
                     
-                    echo $term->color( str_pad( $user->name, 16 ), 'cyan' ),
-                         ' ',
-                         str_pad( $user->uid, 5 ),
-                         ' ',
+                    echo str_pad( $user->uid, $longestUid ),
+                         '  ',
                          Umask::mode_to_str( $user->umask ),
-                         '     ',
+                         '  ',
                          (
                             implode('', [
                                 $user->flags & Umask::AC_NOBODY ? 'n' : '-',
@@ -103,7 +110,7 @@
                                 $user->flags & Umask::AC_REGULAR ? 'r' : '-'
                             ] )
                             
-                        ), "\r";
+                        ), '  ', $term->color( str_pad( $user->name, $longestName ), 'cyan' ), " => ";
                     
                     $groups = $user->groups;
                     
@@ -115,11 +122,10 @@
                             $groupnames[] = $term->color( $group->name, 'light_blue' );
                         }
                         
-                        echo $term->color( "member of: ", 'light_gray' ),
-                             implode( ', ', $groupnames ), "\r";
+                        echo implode( ', ', $groupnames );
                         
                     } else {
-                        echo $term->color( "member of no groups", 'light_gray' ), "\r";
+                        echo $term->color( "no groups", 'light_gray' );
                     }
                     
                     echo "\r";
@@ -134,20 +140,31 @@
                 
                 $groups = $client->sys->groups;
                 
-                echo "\rgroup            gid   flags\r";
-                echo "----------------------------\r";
+                echo ( $len = count( $groups ) ), " group", ( $len != 1 ? 's' : '' ), ". showing: gid, flags, name, users\r";
+                
+                $longestGroupName = 0;
+                $longestGid       = 0;
+                
+                foreach ( $groups as $group ) {
+                    if ( ( $len = strlen( $group->name ) ) > $longestGroupName )
+                        $longestGroupName = $len;
+                    
+                    if ( ( $len = strlen( $group->gid . '' ) ) > $longestGid )
+                        $longestGid = $len;
+                }
                 
                 foreach ( $groups as $group ) {
                     
-                    echo $term->color( str_pad( $group->name, 16 ), 'cyan' ),
-                         ' ',
-                         str_pad( $group->gid, 5 ),
-                         ' ',
+                    echo str_pad( $group->gid, $longestGid ),
+                         '  ',
                          implode('', [
                             $group->flags & Umask::AC_NOBODY ? 'n' : '-',
                             $group->flags & Umask::AC_SUPERUSER ? 's' : '-',
                             $group->flags & Umask::AC_REGULAR ? 'r' : '-'
-                         ]), "\r";
+                         ]),
+                         '  ',
+                         $term->color( str_pad( $group->name, $longestGroupName ), 'cyan' ),
+                         ' => ';
                     
                     $users = $group->users;
                 
@@ -159,11 +176,10 @@
                             $usernames[] = $term->color( $user->name, 'light_blue' );
                         }
                         
-                        echo $term->color( "has users: ", 'light_gray' ),
-                             implode( ', ', $usernames ), "\r";
+                        echo implode( ', ', $usernames );
                             
                     } else {
-                        echo $term->color( "has no users", 'light_gray' ), "\r";
+                        echo $term->color( "no users", 'light_gray' );
                     }
                     
                     echo "\r";
@@ -179,8 +195,7 @@
                 
                 $websites = $client->websites;
                 
-                echo "\rwebsite name\r";
-                echo "------------\r";
+                echo count( $websites ), " website" . ( count( $websites ) == 1 ? '' : 's' ) . "\r";
                 
                 foreach ( $websites as $website ) {
                     

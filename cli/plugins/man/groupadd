@@ -1,0 +1,18 @@
+<white>synopsys:</>
+    the command <green>groupadd</> is used to create a new group in the
+    current website.
+
+<white>usage: </><green>groupadd</> <yellow>$groupname</>
+
+<white>important:</>
+    <red>!</> this command will work only in a website context. for 
+    choosing a website context, see the <green>use</> command.
+
+<white>arguments:</>
+    <yellow>$groupname</> - the name of the group. it is recommended to 
+         use only lowercase letters, as the group names are case 
+         sensitive.
+
+<white>examples:</>
+    <green>groupadd</> <yellow>users</>
+        will add a group <yellow>users</> in the current website.

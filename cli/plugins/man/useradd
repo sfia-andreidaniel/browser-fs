@@ -1,0 +1,21 @@
+<white>synopsys:</>
+    the command <green>useradd</> is used to create a new user in the 
+    current website.
+
+<white>usage: </><green>useradd</> <yellow>$username</> <brown>$password</>
+
+<white>important:</>
+    <red>!</> this command will work only in a website context. for 
+    choosing a website context, see the <green>use</> command.
+    <red>!</> all arguments of this command are mandatory!
+
+<white>arguments:</>
+    <yellow>$username</> - the name of the user. it is recommended to 
+         use only lowercase letters, as the usernames are case 
+         sensitive.
+    
+    <brown>$password</> - a password for the newly created account.
+
+<white>examples:</>
+    <green>useradd</> <yellow>joe</> <brown>secret</>
+        will add a user <yellow>joe</> with a password <brown>secret</>.

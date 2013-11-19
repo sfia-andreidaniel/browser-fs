@@ -1,0 +1,10 @@
+<white>synopsys:</>
+    the command <green>clear</> is used to clear the terminal screen.
+
+<white>usage: </><green>clear</>
+
+<white>arguments:</>
+    this command has no arguments.
+
+<white>examples:</>
+    <green>clear</>

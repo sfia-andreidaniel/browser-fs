@@ -1,0 +1,57 @@
+<white>synopsys:</>
+    the command <green>usermod</> is used to modify settings of a user 
+    account.
+
+<white>usage: </><green>usermod</> <yellow>$username</> \
+               <brown>[ -p $newpassword ]</> \
+               <cyan>[ [ [ -g | +g | :g ] $groupname ] ... [ [ -g | +g | :g ] $groupname ] ]</> \
+               <light_red>[ -umask $umask ]</>
+               <purple>[ [ [ -f | +f ] $flag ] ... [ [ -f | +f ] $flag ] ] </>
+
+<white>important:</>
+    <red>!</> the <green>usermod</> command runs only in a website 
+      context. for more information see command <green>use</>.
+
+<white>arguments:</>
+    <yellow>$username</>       - the name of the user you want to modify
+    
+    <brown>-p $newpassword</> - modify the user password. optional.
+
+    <cyan>-g $groupname</>   - revoke user membership from group <cyan>$groupname</>
+    <cyan>+g $groupname</>   - grants user membership in group <cyan>$groupname</>
+    <cyan>:g $groupname</>   - grants user membership in group <cyan>$groupname</> 
+                      and makes <cyan>$groupname</> the default group of the <yellow>$user</>
+    
+    <light_red>-umask $umask</>   - sets user umask. the umask is the writing mode 
+                      that is implied when creating objects (categories / 
+                      directories, items / files ) in the onedb filesystem.
+                      
+                      the <light_red>$umask</> can be represented either via an octal value, 
+                      like in traditional unix systems (e.g. 700, 755 ), either
+                      in a human readable value, like "rwxrw-r--"
+    
+    <purple>-f $flag</>        - add flag <purple>$flag</> to the account flags list
+    <purple>+f $flag</>        - remove flag <purple>$flag</> from the account flags list
+                      
+                      the <purple>$flag</> can be:
+                          <purple>s</> - the <purple>s</>uper user account flag
+                          <purple>a</> - the <purple>a</>nonymous user account flag
+                          <purple>r</> - the "<purple>r</>egular" user account flag
+
+<white>example:</>
+    <green>usermod</> <yellow>joe</> <brown>-p secret</> <cyan>-g editors</> <cyan>+g marketing</> <cyan>:g gods</> <light_red>-umask 700</> <purple>-f r</> <purple>+f s</>
+    
+    the above command will:
+        - execute for the user <yellow>joe</>
+        - set <yellow>joe</> password to <brown>secret</>
+        - revoke membership of <yellow>joe</> from group <cyan>editors</>
+        - make user <yellow>joe</> a member of a new group, <cyan>marketing</>
+        - make user <yellow>joe</> a member of a new group, <cyan>gods</>, and
+          also set this group (<cyan>gods</>) as <yellow>joe</>'s default user group.
+        - make <light_red>all files</> created by <yellow>joe</> <red>from now on</>, to be <light_red>readable, writable, 
+          and executable</> only by itself ( <red>exception would be all users which are
+          root accounts, the special onedb account, and all users that have the
+          flag "s"</> ).
+        - make joe to be happy that is not a <purple>regular</> user anoymore, and from now on 
+          is a <purple>superuser</> :)
+        

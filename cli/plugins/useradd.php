@@ -13,13 +13,17 @@
             "useradd syntax:",
             '    ' . $term->color( 'useradd', 'green' ) . ' ' . $term->color( '<username>', 'yellow' ) . ' ' . $term->color( '<password>', 'cyan' ),
             '',
-            'note that the command works in a website context (use <website> first).',
+            'important: ',
+            '    note that the command works in a website context (use <website> first).',
+            '',
+            'arguments:',
             '    ' . $term->color( '<username>', 'yellow' ) . ' argument should contain only letters, numbers, and dot(s)',
             '    ' . $term->color( '<password>', 'cyan'   ) . ' argument represents the user password',
             '',
             'see also:',
             '    ' . $term->color( 'usermod', 'green' ),
             '    ' . $term->color( 'userdel', 'green' ),
+            '    ' . $term->color( 'show users', 'green' ),
             '',
             ''
         ] );

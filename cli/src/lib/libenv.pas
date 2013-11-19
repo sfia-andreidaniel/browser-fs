@@ -11,8 +11,10 @@ procedure term_dump_process_output( var lines: TStringList );
 
 implementation
 
-var site: string = '';
-    path: string = '';
+var site     : string = '';
+    path     : string = '';
+    user     : string = '';
+    password : string = '';
 
 function term_set_env( name: string; value: string ): boolean;
 begin
@@ -25,12 +27,23 @@ begin
             term_set_env := true;
         end;
     
+    if name = 'user' then
+        begin
+            user := value;
+            term_set_env := true;
+        end;
+    
     if name = 'path' then
         begin
             path := value;
             term_set_env := true;
         end;
     
+    if name = 'password' then
+        begin
+            password := value;
+            term_set_env := true;
+        end;
 end;
 
 function term_get_env( name: string ): string;
@@ -41,11 +54,25 @@ begin
     if name = 'site' then
     begin
         term_get_env := site;
-    end;
+    end
+    else begin
+        if name = 'path' then
+        begin
+            term_get_env := path;
+        end
+        else begin
     
-    if name = 'path' then
-    begin
-        term_get_env := path;
+            if name = 'user' then
+            begin
+                term_get_env := user;
+            end else
+            begin
+                if name = 'password' then
+                begin
+                    term_get_env := password;
+                end;
+            end;
+        end;
     end;
     
 end;
@@ -74,7 +101,7 @@ var total_lines  : integer = 0;
     i            : integer = 0;
     j            : integer = 0;
     headers      : boolean = true;
-    prev_empty   : boolean = false;
+    //prev_empty   : boolean = false;
     env_var      : string  = '';
 begin
 
@@ -100,6 +127,20 @@ begin
         end;
         
         j := j + 1;
+    end;
+    
+    if ( headers = false ) and ( output_lines > 0 ) then
+    begin
+        
+        // decrement output lines while they're empty at the end
+        repeat
+        
+            if lines[ output_lines - 1 ] = '' then
+                output_lines -= 1;
+        
+        until ( output_lines = 0 ) or ( lines[ output_lines - 1 ] <> '' );
+        
+        
     end;
     
     for i := 0 to output_lines - 1 do

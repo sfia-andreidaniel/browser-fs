@@ -74,7 +74,7 @@
         // the representation of this user in string format is the name of the user
         // converted to string
         public function __toString() {
-            return $this->_client->websiteName . '/' . $this->_name;
+            return $this->_name;
         }
         
         // is the user member of the group with the id $gid?

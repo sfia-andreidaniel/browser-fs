@@ -7,8 +7,6 @@
     
     $term = Object( 'Utils.Terminal' );
     
-    echo  "\n";
-    
     $out = [
         [
             'command' => 'help',
@@ -57,10 +55,30 @@
         [
             'command' => 'prepare',
             'description' => "prepares something"
+        ],
+        [
+            'command' => 'su',
+            'description' => "switch current working user"
+        ],
+        [
+            'command' => 'cd',
+            'description' => "changes current working directory"
+        ],
+        [
+            'command' => 'mkdir',
+            'description' => "creates a directory"
+        ],
+        [
+            'command' => 'rm',
+            'description' => "removes a directory or a item"
+        ],
+        [
+            'command' => 'man',
+            'description' => "display a man page about a command"
         ]
     ];
     
     foreach ( $out as $command )
-        echo '  ', $term->color( str_pad( $command[ 'command' ], 14 ), 'green' ), ' ', $command[ 'description' ], "\n\n";
+        echo '  ', $term->color( str_pad( $command[ 'command' ], 14 ), 'green' ), ' ', $command[ 'description' ], "\r";
     
 ?>

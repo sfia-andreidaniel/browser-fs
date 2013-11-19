@@ -35,7 +35,7 @@ begin
                         on_left();
                     end;
                     
-                    // else
+                    //else
                     //    writeln( 'key: ', ord( ch ), #13 );
                     
                 end;

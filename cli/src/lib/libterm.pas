@@ -22,7 +22,7 @@ procedure die();
 
 implementation
 
-uses crt, libhistory, libosutils, liberror, libenv;
+uses crt, libhistory, libosutils, liberror, libenv, libpassword;
 
 var command  : string  = '';
     wr_index : integer = 0;
@@ -57,36 +57,47 @@ end;
 procedure term_update();
 var site: string = '';
     path: string = '';
+    user: string = '';
     incr: integer = 0;
 begin
 
     site := term_get_env( 'site' );
     path := term_get_env( 'path' );
+    user := term_get_env( 'user' );
 
     gotoxy( 1, wherey() );
     clreol();
     
+    if ( user <> '' ) and ( user <> 'onedb' ) then begin
+        textcolor( yellow );
+        write( user );
+        textcolor( green );
+        write( '@' );
+        incr += ( length( user ) + 1 );
+    end;
+    
     if site <> '' then begin
         textcolor( magenta );
         write( site, ' ' );
-        incr += 1;
+        incr += ( length( site ) + 1 );
     end;
     
     if ( path <> '' ) then begin
         textcolor( cyan );
         write( path, ' ' );
-        incr += 1;
+        incr += ( length( path ) + 1 );
     end;
     
     if ( cursor <> '' ) then begin
         textcolor( blue );
         write( cursor );
+        incr += length( cursor );
     end;
     
     textcolor( lightgray );
     write( command );
     
-    gotoxy( wr_index + length( site ) + length( path ) + length( cursor ) + 1 + incr, wherey() );
+    gotoxy( wr_index + incr + 1, wherey() );
 end;
 
 procedure on_autocomplete;
@@ -150,9 +161,10 @@ end;
 
 procedure on_command();
 
-var tcommand: string = '';
-    args    : TStringList;
-    handled : boolean = false;
+var tcommand   : string = '';      // the terminal command ( unparsed )
+    args       : TStringList;      // the arguments of the parsed command line
+    handled    : boolean = false;  // weather the command has been handled internally
+    supassword : string = '';      // for the "su" command
 
 begin
     wr_index := 0;
@@ -197,7 +209,32 @@ begin
                 term_update();
             end;
             
+        end;
+        
+        2: begin
             
+            // su is a special command where we need to read
+            // the password before running the script
+            if ( args[0] = 'su' ) and ( term_get_env('site') <> '' ) then begin
+                
+                writeln();
+                
+                supassword := read_password();
+                
+                if supassword = '' then
+                begin
+                    textcolor( red );
+                    writeln( 'conversation error' );
+                    textcolor( lightgray );
+                    writeln();
+                    handled := true;
+                end else
+                begin
+                    // add the password as last argument to 'su'
+                    args.add( supassword );
+                end;
+                
+            end;
             
         end;
     end;

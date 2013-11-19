@@ -43,7 +43,7 @@
         
         // converts this object to the string group name representation
         public function __toString() {
-            return $this->_client->websiteName . '/' . $this->_name;
+            return $this->_name;
         }
     }
     
