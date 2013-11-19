@@ -53,6 +53,10 @@
         [
             'command' => 'groupadd',
             'description' => "adds a group to a website"
+        ],
+        [
+            'command' => 'prepare',
+            'description' => "prepares something"
         ]
     ];
     

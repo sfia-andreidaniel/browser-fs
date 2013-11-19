@@ -115,6 +115,15 @@
             return $this->_connection->selectDB( $this->_databaseName )->shadow;
         }
         
+        /* Get an instance to the mongo database of the server. The instance
+           is returned only if the local authenticated user is called root or onedb.
+         */
+        public function get_mongo_database() {
+            if ( $this->_runAs != 'onedb' && $this->_runAs != 'root' )
+                throw Object('Exception.Security', 'access to mongo database is forbidden for user ' . $this->_runAs );
+            return $this->_connection->selectDB( $this->_databaseName );
+        }
+        
         /* Returns an element by it's mongoID.
            @param $elementId.
                 - When null: returns OneDB.Object.Root

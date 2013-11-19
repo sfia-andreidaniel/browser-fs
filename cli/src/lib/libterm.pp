@@ -83,7 +83,7 @@ begin
         write( cursor );
     end;
     
-    textcolor( white );
+    textcolor( lightgray );
     write( command );
     
     gotoxy( wr_index + length( site ) + length( path ) + length( cursor ) + 1 + incr, wherey() );

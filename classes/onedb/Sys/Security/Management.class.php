@@ -31,6 +31,13 @@
                 throw Object( 'Exception.Security', 'Failed to ininitialize security management engine' );
         }
         
+        public function reload() {
+            $this->_users = [];
+            $this->_groups = [];
+            if ( !$this->loadFromDatabase() )
+                throw Object( 'Exception.Security', 'failed to flush settings...' );
+        }
+        
         /* Returns a Sys.Security.Group based on it's id or it's group name */
         public function group( $groupIdOrGroupName ) {
             
@@ -441,6 +448,8 @@
                         'fsync' => TRUE
                     ] );
                 
+                    $client->sys->reload();
+                
                 } catch ( Exception $e ) {
                     
                     if ( $e->getCode() == 11000 )
@@ -518,6 +527,8 @@
                         "fsync" => TRUE
                     ]);
                 
+                    $server->sys->reload();
+                    
                 } catch ( Exception $e ) {
                     
                     if ( $e->getCode() == 11000 )
@@ -575,6 +586,8 @@
                     ]
                 ] );
                 
+                $server->sys->reload();
+                
             } catch ( Exception $e ) {
                 throw Object( 'Exception.Security', 'failed to delete group ' . $groupName . ' on website ' . $websiteName, 20, $e );
             }
@@ -620,6 +633,8 @@
                         'members' => $user->id
                     ]
                 ] );
+                
+                $server->sys->reload();
                 
             } catch ( Exception $e ) {
                 throw Object( 'Exception.Security', 'failed to delete user ' . $userName . ' on website ' . $websiteName, 21, $e );
@@ -847,6 +862,8 @@
                 
                 //print_r( $set );
                 
+                $server->sys->reload();
+                
             } catch ( Exception $e ) {
                 throw Object( 'Exception.Security', 'failed to modify user ' . $userName . ' on website ' . $websiteName, 22, $e );
             }
@@ -1047,6 +1064,8 @@
                         
                     }
                 }
+                
+                $server->sys->reaload();
                 
             } catch ( Exception $e ) {
                 
