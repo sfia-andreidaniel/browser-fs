@@ -1,5 +1,4 @@
 #!/bin/bash
-fpc libhistory.pp
-fpc libterm.pp
-fpc main.pp
-./main
+fpc -B -Filib -FUlib -Ilib -Fulib main.pp
+rm lib/*.o
+rm lib/*.ppu

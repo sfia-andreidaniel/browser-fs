@@ -15,24 +15,16 @@
             while ( $e ) {
                 
                 $stack[] = $pad
-                    . get_class( $e )
+                    . preg_replace( '/^Exception_/', '', get_class( $e ) )
                     . ': '
                     . substr( $e->getMessage(), 0, $maxMessageLength )
-                    . ' [ '
                     . ( $e->getCode() != 0 
-                        ? ( 'code '
+                        ? ( ' ( error code: '
                             . $e->getCode()
-                            . ', '
+                            . ' )'
                         )
                         : ''
-                    )
-                    . 'line #'
-                    . $e->getLine()
-                    . ' in "'
-                    . str_replace( self::$_trimPath, '', $e->getFile() )
-                    . '" ]';
-                
-                $pad .= '  ';
+                    );
                 
                 $e = $e->getPrevious();
                 

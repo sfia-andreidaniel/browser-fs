@@ -17,7 +17,7 @@
         
         // echo $connection->get_shadow_collection(), "\n";
     
-        //Sys_Security_Management::useradd( 'loopback', 'andrei', 'nu stiu' );
+        //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
         
         //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
         
@@ -33,17 +33,28 @@
         //print_r( $members );
         
         /*
-        Sys_Security_Management::usermod( 'loopback', 'andrei', [
+        Sys_Security_Management::useradd( 'loopback', 'root', 'root' );
+        Sys_Security_Management::useradd( 'loopback', 'anonymous', 'anonymous' );
+        
+        Sys_Security_Management::groupadd( 'loopback', 'root' );
+        Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
+        */
+
+        Sys_Security_Management::usermod( 'loopback', 'root', [
             
-            'password' => 'new password',
-            'umask' => 512,
             'groups' => [
-                ':root',
-                'anonymous'
+                ':root'
             ]
             
         ] );
-        */
+        
+        Sys_Security_Management::usermod( 'loopback', 'anonymous', [
+            
+            'groups' => [
+                ':anonymous'
+            ]
+            
+        ] );
         
         /*
         Sys_Security_Management::groupmod( 'loopback', 'root', [
@@ -67,9 +78,11 @@
         //Sys_Security_Management::groupadd( 'loopback', 'anonymous' );
         
         // Sys_Security_Management::useradd( 'loopback', 'andrei', 'test' );
-        Sys_Security_Management::usermod( 'loopback', 'andrei', [
+        /* Sys_Security_Management::usermod( 'loopback', 'andrei', [
             'groups' => [ 'root' ]
-        ] );
+        ] );*/
+        
+        
     
     } catch ( Exception $e ) {
         

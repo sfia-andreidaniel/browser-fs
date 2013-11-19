@@ -18,24 +18,16 @@ procedure on_command();
 function parse_command( command: string ): TStringList;
 procedure term_update();
 
-function get_connection: string;
-
 procedure die();
 
 implementation
 
-uses crt, libhistory, libosutils, liberror;
+uses crt, libhistory, libosutils, liberror, libenv;
 
 var command  : string  = '';
     wr_index : integer = 0;
-    prefix   : string  = '';
     cursor   : string  = '$ ';
     phpbin   : string  = '';
-
-function get_connection: string;
-begin
-    get_connection := prefix;
-end;
 
 procedure die();
 begin
@@ -63,16 +55,38 @@ begin
 end;
 
 procedure term_update();
+var site: string = '';
+    path: string = '';
+    incr: integer = 0;
 begin
+
+    site := term_get_env( 'site' );
+    path := term_get_env( 'path' );
+
     gotoxy( 1, wherey() );
     clreol();
-    textcolor( green );
-    write( prefix );
-    textcolor( blue );
-    write( cursor );
+    
+    if site <> '' then begin
+        textcolor( magenta );
+        write( site, ' ' );
+        incr += 1;
+    end;
+    
+    if ( path <> '' ) then begin
+        textcolor( cyan );
+        write( path, ' ' );
+        incr += 1;
+    end;
+    
+    if ( cursor <> '' ) then begin
+        textcolor( blue );
+        write( cursor );
+    end;
+    
     textcolor( white );
     write( command );
-    gotoxy( wr_index + length( prefix ) + length( cursor ) + 1, wherey() );
+    
+    gotoxy( wr_index + length( site ) + length( path ) + length( cursor ) + 1 + incr, wherey() );
 end;
 
 procedure on_autocomplete;
@@ -184,18 +198,6 @@ begin
             end;
             
             
-            
-        end;
-        2: begin
-            
-            if args[0] = 'use' then begin
-                // use command
-                prefix :=  args[1];
-                handled := true;
-                write( #10 );
-                writeln( #13'* using connection: ', args[1] );
-                term_update();
-            end;
             
         end;
     end;

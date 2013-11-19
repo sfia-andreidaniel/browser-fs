@@ -52,6 +52,12 @@
             return $this->_id;
         }
     ] );
+
+    Sys_Security_Group::prototype()->defineProperty( 'gid', [
+        'get' => function() {
+            return $this->_id;
+        }
+    ] );
     
     Sys_Security_Group::prototype()->defineProperty( 'name', [
         'get' => function() {

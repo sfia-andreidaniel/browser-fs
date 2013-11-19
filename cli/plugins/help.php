@@ -1,4 +1,6 @@
 <?php
+
+    require_once __DIR__ . "/lib/term.php";
     require_once __DIR__ . "/../../bootstrap.php";
     
     $out = [];
@@ -22,12 +24,39 @@
         ],
         [
             'command' => 'use',
-            'description' => "selects a onedb site\r
-              EXAMPLE: use loopback - selects onedb site 'loopback'"
+            'description' => "selects a onedb site"
+        ],
+        [
+            'command' => 'show users',
+            'description' => "shows informations about users"
+        ],
+        [
+            'command' => 'show groups',
+            'description' => "shows informations about groups"
+        ],
+        [
+            'command' => 'show websites',
+            'description' => "shows informations about websites"
+        ],
+        [
+            'command' => 'useradd',
+            'description' => "adds a user in a website"
+        ],
+        [
+            'command' => 'usermod',
+            'description' => "set settings for a user from a website"
+        ],
+        [
+            'command' => 'userdel',
+            'description' => "deletes an user from a website"
+        ],
+        [
+            'command' => 'groupadd',
+            'description' => "adds a group to a website"
         ]
     ];
     
     foreach ( $out as $command )
-        echo '  ', $term->color( str_pad( $command[ 'command' ], 8 ), 'green' ), '    ', $command[ 'description' ], "\n\n";
+        echo '  ', $term->color( str_pad( $command[ 'command' ], 14 ), 'green' ), ' ', $command[ 'description' ], "\n\n";
     
 ?>

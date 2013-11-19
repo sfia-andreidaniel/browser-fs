@@ -364,7 +364,6 @@
             }
         }
         
-        
         public function __mux() {
             return [
                 "root"  => $this->_server->__mux(),
@@ -547,7 +546,7 @@
                 if ( !is_string( $groupName ) || !strlen( $groupName ) )
                     throw Object( 'Exception.Security', 'invalid group name' );
                 
-                if ( in_array( $userName, [ 'root', 'anonymous', 'onedb' ] ) )
+                if ( in_array( $groupName, [ 'root', 'anonymous', 'onedb' ] ) )
                     throw Object( 'Exception.Security', 'this is a built-in group and cannot be deleted' );
 
                 $server = OneDB::connect( $websiteName, 'onedb', static::getOneDBPassword() );
@@ -827,11 +826,11 @@
                             switch ( $batch['op'] ) {
                                 
                                 case 'add':
-                                    $grp[ 'members' ][] = $batch[ '_id' ];
+                                    $grp[ 'members' ][] = $batch[ 'member' ];
                                     break;
                                 
                                 case 'remove':
-                                    if ( ( $key = array_search( $batch[ '_id'], $grp['members'] ) ) !== FALSE )
+                                    if ( ( $key = array_search( $batch[ 'member'], $grp['members'] ) ) !== FALSE )
                                         unset( $grp['members'][ $key ] );
                                     break;
                                 
@@ -1057,5 +1056,27 @@
         }
         
     }
+    
+    Sys_Security_Management::prototype()->defineProperty( 'users', [
+        "get" => function() {
+            $out = [];
+            
+            foreach ( array_keys( $this->_users ) as $id )
+                $out[] = $this->user( (int)$id );
+            
+            return $out;
+        }
+    ] );
+
+    Sys_Security_Management::prototype()->defineProperty( 'groups', [
+        "get" => function() {
+            $out = [];
+            
+            foreach ( array_keys( $this->_groups ) as $id )
+                $out[] = $this->group( (int)$id );
+            
+            return $out;
+        }
+    ] );
 
 ?>

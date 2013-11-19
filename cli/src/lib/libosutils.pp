@@ -12,7 +12,7 @@ function  run_command( args: TStringList ): boolean;
 
 implementation
 
-uses sysutils, dos, strings, strutils, process, libterm;
+uses sysutils, dos, strings, strutils, process, libterm, libenv;
 
 var basedir: string;
 
@@ -140,7 +140,7 @@ begin
         exit(false);
     end;
     
-    cmdline := which( 'php' ) + ' ' + escapeshellarg( testfile  ) + ' ' + escapeshellarg( get_connection() );
+    cmdline := which( 'php' ) + ' ' + escapeshellarg( testfile ) + ' ' + escapeshellarg( '-ENV=site:' + term_get_env( 'site' ) ) + ' ' + escapeshellarg('-ENV=path:' + term_get_env('path') );
     
     len := args.count;
     
@@ -176,10 +176,12 @@ begin
     OutputLines := TStringList.Create;
     OutputLines.LoadFromStream(MemStream);
 
-    for NumBytes := 0 to OutputLines.Count - 1 do
-    begin
-        writeLn(OutputLines[NumBytes]);
-    end;
+    term_dump_process_output( OutputLines );
+
+//    for NumBytes := 0 to OutputLines.Count - 1 do
+//    begin
+//        writeLn(OutputLines[NumBytes]);
+//    end;
 
     OutputLines.Free;
     OurProcess.Free;
