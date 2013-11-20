@@ -15,16 +15,3 @@ ln -s "/etc/php5/mods-available/mongo.ini" "/etc/php5/cli/conf.d/30-mongo.ini"
 ln -s "/etc/php5/mods-available/mongo.ini" "/etc/php5/cgi/conf.d/30-mongo.ini"
 ln -s "/etc/php5/mods-available/mongo.ini" "/etc/php5/apache/conf.d/30-mongo.ini"
 chown www-data:www-data -R etc/shadow
-
-MONGO INDEXES:
-
-db.objects.ensureIndex( { "url": 1 }, { "unique": true } );
-db.objects.ensureIndex( { "name": 1, "parent": 1 }, { "unique": true } );
-db.shadow.ensureIndex ( { "type": 1, "name": 1 },   { "unique": true } );
-
-add user root
-add user anonymous
-add group root
-add group anonymous
-make user root member of group root
-make user anonymous member of group anonymous

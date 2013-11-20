@@ -4,7 +4,7 @@
         
         static public $_trimPath = NULL;
         
-        public function explainException( $exception, $maxMessageLength = 48 ) {
+        public function explainException( $exception, $maxMessageLength = 64 ) {
             
             $stack = [];
             

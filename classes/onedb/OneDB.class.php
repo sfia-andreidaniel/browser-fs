@@ -26,7 +26,7 @@
         
         "get" => function() {
             
-            return Object('Utils.Parsers.OneDBCfg', __DIR__ . '/../../conf/onedb.ini' )->getWebsitesNames();
+            return Object('Utils.Parsers.OneDBCfg', __DIR__ . '/../../etc/onedb/onedb.ini' )->getWebsitesNames();
             
         }
         

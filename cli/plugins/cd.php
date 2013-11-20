@@ -7,25 +7,6 @@
 
     $term = Object( 'Utils.Terminal' );
     
-    function help() {
-        
-        global $term;
-        
-        echo implode( "\r", [
-            'cd syntax:',
-            '    ' . $term->color( 'cd', 'green' ) . ' ' . $term->color( '<path>', 'yellow' ),
-            '',
-            'note that the command works in a website context (use <website> first).',
-            '',
-            'arguments:',
-            '    ' . $term->color( '<path>', 'yellow' ) . ' - relative or absolute path',
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-
     if ( term_get_env( 'site' ) == '' ) {
         echo $term->color( 'this command requires a site context', 'red' ), "\r\r";
         die(1);
@@ -37,7 +18,7 @@
     }
     
     if ( count( $argv ) != 2 )
-        help();
+        term_manual('cd');
     
     try {
         // initialize path parser

@@ -7,8 +7,6 @@
 
     $term = Object( 'Utils.Terminal' );
     
-    term_manual( 'mkdir' );
-
     if ( term_get_env( 'site' ) == '' ) {
         echo $term->color( 'this command requires a site context', 'red' ), "\r\r";
         die(1);
@@ -20,7 +18,7 @@
     }
     
     if ( count( $argv ) != 2 )
-        help();
+        term_manual('mkdir');
     
     try {
 

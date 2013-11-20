@@ -13,22 +13,6 @@
 
     $term = Object( 'Utils.Terminal' );
 
-    function help() {
-        
-        $term = Object( 'Utils.Terminal' );
-        
-        echo implode( "\r", [
-            "show syntax:",
-            "     " . $term->color( 'show ', 'green' ) . $term->color( 'users   ', 'yellow' ) . " - displays info about users in the system",
-            "     " . $term->color( 'show ', 'green' ) . $term->color( 'groups  ', 'yellow' ) . " - displays info about groups in the system",
-            "     " . $term->color( 'show ', 'green' ) . $term->color( 'websites', 'yellow' ) . " - displays the list of available websites",
-            "",
-            ""
-        ] );
-        
-        die(1);
-    }
-
     switch ( TRUE ) {
         
         case $arglen == 2 && $argv[1] == 'users':
@@ -63,7 +47,7 @@
         
         default:
             
-            help();
+            term_manual('show');
             break;
     }
     
