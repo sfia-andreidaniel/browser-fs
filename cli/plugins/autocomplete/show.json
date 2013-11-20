@@ -1,0 +1,11 @@
+[
+    {
+        "index": "1",
+        "type": "strings",
+        "values": [
+            "groups",
+            "users",
+            "websites"
+        ]
+    }
+]

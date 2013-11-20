@@ -1,0 +1,10 @@
+[
+    {
+        "index": "1",
+        "type": "strings",
+        "values": [
+            "database",
+            "environment"
+        ]
+    }
+]

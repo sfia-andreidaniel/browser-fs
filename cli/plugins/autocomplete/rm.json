@@ -1,0 +1,13 @@
+[
+    {
+        "index": "1",
+        "type": "strings",
+        "values": [
+            "-r"
+        ]
+    },
+    {
+        "index": "1..999",
+        "type": "fs"
+    }
+]

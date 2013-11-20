@@ -438,8 +438,8 @@
                 $typeName = "OneDB_Type_" . $this->_type->name;
 
                 return isset( $typeName::$_isLive )
-                    ? $typeName::$_isLive;
-                    : return FALSE;
+                    ? $typeName::$_isLive
+                    : FALSE;
                 
             } else return FALSE;
         }
