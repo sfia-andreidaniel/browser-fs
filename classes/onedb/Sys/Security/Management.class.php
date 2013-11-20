@@ -28,7 +28,7 @@
             $this->_server = $client;
             
             if ( !$this->loadFromShadow() && !$this->loadFromDatabase() )
-                throw Object( 'Exception.Security', 'Failed to ininitialize security management engine' );
+                throw Object( 'Exception.Security', 'The security manager could not initialized' );
         }
         
         public function reload() {
@@ -335,7 +335,8 @@
                     'password' => FALSE
                 ]);
             
-            
+                assert( '$result !== NULL' );
+                
                 if ( empty( $result ) )
                     return FALSE;
                 

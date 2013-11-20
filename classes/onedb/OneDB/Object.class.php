@@ -199,7 +199,7 @@
             
             // if the object implements an object type, call it's type hook
             // to populate the properties
-            if ( $this->_type !== NULL ) $this->_type->exportOwnProperties( $saveProperties );
+            if ( $this->_type !== NULL ) $this->_type->exportOwnProperties( $props );
             
             // try to do a save in the database.
             try {

@@ -29,7 +29,7 @@
         }
     
     } catch ( Exception $e ) {
-        echo $term->color( $e->getMessage(), 'red' ), "\r\r";
+        echo $term->color( Object( 'Utils.Parsers.Exception')->explainException( $e ), 'red' ), "\r\r";
     }
     
 ?>

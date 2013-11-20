@@ -8,7 +8,6 @@
         }
         
         static public function connect( $websiteName, $userName = 'anonymous', $password = '', $shadowKeyChallenge = '' ) {
-            
             return Object( 'OneDB.Client', $websiteName, $userName, $password, $shadowKeyChallenge );
             
         }
