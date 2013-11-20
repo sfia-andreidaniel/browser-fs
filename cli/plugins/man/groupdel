@@ -1,0 +1,21 @@
+<white>synopsys:</>
+    the command <green>groupdel</> is used to delete a group of users
+    from a website.
+
+<white>usage: </><green>groupdel</> <yellow>$groupname</>
+
+<white>important:</>
+    <red>!</> the <green>groupdel</> command runs only in a website 
+      context. for more information see command <green>use</>
+    
+    <red>!</> keep in mind that by deleting a group, the accounts that
+      were members of the group won't be deleted.
+
+<white>arguments:</>
+    <yellow>$groupname</>  - the name of the group you want to delete
+
+<white>example:</>
+    <green>groupdel</> <yellow>editors</>
+    
+    the above command will:
+        - delete <yellow>editors</> group from the system.

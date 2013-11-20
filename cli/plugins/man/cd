@@ -1,0 +1,23 @@
+<white>synopsys:</>
+    the command <green>cd</> is used to change the current working
+    directory when operating under a website context.
+    
+    this command has an alias, called <green>chdir</>
+    
+<white>usage: </><green>cd</> <cyan>$path_to_dir</>
+       <green>chdir</> <cyan>$path_to_dir</>
+
+<white>arguments:</>
+    <cyan>$path_to_dir</> - mandatory argument, representing either a
+         relative path, either an absolute path to the folder.
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command will use the privileges of the current logged-in
+      user. form more information see command <green>su</>
+
+<white>examples:</>
+    <green>cd</> <cyan>../my_folder/</>
+    <green>chdir</> <cyan>/full/path/to/my/folder</>

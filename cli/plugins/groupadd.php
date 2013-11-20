@@ -5,28 +5,6 @@
     
     term_init( $argv );
     
-    function help() {
-        
-        $term = Object( 'Utils.Terminal' );
-        
-        echo implode( "\r", [
-            "groupadd syntax:",
-            '    ' . $term->color( 'groupadd', 'green' ) . ' ' . $term->color( '<groupname>', 'yellow' ),
-            '',
-            'note that the command works in a website context (use <website> first).',
-            '    ' . $term->color( '<groupname>', 'yellow' ) . ' argument should contain only letters, numbers, and dot(s)',
-            '',
-            'see also:',
-            '    ' . $term->color( 'groupmod', 'green' ),
-            '    ' . $term->color( 'groupdel', 'green' ),
-            '    ' . $term->color( 'show groups', 'green' ),
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-
     $term = Object( 'Utils.Terminal' );
         
     
@@ -36,7 +14,7 @@
     }
     
     if ( count( $argv ) != 2 )
-        help();
+        term_manual( 'groupadd' );
 
     try {
         

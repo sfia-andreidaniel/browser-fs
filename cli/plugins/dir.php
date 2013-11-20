@@ -7,26 +7,6 @@
 
     $term = Object( 'Utils.Terminal' );
     
-    function help() {
-        
-        global $term;
-        
-        echo implode( "\r", [
-            'dir syntax:',
-            '    ' . $term->color( 'cd', 'green' ) . ' ' . $term->color( '[ <path> ]', 'yellow' ),
-            '',
-            'note that the command works in a website context (use <website> first).',
-            '',
-            'arguments:',
-            '    [ ' . $term->color( '<path>', 'yellow' ) . ' ] - optional argument, relative or absolute path',
-            '                                             if omitted, current path will be listed.',
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-
     if ( term_get_env( 'site' ) == '' ) {
         echo $term->color( 'this command requires a site context', 'red' ), "\r\r";
         die(1);
@@ -36,6 +16,9 @@
         echo $term->color( 'the client binary did not reported to cd command the current working directory', 'red' );
         die(1);
     }
+    
+    if ( count( $argv ) > 2 )
+        term_manual('dir');
     
     if ( count( $argv ) == 1 )
         $argv[] = term_get_env( 'path' );

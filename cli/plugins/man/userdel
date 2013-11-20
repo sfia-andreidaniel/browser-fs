@@ -1,0 +1,18 @@
+<white>synopsys:</>
+    the command <green>userdel</> is used to delete a user account
+    from a website.
+
+<white>usage: </><green>userdel</> <yellow>$username</>
+
+<white>important:</>
+    <red>!</> the <green>userdel</> command runs only in a website 
+      context. for more information see command <green>use</>.
+
+<white>arguments:</>
+    <yellow>$username</>       - the name of the user you want to delete
+
+<white>example:</>
+    <green>userdel</> <yellow>joe</>
+    
+    the above command will:
+        - delete <yellow>joe</>'s account from current website

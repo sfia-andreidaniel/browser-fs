@@ -1,0 +1,23 @@
+<white>synopsys:</>
+    the command <green>rm</> is used to remove a item ( folder / category
+    or file / item ) from the database filesystem ( of the website ).
+    
+<white>usage: </><green>rm</> [ <yellow>-r</> ] <cyan>$path_to_object</>
+
+<white>arguments:</>
+    <yellow>-r</> - optional argument, specifying that the removal
+         would be recursive.
+
+    <cyan>$path_to_object</> - mandatory argument, representing either a
+         relative path, either an absolute path to the object.
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command can be dangerous if not used wisely. <red>items deleted
+       with </><green>rm</><red> command will be lost forever!!!</>
+
+<white>examples:</>
+    <green>rm</> <yellow>bar</>
+    <green>rm</> <yellow>-r</> <cyan>../my_folder/</>

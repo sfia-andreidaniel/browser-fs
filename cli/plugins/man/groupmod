@@ -1,0 +1,42 @@
+<white>synopsys:</>
+    the command <green>groupmod</> is used to modify settings of a group
+    from the website.
+
+<white>usage: </><green>groupmod</> <yellow>$groupname</> \
+               <cyan>[ [ [ -u | +u | :u ] $username ] ... [ [ -u | +u | :u ] $username ] ]</> \
+               <purple>[ [ [ -f | +f ] $flag ] ... [ [ -f | +f ] $flag ] ]</>
+
+<white>important:</>
+    <red>!</> the <green>groupmod</> command runs only in a website 
+      context. for more information see command <green>use</>.
+
+<white>arguments:</>
+    <yellow>$groupname</>      - the name of the group you want to modify
+    
+    <cyan>-u $username</>    - revoke <cyan>username</> membership from group <yellow>$groupname</>
+    <cyan>+u $username</>    - grants <cyan>username</> membership in group <yellow>$groupname</>
+    <cyan>:u $username</>    - grants <cyan>username</> membership in group <yellow>$groupname</> 
+                      and makes <yellow>$groupname</> the default group of the <cyan>$username</>
+    
+    <purple>-f $flag</>        - add flag <purple>$flag</> to the <yellow>$groupname</> group flags list
+    <purple>+f $flag</>        - remove flag <purple>$flag</> from the <yellow>$groupname</> flags list
+                      
+                      the <purple>$flag</> can be:
+                          <purple>s</> - the <purple>s</>uper users group flag
+                          <purple>a</> - the <purple>a</>nonymous group flag
+                          <purple>r</> - the "<purple>r</>egular" users group account flag
+
+<white>example:</>
+    <green>groupmod</> <yellow>gods</> <cyan>-u joe</> <cyan>+u ben</> <cyan>:u marry</> <purple>-f r</> <purple>+f s</>
+    
+    the above command will:
+        - execute for the group <yellow>gods</>
+        - revoke membership of <cyan>joe</> from group <yellow>gods</>. joe will be upset
+          afterwards.
+        - make user <cyan>ben</> a member of group, <yellow>gods</>. ben will be happy
+          afterwards.
+        - make user <cyan>marry</> a member of group <yellow>gods</>, and also set this group
+          (<yellow>gods</>) as <cyan>marry</>'s default user group.
+        - make all users of group <yellow>gods</> to be happy that they are not <purple>regular</>
+          users anoymore, and from now they are <purple>superusers</> :)
+        

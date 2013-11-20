@@ -1,0 +1,11 @@
+<white>synopsys:</>
+    the command <green>help</> is used to display all the names of
+    the commands that the cli interface is supporting.
+
+<white>usage: </><green>help</>
+
+<white>arguments:</>
+    this command has no arguments.
+
+<white>examples:</>
+    <green>help</>

@@ -1,0 +1,21 @@
+<white>synopsys:</>
+    the command <green>mkdir</> is used to create a folder (category) in the 
+    database filesystem ( of the website ).
+    
+    <light_gray>this command has a command alias, called </><green>md</>
+    
+<white>usage: </><green>mkdir</> <cyan>$path_to_object</>
+       <green>md</> <cyan>$path_to_object</>
+
+<white>arguments:</>
+    <cyan>$path_to_object</> - mandatory argument, representing either a
+        relative path, either a full path to the object (directory /
+        category).
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+
+<white>examples:</>
+    <green>mkdir</> <cyan>foo</>
+    <green>mkdir</> <cyan>../bar</>

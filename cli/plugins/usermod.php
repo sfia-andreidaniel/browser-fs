@@ -5,59 +5,12 @@
     
     term_init( $argv );
     
-    function help() {
-        
-        $term = Object( 'Utils.Terminal' );
-        
-        echo implode( "\r", [
-            "usermod syntax:",
-            '    ' . $term->color( 'usermod', 'green' ) . ' ' . $term->color( '<username>', 'yellow' ),
-            '       ' . $term->color( ' [ -p <newpassword> ] ', 'cyan' ),
-            '       ' . $term->color( ' [ [ -g <groupname> | +g <groupname> | :g <groupname> ] ... [ -g <groupname> | +g <groupname> | :g <groupname> ]  ] ', 'brown' ),
-            '       ' . $term->color( ' [ -umask <umask> ] ', 'purple' ),
-            '       ' . $term->color( ' [ [ +f <flag> | -f <flag> ] ... [ +f <flag> | -f <flag> ] ]', 'light_cyan' ),
-            
-            '',
-            'notes:',
-            '    note that the command works in a website context only (use <website> first).',
-            '',
-            'arguments explanation:',
-            '    ' . $term->color( '<username>', 'yellow' )     . '       - the username to be modified',
-            '    ' . $term->color( '-p <newpassword>', 'cyan' ) . ' - set user password to <newpassword>',
-            '    ' . $term->color( '-g <groupname>', 'brown' ) . '   - remove user from group <groupname>',
-            '    ' . $term->color( '+g <groupname>', 'brown' ) . '   - add user to group <groupname>',
-            '    ' . $term->color( ':g <groupname>', 'brown' ) . '   - add user to group <groupname> and make <groupname> default user group',
-            '    ' . $term->color( '-umask <umask>', 'purple' ) . '   - set user default umask <umask>' ,
-            '    ' . $term->color( '+f <flag>', 'light_cyan' ) . '        - add user account flag <flag> (n,s,r)',
-            '    ' . $term->color( '-f <flag>', 'light_cyan' ) . '        - remove user account flag <flag> (n,s,r)',
-            '',
-            'flags explanation:',
-            '    n flag: account is a "nobody" type account',
-            '    s flag: account is a "superuser" type account',
-            '    r flag: account is a "regular" type account',
-            '',
-            'umask explanation:',
-            '    umask represents the default user object creation mode, and can',
-            '    be represented either in octal mode (e.g. 700, 543), either in ',
-            '    human readable mode "rwxr--r--"',
-            '',
-            'see also:',
-            '    ' . $term->color( 'useradd', 'green' ),
-            '    ' . $term->color( 'userdel', 'green' ),
-            '    ' . $term->color( 'show users', 'green' ),
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-    
     //print_r( $argv );
     $term = Object( 'Utils.Terminal' );
 
     
     if ( count( $argv ) < 2 )
-        help();
+        term_manual( 'usermod');
 
     if ( term_get_env( 'site' ) == '' )
         die( $term->color( 'this command requires a site context', 'red' ) . "\r\r" );
@@ -202,7 +155,7 @@
                 
                 default:
                     echo $term->color( 'unknown argument: ' . $argv[$i], 'red' ) . "\r\r";
-                    help();
+                    term_manual( 'usermod');
                     break;
                 
             }

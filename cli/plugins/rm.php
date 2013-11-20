@@ -7,28 +7,6 @@
 
     $term = Object( 'Utils.Terminal' );
     
-    function help() {
-        
-        global $term;
-        
-        echo implode( "\r", [
-            'rm syntax:',
-            '    ' . $term->color( 'rm', 'green' ) . ' '
-                   . $term->color( '[ -r ]', 'yellow' ) . ' '
-                   . $term->color( '<path>', 'cyan' ),
-            '',
-            'note that the command works in a website context (use <website> first).',
-            '',
-            'arguments:',
-            '    ' . $term->color( '-r',     'cyan'   ) . ' - recursive. optional argument',
-            '    ' . $term->color( '<path>', 'yellow' ) . ' - path to remove',
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-
     if ( term_get_env( 'site' ) == '' ) {
         echo $term->color( 'this command requires a site context', 'red' ), "\r\r";
         die(1);
@@ -40,7 +18,7 @@
     }
     
     if ( count( $argv ) == 1 )
-        help();
+        term_manual( 'rm' );
     
     try {
 

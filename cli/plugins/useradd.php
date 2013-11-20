@@ -5,32 +5,6 @@
     
     term_init( $argv );
     
-    function help() {
-        
-        $term = Object( 'Utils.Terminal' );
-        
-        echo implode( "\r", [
-            "useradd syntax:",
-            '    ' . $term->color( 'useradd', 'green' ) . ' ' . $term->color( '<username>', 'yellow' ) . ' ' . $term->color( '<password>', 'cyan' ),
-            '',
-            'important: ',
-            '    note that the command works in a website context (use <website> first).',
-            '',
-            'arguments:',
-            '    ' . $term->color( '<username>', 'yellow' ) . ' argument should contain only letters, numbers, and dot(s)',
-            '    ' . $term->color( '<password>', 'cyan'   ) . ' argument represents the user password',
-            '',
-            'see also:',
-            '    ' . $term->color( 'usermod', 'green' ),
-            '    ' . $term->color( 'userdel', 'green' ),
-            '    ' . $term->color( 'show users', 'green' ),
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-
     $term = Object( 'Utils.Terminal' );
         
     
@@ -40,7 +14,7 @@
     }
     
     if ( count( $argv ) != 3 )
-        help();
+        term_manual('useradd');
 
     try {
         

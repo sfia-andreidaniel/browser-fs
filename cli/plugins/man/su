@@ -1,0 +1,18 @@
+<white>synopsys:</>
+    the command <green>su</> is used to change the current user
+    context in a website context.
+    
+    after running this command, all permissions of this user will
+    be applied to the current website context.
+
+<white>usage: </><green>su</> <yellow>$username</>
+
+<white>arguments:</>
+    <yellow>$username</> - the username you want to become
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+
+<white>examples:</>
+    <green>su</> <yellow>joe</>

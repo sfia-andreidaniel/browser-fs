@@ -1,1 +1,11 @@
-this is the manual for <red>the</> man command.
+<white>synopsys:</>
+    the comand <green>man</> is used to display the manual page about
+    a command.
+    
+<white>usage: </><green>man</> <yellow>$command</>
+
+<white>arguments:</>
+    <yellow>$command</> - the name of the command.
+
+<white>examples:</>
+    <green>man</> <yellow>ls</>, <green>man</> <yellow>use</>, <green>man</> <yellow>rm</>

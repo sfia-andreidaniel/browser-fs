@@ -5,50 +5,12 @@
     
     term_init( $argv );
     
-    function help() {
-        
-        $term = Object( 'Utils.Terminal' );
-        
-        echo implode( "\r", [
-            "groupmod syntax:",
-            '    ' . $term->color( 'groupmod', 'green' ) . ' ' . $term->color( '<groupname>', 'yellow' ),
-            '       ' . $term->color( ' [ [ -u <username> | +u <username> | :u <username> ] ... [ -u <username> | +u <username> | :u <username> ]  ] ', 'brown' ),
-            '       ' . $term->color( ' [ [ +f <flag> | -f <flag> ] ... [ +f <flag> | -f <flag> ] ]', 'light_cyan' ),
-            
-            '',
-            'notes:',
-            '    note that the command works in a website context only (use <website> first).',
-            '',
-            'arguments explanation:',
-            '    ' . $term->color( '<groupname>', 'yellow' )     . '       - the group name to be modified',
-            '    ' . $term->color( '-u <username>', 'brown' ) . '   - remove user <username> from this group',
-            '    ' . $term->color( '+u <username>', 'brown' ) . '   - add user <username> to this group',
-            '    ' . $term->color( ':u <username>', 'brown' ) . '   - add user <username> to this group and make this group the default group of the user',
-            '    ' . $term->color( '+f <flag>', 'light_cyan' ) . '        - add group flag <flag> (n,s,r)',
-            '    ' . $term->color( '-f <flag>', 'light_cyan' ) . '        - remove group flag <flag> (n,s,r)',
-            '',
-            'flags explanation:',
-            '    n flag: group is a "nobody" type group',
-            '    s flag: group is a "superuser" type group',
-            '    r flag: group is a "regular" type group',
-            '',
-            'see also:',
-            '    ' . $term->color( 'groupadd', 'green' ),
-            '    ' . $term->color( 'groupdel', 'green' ),
-            '    ' . $term->color( 'show groups', 'green' ),
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-    
     //print_r( $argv );
     $term = Object( 'Utils.Terminal' );
 
     
     if ( count( $argv ) < 2 )
-        help();
+        term_manual( 'groupmod' );
 
     if ( term_get_env( 'site' ) == '' )
         die( $term->color( 'this command requires a site context', 'red' ) . "\r\r" );
@@ -167,7 +129,7 @@
                 
                 default:
                     echo $term->color( 'unknown argument: ' . $argv[$i], 'red' ) . "\r\r";
-                    help();
+                    term_manual( 'groupmod' );
                     break;
                 
             }

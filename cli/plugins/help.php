@@ -53,19 +53,27 @@
             'description' => "adds a group to a website"
         ],
         [
+            'command' => 'groumod',
+            'description' => "modifies a group of a website"
+        ],
+        [
+            'command' => 'groupdel',
+            'description' => "deletes a group of a website"
+        ],
+        [
             'command' => 'prepare',
-            'description' => "prepares something"
+            'description' => "prepares database or local environment"
         ],
         [
             'command' => 'su',
             'description' => "switch current working user"
         ],
         [
-            'command' => 'cd',
+            'command' => 'chdir, cd',
             'description' => "changes current working directory"
         ],
         [
-            'command' => 'mkdir',
+            'command' => 'mkdir, md',
             'description' => "creates a directory"
         ],
         [
@@ -77,6 +85,10 @@
             'description' => "display a man page about a command"
         ]
     ];
+    
+    usort( $out, function( $a, $b ) {
+        return strcmp( $a['command'], $b['command'] );
+    } );
     
     foreach ( $out as $command )
         echo '  ', $term->color( str_pad( $command[ 'command' ], 14 ), 'green' ), ' ', $command[ 'description' ], "\r";

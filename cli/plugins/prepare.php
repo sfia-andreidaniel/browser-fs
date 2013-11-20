@@ -5,41 +5,6 @@
     
     term_init( $argv );
     
-    function help() {
-        
-        $term = Object( 'Utils.Terminal' );
-        
-        echo implode( "\r", [
-            'prepare syntax:',
-            '    ' . $term->color( 'prepare', 'green' ) . ' ' . $term->color( 'database', 'yellow' ) . ' ' . $term->color( '-force', 'red' ),
-            '    ' . $term->color( 'prepare', 'green' ) . ' ' . $term->color( 'environment', 'yellow' ),
-            '',
-            'important:',
-            '    note that the command works in a website context (use <website> first).',
-            '',
-            'arguments:',
-            '    ' . $term->color( 'prepare', 'green' ) . ' ' . $term->color( 'database   ', 'yellow' ) . ' - prepares a mongo database for usage.',
-            '    ' . $term->color( 'prepare', 'green' ) . ' ' . $term->color( 'environment', 'yellow' ) . ' - prepares this node',
-            '',
-            'note about prepare database:',
-            '    ' . $term->color( 'USE THIS COMMAND ONLY ONCE!!!', 'red' ) . '. this command is used to create mongodb',
-            '    needed collections. Existing collections ( shadow, objects, counters, etc. )',
-            '    will be reinitialized.',
-            '',
-            '    if data is allready detected in the database, the prepare database script ',
-            '    will refuse to run unless the ' . $term->color( '-force', 'red' ) . ' argument is present',
-            '',
-            'note about prepare environment:',
-            '    use this command on each server that is using onedb. the role of this',
-            '    command is to initialize local cache directories, ensure that appropriate',
-            '    rights are set to onedb paths',
-            '',
-            ''
-        ] );
-        
-        die(1);
-    }
-
     $term = Object( 'Utils.Terminal' );
         
     
@@ -49,7 +14,7 @@
     }
     
     if ( count( $argv ) < 2 || !in_array( $argv[1], [ 'database', 'environment' ] ) )
-        help();
+        term_manual('prepare');
     
     function onedbpass() {
         return @file_get_contents( __DIR__ . '/../../etc/onedb.shadow.gen' );
@@ -83,12 +48,13 @@
                         if ( !isset( $argv[2] ) || $argv[2] != '-force' ) {
                             
                             die( $term->color( implode( "\r", [
-                                "the database seems to be prepared ( found at least an object in collection $drop ).",
-                                "if you really know what you are doing, use the '-force' argument.",
                                 "",
-                                "note that if you run a -force database prepair, ALL DATA WILL BE LOST FOREVER.",
+                                "  the database seems to be prepared ( found at least an object in collection $drop ).",
+                                "  if you really know what you are doing, use the '-force' argument.",
                                 "",
-                                "command refused due to safety considerations",
+                                "  note that if you run a -force database prepair, ALL DATA WILL BE LOST FOREVER.",
+                                "",
+                                "  command refused due to safety considerations",
                                 "",
                                 ""
                             ] ), 'red' ) );

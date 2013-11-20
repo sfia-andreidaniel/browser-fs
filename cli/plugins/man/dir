@@ -1,0 +1,24 @@
+<white>synopsys:</>
+    the command <green>dir</> is used to display information about the items
+    inside of a directory, or information about a specific item (file).
+    
+    this command has an alias, called <green>ls</>
+    
+<white>usage: </><green>dir</> [ <cyan>$path_to_object</> ]
+       <green>ls</> [ <cyan>$path_to_object</> ]
+
+<white>arguments:</>
+    <cyan>$path_to_object</> - optional argument, representing either a
+         relative path, either an absolute path to the object.
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command will use the privileges of the current logged-in
+      user. form more information see command <green>su</>
+
+<white>examples:</>
+    <green>dir</>
+    <green>ls</> <cyan>../my_folder/</>
+    <green>dir</> <cyan>/full/path/to/my/file</>

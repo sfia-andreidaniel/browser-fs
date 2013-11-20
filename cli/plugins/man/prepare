@@ -1,0 +1,37 @@
+<white>synopsys:</>
+    the command <green>prepare</> is used to prepare either the database
+    either the local envinonment of the current server onedb is running on.
+    
+<white>usage: </><green>prepare</> [ <red>-force</> ] <yellow>database</>
+       or
+       <green>prepare</> <yellow>environment</>
+
+<white>arguments:</>
+    <red>-force</> - optional argument, specifying that you know what you're
+             doing. when you prepare a database, onedb will check to see if
+             there is any existing data allready. if we find data in any mongo
+             db collection, then the prepare script will be aborted without
+             using the <red>-force</> argument.
+
+    <yellow>database</> - use this command only once. the <green>prepare</> <yellow>database</>
+             will creates necesarry tables in the database, necesarry indexes
+             for collections, built-in users (root, anonymous), built-in groups
+             (root, anonymous). <red>WARNING:</> any existing data will be lost
+             upon completion of this command.
+
+    <yellow>environment</> - use this command to ensure that everything is setup'ed
+             good on a local onedb node. this command does not delete everything,
+             in contrast with prepare database command, so it does not have any
+             potential data-loss risk.
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command can be dangerous if not used with caution. <red>any existing
+      data after a </>"<green>prepare</> <yellow>database</>" <red>command will be lost forever!</>
+
+<white>examples:</>
+    <green>prepare</> <yellow>database</>
+    <green>prepare</> <red>-force</> <yellow>database</>
+    <green>prepare</> <yellow>environment</>
