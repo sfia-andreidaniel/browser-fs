@@ -142,21 +142,6 @@ begin
         exit(false);
     end;
     
-    //cmdline := which( 'php' ) + ' ' 
-    //    + escapeshellarg( testfile ) + ' ' 
-    //    + escapeshellarg( '-ENV=site:' + term_get_env( 'site' ) ) + ' ' 
-    //    + escapeshellarg( '-ENV=path:' + term_get_env('path') ) + ' ' 
-    //    + escapeshellarg( '-ENV=user:' + term_get_env( 'user' ) ) + ' '
-    //    + escapeshellarg( '-ENV=password:' + term_get_env( 'password' ) );
-    
-    //len := args.count;
-    
-    // for i := 1 to len - 1 do begin
-    //    cmdline := concat( cmdline, ' ', escapeshellarg( args[i] ) );
-    //end;
-    
-    //writeln( 'running: ', cmdline );
-    
     memstream := TMemoryStream.Create;
     bytesread := 0;
     
@@ -197,17 +182,13 @@ begin
     end;
 
     if BytesRead > 0 then WriteLn;
+
     MemStream.SetSize(BytesRead);
 
     OutputLines := TStringList.Create;
     OutputLines.LoadFromStream(MemStream);
 
     term_dump_process_output( OutputLines );
-
-//    for NumBytes := 0 to OutputLines.Count - 1 do
-//    begin
-//        writeLn(OutputLines[NumBytes]);
-//    end;
 
     OutputLines.Free;
     OurProcess.Free;

@@ -25,7 +25,7 @@
         $out = [];
         
         // cannot get users if not in a website context
-        if ( ( $website = term_get_env( 'website' ) ) == '' )
+        if ( ( $website = term_get_env( 'site' ) ) == '' )
             return [];
         
         try {
@@ -44,6 +44,7 @@
             return $out;
             
         } catch ( Exception $e ) {
+            
             // if an exception is made then we don't forward it, but instead
             // we return an  empty set of data
             return [];
@@ -56,7 +57,7 @@
         $out = [];
         
         // cannot get users if not in a website context
-        if ( ( $website = term_get_env( 'website' ) ) == '' )
+        if ( ( $website = term_get_env( 'site' ) ) == '' )
             return [];
         
         try {
