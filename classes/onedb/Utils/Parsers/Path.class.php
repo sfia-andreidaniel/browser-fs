@@ -97,7 +97,7 @@
         // substract "/foo/bar", 2 = "/"
         // substract "/foo/bar", 1 = "/foo"
         // return string on success, or FALSE on error
-        public function substract( $path, $segments ) {
+        public function substract( $path, $segments = 0 ) {
             
             if ( !is_int( $segments ) || $segments < 0 )
                 return FALSE;
@@ -136,6 +136,118 @@
                 
             } else
                 return FALSE;
+        }
+        
+        // returns the last segment of the path
+        // path will become shorter with that segment
+        // examples:
+        // pop "foo/ba" => "foo/"
+        // pop "foo/bar" => "foo/"
+        // pop "foo/bar/char" => "foo/bar/"
+        // pop "foo/" => "foo/"
+        // NOTE THE BEHAVIOUR, the resulting path will always end in a trailing slash
+        // @return string or FALSE when $path is not valid
+        public function pop( &$path ) {
+            
+            if ( !is_string( $path ) )
+                return FALSE;
+            
+            if ( preg_match( '/\/([^\/]+)?$/', $path, $matches ) ) {
+                
+                $segment = isset( $matches[1] ) ? $matches[1] : '';
+                
+                $path = ( $len = strlen( $segment ) )
+                    ? substr( $path, -strlen( $segment ) )
+                    : $path;
+                
+                return $segment;
+                
+            } else {
+                
+                $segment = $path;
+                $path = '/';
+                
+                return $segment;
+            }
+            
+        }
+        
+        // convers a path with urlencoded segments into a path with urldecoded segments
+        // however, the "/" character will always remain encoded as %2F
+        public function decode( $str ) {
+            
+            $str = $this->resolve( $str );
+            
+            if ( $str === FALSE )
+                return FALSE;
+            
+            $segments = explode( '/', trim( $str, '/' ) );
+            
+            for ( $i=0, $len = count( $segments ); $i<$len; $i++ ) {
+                
+                $segments[$i] = str_replace( '+', '%20', $segments[$i] );
+                
+                $segments[$i] = urldecode( $segments[$i] );
+                
+                $segments[$i] = str_replace( '"', '%22', str_replace( '/', '%2F', $segments[$i] ) );
+            }
+            
+            return '/' . implode( '/', $segments );
+        }
+        
+        public function isEqual( $path1, $path2 ) {
+            
+            $a = $this->decode( $path1 );
+            $b = $this->decode( $path2 );
+            
+            return ( $a === FALSE || $b === FALSE )
+                ? NULL
+                : $a === $b;
+            
+            return $this->decode( $path1 ) == $this->decode( $path2 );
+            
+        }
+        
+        public function isCommonParent( $path1, $path2 ) {
+            
+            $a = $this->decode( $path1 );
+            $b = $this->decode( $path2 );
+            
+            if ( $a === NULL || $b === NULL )
+                return NULL;
+            else {
+                
+                $a = $this->substract( $a, 1 );
+                $b = $this->substract( $b, 1 );
+                
+                if ( $a === FALSE || $b === FALSE )
+                    return NULL;
+                else
+                    return $a === $b;
+                
+            }
+            
+            return $this->substract( $this->decode( $path1 ), 1 ) == $this->substract( $this->decode( $path2 ), 1 );
+            
+        }
+        
+        // weather a path is a direct parent of another path or not
+        // @return NULL, TRUE, or FALSE
+        //         NULL is returned when one of the paths is invalid
+        public function isParentOf( $father, $child ) {
+            
+            $child = $this->substract( $child, 1 );
+            
+            if ( $child === FALSE )
+                return FALSE;
+            
+            $rf = $this->decode( $father );
+            $rc = $this->decode( $child );
+            
+            return ( $rf === NULL || $rc === NULL )
+                ? NULL
+                : $rf === $rc;
+            
         }
     }
     

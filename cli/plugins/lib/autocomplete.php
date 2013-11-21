@@ -107,9 +107,183 @@
     }
     
     function autocomplete_get_fs( $written = '' ) {
+        $out = [];
         
-        // fs autocompletion not coded yet
-        return [];
+        if ( ( $website = term_get_env( 'site' ) ) == '' )
+            return $out; // needs a website context to do auto-completion
+        
+        try {
+        
+            // init site connection
+            $client   = Object('OneDB')->connect( $website, term_get_env('user'), term_get_env( 'password' ) );
+            
+            // init path resolver
+            $resolver = Object('Utils.Parsers.Path' );
+            
+            // current working dir
+            $cwd = ( $cwd = term_get_env( 'path' ) )
+                ? $cwd
+                : '/';
+            
+            $absolute = FALSE;
+            
+            $checkIn = [];
+            
+            switch ( TRUE ) {
+                
+                case $written == '': // nothing written, we suggest from current working dir
+                    $checkIn[] = ( $targetPath = $cwd );
+                    break;
+                
+                case $resolver->isAbsolute( $written ):
+                    
+                    $targetPath = $written;
+                    
+                    $checkIn[] = $written;
+                    $written2 = $written;
+                    
+                    $resolver->pop( $written2 );
+                    $checkIn[] = $written2;
+                    
+                    $checkIn[] = preg_replace( '/\/([^\/]+)?$/', '', $written );
+                    
+                    break;
+                
+                default:
+                    
+                    $checkIn[] = $targetPath = $resolver->append( $cwd, $written );
+                    
+                    $checkIn[] = $resolver->substract( $targetPath, 1 );
+                    
+                    break;
+                
+            }
+            
+            $checkIn = array_filter( $checkIn, function( $s ) {
+                return is_string( $s );
+            } );
+            
+            for ( $i=0, $len = count( $checkIn ); $i<$len; $i++ ) {
+                if ( substr($checkIn[$i], 0, 1 ) != '/' )
+                    $checkIn[$i] = '/' . $checkIn[$i];
+            }
+            
+            $checkIn = array_unique( $checkIn );
+            
+            foreach ( $checkIn as $check ) {
+                
+                //echo "find in: $check\n";
+                
+                $find = $client->getElementByPath( $check );
+                
+                if ( $find === NULL )
+                    continue;
+                
+                $out[] = $find->url;
+                
+                $find->childNodes->each( function( $item ) use ( &$out, $resolver ) {
+                    
+                    //echo "found: $item->url\n";
+                    
+                    $out[] = $resolver->decode( $item->url );
+                } );
+                
+            }
+            
+            $out = array_values( array_unique( $out ) );
+            
+            //echo "target path: $targetPath\n";
+            
+            $parent = ( preg_match( '/\/$/', $targetPath ) || $written == '' )
+                ? $targetPath
+                : $resolver->substract( $targetPath, 1 );
+            
+            //echo "parent target path: $parent\n";
+            
+            //print_r( $out );
+            
+            // decode all paths
+            for ( $i=0, $len = count( $out ); $i<$len; $i++ )
+                $out[$i] = $resolver->decode( $out[$i] );
+
+            $out = array_values( array_filter( $out, function( $item ) use ( &$resolver, $parent ) {
+                
+                return ( $item === FALSE || $item === NULL || !$resolver->isParentOf( $parent, $item ) )
+                    ? FALSE
+                    : TRUE;
+                
+            } ) );
+            
+            // determine what to publish to autocompleter
+            if ( preg_match( '/^((.*)\/)([^\/]+)?$/', $written, $matches ) ) {
+                $keep  =  $matches[1];
+                $addTo = isset( $matches[3] ) && strlen( $matches[3] ) ? $matches[3] : '';
+            } else {
+                $keep = '';
+                $addTo = $written;
+            }
+            
+            $realMatchStart = $addTo != ''
+                ? ltrim( $resolver->decode( $addTo ), '/' )
+                : '';
+            
+            $realMatchStartLength = strlen( $realMatchStart );
+            
+            $finalOut = [];
+            
+            $mode = $resolver->isAbsolute( $written ) ? 1 : 0;
+            
+            for( $i=0, $len = count( $out ); $i<$len; $i++ ) {
+                
+                $out[$i] = $resolver->basename( '/' . $out[$i] );
+                
+                if ( substr( $out[$i], 0, $realMatchStartLength ) == $realMatchStart ) {
+                    
+                    $item = $keep .  $addTo . ( $written == '..' ? '/' : '' ) .substr( $out[$i], $realMatchStartLength );
+                    
+                    switch ( $mode ) {
+                        case 1:
+                            // test if $item exists
+                            if ( !( $obj = $client->getElementByPath( $item ) ) )
+                                $item = NULL;
+                            else {
+                            
+                                $item .= $obj->isContainer() ? '/' : '';
+                                
+                                if ( $written == '' && $cwd == '/' )
+                                    $item = '/' . $item;
+                            }
+                            
+                            break;
+                        
+                        case 0:
+                            if ( !( $obj = $client->getElementByPath( $resolver->resolve( $cwd ) . $item ) ) )
+                                $item = NULL;
+                            else {
+                            
+                                $item .= $obj->isContainer() ? '/' : '';
+                                
+                                if ( $written == '' && $cwd == '/' )
+                                    $item = '/' . $item;
+                            }
+                            
+                            break;
+                    }
+                    
+                    if ( $item !== NULL )
+                        $finalOut[] = $item;
+                }
+                
+            }
+            
+            return $finalOut;
+        
+        } catch ( Exception $e ) {
+            
+            echo "\r\r" . $e->getMessage() . "\r\r";
+            
+            return $out;
+        }
         
     }
     

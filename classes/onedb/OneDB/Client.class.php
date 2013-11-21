@@ -22,6 +22,8 @@
         protected $_user        = NULL;     // <Sys_Security_User>       instance of the user this website is operating
         protected $_sys         = NULL;     // <Sys_Security_Management> local server accounts enumerator
         
+        protected static $_path_ = NULL;    // singleton of <Utils.Parsers.Path>
+        
         public function init( $websiteName, $userName = 'anonymous', $password = '', $shadowChallenge = '' ) {
             
             // singleton
@@ -177,33 +179,9 @@
                 
             } else {
             
-                if ( is_string( $elementPath ) ) {
-                    $assumeGoodPath = $elementPath;
-                    $elementPath = explode( "/", $elementPath );
-                } else $assumeGoodPath = NULL;
-                
-                for ( $i=0, $len = count( $elementPath ); $i<$len; $i++ ) {
-                    $elementPath[$i] = urlencode( $elementPath[$i] );
-                }
-                
-                $path = preg_replace( '/[\/]+/', '/', implode( "/", $elementPath ) );
-                
-                if ( $assumeGoodPath !== NULL ) {
-                    $query = [
-                        "url" => [
-                            '$in' => [
-                                $assumeGoodPath,
-                                $path
-                            ]
-                        ]
-                    ];
-                } else {
-                    $query = [
-                        'url' => $path
-                    ];
-                }
-                
-                $data = $this->_objects->findOne( $query );
+                $data = $this->_objects->findOne( [
+                    'url' => self::$_path_->decode( $elementPath )
+                ] );
                 
                 if ( $data === NULL )
                     return NULL;
@@ -324,6 +302,10 @@
             return Object( 'OneDB.Client', $data[0], $data[1], '', $data[2] );
         }
         
+        static public function _init_() {
+            self::$_path_ = Object( 'Utils.Parsers.Path' );
+        }
+        
     }
     
     OneDB_Client::prototype()->defineProperty( 'runAs', [
@@ -361,5 +343,7 @@
             return $this->_websiteName;
         }
     ] );
-
+    
+    OneDB_Client::_init_();
+    
 ?>

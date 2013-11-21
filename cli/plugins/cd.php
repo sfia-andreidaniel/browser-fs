@@ -46,7 +46,7 @@
                 throw Object( 'Exception.IO', 'path "' . $where . '" exists but is not a directory' );
             
             // path is valid
-            term_set_env( 'path', $where );
+            term_set_env( 'path', $parser->decode( $where ) );
             
         } else {
             
@@ -83,7 +83,7 @@
                     throw Object( 'Exception.IO', 'path "' . $where . '" exists but is not a directory' );
                 
                 // path is valid
-                term_set_env( 'path', $where );
+                term_set_env( 'path', $parser->decode( $where ) );
             }
         
         }

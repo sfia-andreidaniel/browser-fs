@@ -71,8 +71,10 @@
             'online'
         ];
         
-        // a cache of the muxer, to do fast object muxing
-        public static $_muxer = NULL;
+        // a singleton of the muxer, to do fast object muxing
+        public static $_muxer_ = NULL;
+        // a singleton of a <Utils.Parsers.Path> object do do fast path conversion
+        public static $_path_ = NULL;
         
         /* Initializes the object. This is the constructor of the object 
          */
@@ -553,7 +555,7 @@
             $props[ 'url'    ] = $this->url;
             $props[ '_flags' ] = $this->getObjectFlags();
             
-            return self::$_muxer->mux( [ $this->_server, $props ] );
+            return self::$_muxer_->mux( [ $this->_server, $props ] );
             
         }
         
@@ -614,6 +616,8 @@
             if ( empty( $newName ) )
                 throw Object('Exception.OneDB', "The name cannot be empty!" );
             
+            $newName = str_replace( '"', '%22', str_replace( '/', '%2F', urldecode( str_replace( '+', ' ', $newName ) ) ) );
+
             //echo "set name: $newName\n";
             
             $this->_name = $newName;
@@ -819,9 +823,9 @@
         
         "get" => function() {
             if ( $this->_parent === NULL )
-                return '/' . $this->_name;
+                return OneDB_Object::$_path_->decode( '/' . $this->_name );
             else
-                return preg_replace( '/[\/]+/', '/', $this->_parent->url . '/' . urlencode( $this->_name ) );
+                return OneDB_Object::$_path_->decode( $this->_parent->url . '/' . str_replace( '/', '%2F', $this->_name ) );
         }
         
     ] );
@@ -853,6 +857,7 @@
         }
     ]);
     
-    OneDB_Object::$_muxer = Object('RPC.Muxer');
+    OneDB_Object::$_muxer_ = Object('RPC.Muxer');
+    OneDB_Object::$_path_  = Object('Utils.Parsers.Path');
 
 ?>

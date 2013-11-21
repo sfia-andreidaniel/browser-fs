@@ -56,7 +56,7 @@
 
                         //echo "url: " . $item->url . "\n";
                         $expr = new MongoRegex( '/^' .
-                            addcslashes( $item->url, '*/\\.#{}+?%()^:' ) . // ' > mc bug
+                            addcslashes( $item->url . '/', '*/\\.#{}+?%()^:' ) . // ' > mc bug
                             '([^*]+)/'
                         );
 
@@ -87,7 +87,7 @@
                                 $item->refresh();
                             
                             $where[] = [ 'url' => new MongoRegex( '/^' .
-                                addcslashes( $item->url, '*/\\.#{}+?%()^:' ) . 
+                                addcslashes( $item->url . '/', '*/\\.#{}+?%()^:' ) . 
                                 '([^*]+)/' 
                             ) ];
                             
