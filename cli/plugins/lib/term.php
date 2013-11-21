@@ -10,6 +10,9 @@
     
         for ( $i = count($args) - 1; $i>0; $i-- ){
         
+            if ( $args[$i] == '---empty---argument---fpc---tprocess---bug---' )
+                $args[$i] = '';
+        
             //echo $args[$i], "\n";
         
             if ( substr( $args[$i], 0, 5 ) == '-ENV=' ) {

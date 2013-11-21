@@ -41,8 +41,6 @@
         ? $argv[3]
         : '';
     
-    print_r( $argv );
-    
     // sources from where to obtain suggestions
     $sources = [];
     
@@ -166,8 +164,6 @@
     
     $fsources = array_values( $fsources );
     
-    echo "argWr: ", $argWritten, "\n\n";
-    
     for ( $i=0, $len = count( $fsources ); $i<$len; $i++ ) {
         
         if ( $fsources[$i]['type'] == 'strings' )
@@ -215,7 +211,7 @@
     $out = array_filter( $out, function( $item ) use ($argWritten) {
         
         if ( $argWritten != '' )
-            return strpos( $item, $argWritten ) === 0;
+            return strpos( $item, $argWritten ) === 0 && $item != $argWritten;
         else return TRUE;
         
     } );

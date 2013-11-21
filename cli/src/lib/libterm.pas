@@ -10,6 +10,9 @@ procedure on_up;
 procedure on_down;
 procedure on_left;
 procedure on_right;
+procedure on_prev_word;
+procedure on_next_word;
+procedure on_delete;
 
 procedure on_autocomplete;
 procedure on_key( c: char );
@@ -22,7 +25,7 @@ procedure die();
 
 implementation
 
-uses crt, libhistory, libosutils, liberror, libenv, libpassword;
+uses crt, libhistory, libosutils, liberror, libenv, libpassword, libautocomplete;
 
 var command  : string  = '';
     wr_index : integer = 0;
@@ -102,6 +105,53 @@ end;
 
 procedure on_autocomplete;
 begin
+    autocomplete( command, wr_index );
+    term_update();
+end;
+
+procedure on_prev_word;
+begin
+    //writeln('prev_word');
+    
+    while ( wr_index > 0 ) and ( command[ wr_index ] = ' ' ) do
+    begin
+        dec(wr_index);
+    end;
+    
+    while ( wr_index > 0 ) and ( command[ wr_index ] <> ' ' ) do
+    begin
+        dec(wr_index);
+    end;
+    term_update();
+end;
+
+procedure on_next_word;
+var len: integer = 0;
+begin
+
+    len := length( command );
+    
+    while ( wr_index < len ) and ( command[ wr_index ] = ' ' ) do
+    begin
+        inc(wr_index);
+    end;
+    
+    while ( wr_index < len ) and ( command[ wr_index ] <> ' ' ) do
+    begin
+        inc( wr_index);
+    end;
+    
+    term_update();
+end;
+
+procedure on_delete;
+begin
+    
+    delete( command, wr_index + 1, 1 );
+    
+    term_update();
+    
+    //writeln('on_delete');
 end;
 
 procedure on_bksp;
@@ -194,6 +244,8 @@ begin
         end;
     
     args := parse_command( tcommand );
+    
+    //writeln( #13#10'num args: ', args.count, #13#10 );
     
     case args.count of
         1: begin

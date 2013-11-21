@@ -10,6 +10,8 @@ function  base_dir(): string;                   // returns current program direc
 // run a console command command_name (e.g. help), with given arguments args
 function  run_command( args: TStringList ): boolean;
 
+function escapeshellarg( str: string ) : string;
+
 implementation
 
 uses sysutils, dos, strings, strutils, process, libterm, libenv;
@@ -120,9 +122,9 @@ end;
 function run_command( args: TStringList ): boolean;
 
 var testfile   : string;
-    cmdline    : string;
+    //cmdline    : string;
     i          : integer = 0;
-    len        : integer = 0;
+    //len        : integer = 0;
     outputlines: TStringList;
     memstream  : TMemoryStream;
     ourprocess : TProcess;
@@ -140,25 +142,44 @@ begin
         exit(false);
     end;
     
-    cmdline := which( 'php' ) + ' ' 
-        + escapeshellarg( testfile ) + ' ' 
-        + escapeshellarg( '-ENV=site:' + term_get_env( 'site' ) ) + ' ' 
-        + escapeshellarg( '-ENV=path:' + term_get_env('path') ) + ' ' 
-        + escapeshellarg( '-ENV=user:' + term_get_env( 'user' ) ) + ' '
-        + escapeshellarg( '-ENV=password:' + term_get_env( 'password' ) );
+    //cmdline := which( 'php' ) + ' ' 
+    //    + escapeshellarg( testfile ) + ' ' 
+    //    + escapeshellarg( '-ENV=site:' + term_get_env( 'site' ) ) + ' ' 
+    //    + escapeshellarg( '-ENV=path:' + term_get_env('path') ) + ' ' 
+    //    + escapeshellarg( '-ENV=user:' + term_get_env( 'user' ) ) + ' '
+    //    + escapeshellarg( '-ENV=password:' + term_get_env( 'password' ) );
     
-    len := args.count;
+    //len := args.count;
     
-    for i := 1 to len - 1 do begin
-        cmdline := concat( cmdline, ' ', escapeshellarg( args[i] ) );
-    end;
+    // for i := 1 to len - 1 do begin
+    //    cmdline := concat( cmdline, ' ', escapeshellarg( args[i] ) );
+    //end;
     
     //writeln( 'running: ', cmdline );
     
     memstream := TMemoryStream.Create;
     bytesread := 0;
+    
     ourprocess:= TProcess.create( nil );
-    ourprocess.CommandLine := cmdline;
+    
+    ourprocess.executable := which( 'php' );
+    
+    ourprocess.parameters.add( testfile );
+    ourprocess.parameters.add( '-ENV=site:' + term_get_env('site') );
+    ourprocess.parameters.add( '-ENV=path:' + term_get_env('path') );
+    ourprocess.parameters.add( '-ENV=user:' + term_get_env('user') );
+    ourprocess.parameters.add( '-ENV=password:' + term_get_env( 'password' ) );
+    
+    for i := 1 to args.count - 1 do begin
+
+        if args[i] = '' then
+            ourprocess.parameters.add( '---empty---argument---fpc---tprocess---bug---' )
+        else
+            ourprocess.parameters.add( args[i] );
+    end;
+    
+    //ourprocess.CommandLine := cmdline;
+    
     ourprocess.Options := [ poUsePipes ];
     ourprocess.Execute;
     
