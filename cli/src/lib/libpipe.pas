@@ -1,4 +1,16 @@
-// the libpipe unit implements piping
+// the libpipe unit implements piping.
+// piping from the point of view of the onedb cli, is a method
+// of passing the output of a command as a input of another next command
+//
+// eg: ls /foo | grep file | split " " 3
+//             ^ pipe      ^ pipe
+//
+// the above command consists of two pipe processors, "grep" and "split", and
+// a cli plugin command, "ls"
+//
+// i don't know how to explain better, at this point, better look at the code
+//
+//
 
 unit libpipe;
 
