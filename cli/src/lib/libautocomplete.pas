@@ -5,9 +5,7 @@ procedure autocomplete( var commandline: string; var cursorindex: integer );
 
 implementation
 
-uses classes, libosutils, libenv, crt, sysutils, process, strutils;
-
-type tstrarray = array of string;
+uses classes, libosutils, libenv, crt, sysutils, process, strutils, libutils;
 
 function parse_args_raw_mode  ( commandline: string ): tstrarray; forward;
 function argument_is_quoted   ( argument   : string ): byte;      forward;

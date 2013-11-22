@@ -2,7 +2,7 @@ unit libosutils;
 
 interface
 
-uses classes;
+uses classes, libutils;
 
 function  which( binary_name: string ): string; // which( 'php' ) will return '/usr/bin/php'
 function  base_dir(): string;                   // returns current program directory

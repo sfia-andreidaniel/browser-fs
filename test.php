@@ -4,13 +4,14 @@
     
     $parser = Object( 'Utils.Parsers.Path' );
     
-    for ( $i=0; $i<10000; $i++ ) {
-    
     if ( $parser->isCommonParent( '/foo car/mar', '/foo+car/phar/../foo' ) )
         echo "yes\n";
     else
         echo "no\n";
     
-    }
+    echo $parser->decode( '/foo%20bar/car+mar' ), "\n";
+    
+    if ( $parser->isEqual( '/foo%20bar/car+mar', '/foo+bar/../foo+bar//car+mar/.' ) )
+        echo "equal\n";
 
 ?>

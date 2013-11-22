@@ -2,7 +2,7 @@ unit libterm;
 
 interface
 
-uses classes;
+uses classes, libutils, libpipe;
 
 procedure on_bksp;
 

@@ -1,3 +1,4 @@
 /etc/shadow/
 /cli/src/*.o
 /cli/src/*.ppu
+/cli/src/main
