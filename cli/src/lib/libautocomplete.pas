@@ -35,6 +35,12 @@ begin
     if pos( ' ', s ) > 0 then exit( true ) else exit( false );
 end;
 
+function is_pipe_argument( s: string ): boolean;
+begin
+    if trim( s ) = '|' then exit( true )
+    else exit( false );
+end;
+
 procedure autocomplete( var commandline: string; var cursorindex: integer );
 var args               : tstrarray;   // array of string (dynamic array, 0-based index)
     i                  : integer =  0; // counter variable
@@ -51,6 +57,8 @@ var args               : tstrarray;   // array of string (dynamic array, 0-based
     completionList     : tstrarray;
     cursor_increment   : integer = 0;
     new_argument       : string  = '';
+    relative_arg_index : integer = 0;
+    last_pipe_position : integer = -1;
 begin
     
     if ( length( commandline ) = 0 ) then
@@ -65,8 +73,19 @@ begin
             detected_arg_index := i;
             break; // exit loop
         end;
+        
         processed_chars += length( args[i] );
+        
+        if is_pipe_argument( args[i] ) then begin
+            relative_arg_index := -1;
+            last_pipe_position := i;
+        end else
+        begin
+            inc(relative_arg_index);
+        end;
     end;
+    
+    if relative_arg_index < 0 then relative_arg_index := 0;
     
     // detected argument index is 0-based
     if detected_arg_index = -1 then
@@ -115,10 +134,10 @@ begin
     
     //writeln( arg_left_text );
     
-    first_script_arg := argument_trim_quotes( trim( args[0] ) );
+    first_script_arg := argument_trim_quotes( trim( args[last_pipe_position + 1] ) );
     
     completionList := autocomplete_get_starting_sequence(
-        call_autocomplete( detected_arg_index, first_script_arg, arg_left_text ),
+        call_autocomplete( relative_arg_index, first_script_arg, arg_left_text ),
         arg_left_text
     );
     

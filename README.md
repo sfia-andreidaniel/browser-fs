@@ -42,7 +42,6 @@ Api:
 
 Cli:
 
-* implement pipes and output processors like grep, sort, etc., which modify the contents on the fly and use the "|" operator
 * commands: chown, chmod, mv, cp, route
 * autocompleter: message "Do you want to display all 372 results?"
 

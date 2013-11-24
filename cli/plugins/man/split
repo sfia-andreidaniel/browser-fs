@@ -1,0 +1,22 @@
+<white>synopsys:</>
+    the command <green>split</> is used to split a string into substrings
+    by a given pattern, and return a single substring by a given index
+    
+    the split command is intended to be used via a pipe.
+    
+<white>usage: </><light_gray>$command</> | <green>split</> <cyan>$pattern</> <brown>$index</>
+
+<white>arguments:</>
+    <light_gray>$command</> - although command is not an argument of the split
+               command, it is here for illustrating purposes.
+    
+    <green>split</>    - the <green>split</> command
+    
+    <cyan>$pattern</> - a string pattern. by this pattern each line will be
+               splitted into substrings
+    
+    <brown>$index</>   - the index of the substring that the split command
+               will return.
+
+<white>examples:</>
+    ls | <green>split</> <cyan>"  "</> <brown>5</>

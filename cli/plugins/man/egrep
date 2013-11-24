@@ -1,0 +1,20 @@
+<white>synopsys:</>
+    the command <green>egrep</> is used to filter the output of another
+    command in the sense that only lines that are matching a regular expression
+    pattern are returned.
+    
+    the egrep command is intended to be used via a pipe.
+    
+<white>usage: </><light_gray>$command</> | <green>egrep</> <cyan>$pattern</>
+
+<white>arguments:</>
+    <light_gray>$command</> - although command is not an argument of the egrep
+               command, it is here for illustrating purposes.
+    
+    <green>egrep</>     - the <green>egrep</> command
+    
+    <cyan>$pattern</> - a pattern representing a regular expression.
+
+<white>examples:</>
+    ls | <green>egrep</> <cyan>[0-9]+</>
+    ls | <green>egrep</> <cyan>Cat[e|g|o|r|y]+</>

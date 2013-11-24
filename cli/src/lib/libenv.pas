@@ -2,12 +2,12 @@ unit libenv;
 
 interface
 
-uses strutils, strings, sysutils, classes;
+uses strutils, strings, sysutils, classes, libutils;
 
 function term_set_env( name: string; value: string ): boolean;
 function term_get_env( name: string ): string;
 
-procedure term_dump_process_output( var lines: TStringList );
+procedure term_set_process_output( var lines: TStringList; var output: TStrArray );
 
 implementation
 
@@ -95,7 +95,7 @@ begin
     
 end;
 
-procedure term_dump_process_output( var lines: TStringList );
+procedure term_set_process_output( var lines: TStringList; var output: TStrArray );
 var total_lines  : integer = 0;
     output_lines : integer = 0;
     i            : integer = 0;
@@ -104,6 +104,8 @@ var total_lines  : integer = 0;
     //prev_empty   : boolean = false;
     env_var      : string  = '';
 begin
+
+    setlength( output, 0 );
 
     //writeln( 'dumping process output...' );
     
@@ -143,8 +145,10 @@ begin
         
     end;
     
+    setLength( output, output_lines );
+    
     for i := 0 to output_lines - 1 do
-        writeln( lines[i] );
+        output[i] := lines[i];
     
     for i := output_lines + 1 to total_lines - 1 do begin
         

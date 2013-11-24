@@ -18,7 +18,7 @@ unit libpipe;
 
 interface
 
-    uses libutils;
+    uses libutils, sysutils;
 
     const term_no_color        =  0;
 
@@ -66,10 +66,10 @@ interface
             constructor Create ();
             
             // adds a line to internal _input
-            procedure   write_line( line: string );
+            procedure   write_line( line: string ); virtual;
             
             // adds an argument to internal _arguments
-            procedure   add_arg( argument: string );
+            procedure   add_arg( argument: string ); virtual;
             
             // removes terminal string codes from a string
             function    decolorize( s: string ): string;
@@ -93,13 +93,39 @@ interface
             destructor  Free();
     end;
     
+    Type TPipeCommand_Screen = class( TPipeCommand )
+        
+        function    Compile( args: TStrArray ): string; override;
+        procedure   Run;                                override;
+        procedure   write_line( line: string );         override;
+        
+    end;
+    
     Type TPipeCommand_Grep = class( TPipeCommand )
         
         public
             
             function  Compile( args: TStrArray ): string; override;
-            procedure Run;                                  override;
+            procedure Run;                                override;
         
+    end;
+    
+    Type TPipeCommand_EGrep = class( TPipeCommand )
+        
+        public
+        
+            function  Compile( args: TStrArray ): string; override;
+            procedure Run;                                override;
+        
+    end;
+    
+    Type TPipeCommand_Split = class( TPipeCommand )
+        
+        public
+            
+            function  Compile( args: TStrArray ): string; override;
+            procedure Run;                                override;
+    
     end;
     
 implementation
@@ -291,8 +317,9 @@ begin
     
 end;
 
+{$i inc/screen.pas}
 {$i inc/grep.pas}
-
-
+{$i inc/split.pas}
+{$i inc/egrep.pas}
 
 end.

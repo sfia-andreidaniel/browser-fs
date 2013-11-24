@@ -83,6 +83,18 @@
         [
             'command' => 'man',
             'description' => "display a man page about a command"
+        ],
+        [
+            'command' => 'grep',
+            'description' => "display only lines that are containing a substring"
+        ],
+        [
+            'command' => 'split',
+            'description' => "splits a string and return substring by index"
+        ],
+        [
+            'command' => 'egrep',
+            'description' => "display only lines that are matching a regular expression pattern"
         ]
     ];
     

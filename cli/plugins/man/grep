@@ -1,0 +1,24 @@
+<white>synopsys:</>
+    the command <green>grep</> is used to filter the output of another
+    command in the sense that only lines that are matching a substring
+    pattern are returned.
+    
+    the grep command is intended to be used via a pipe.
+    
+<white>usage: </><light_gray>$command</> | <green>grep</> <cyan>$pattern</>
+
+<white>arguments:</>
+    <light_gray>$command</> - although command is not an argument of the grep
+               command, it is here for illustrating purposes.
+    
+    <green>grep</>     - the <green>grep</> command
+    
+    <cyan>$pattern</> - a string pattern.
+
+<white>remarks:</>
+    
+    The grep command is case sensitive, meaning that "foo" is not equal with "Foo"
+
+<white>examples:</>
+    ls | <green>grep</> <cyan>"root"</>
+    ls | <green>grep</> <cyan>"Category"</>

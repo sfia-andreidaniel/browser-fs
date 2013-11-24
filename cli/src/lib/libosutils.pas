@@ -8,7 +8,7 @@ function  which( binary_name: string ): string; // which( 'php' ) will return '/
 function  base_dir(): string;                   // returns current program directory
 
 // run a console command command_name (e.g. help), with given arguments args
-function  run_command( args: TStringList ): boolean;
+function  run_command( args: TStrArray; var output: TStrArray ): boolean;
 
 function escapeshellarg( str: string ) : string;
 
@@ -119,7 +119,7 @@ begin
     
 end;
 
-function run_command( args: TStringList ): boolean;
+function run_command( args: TStrArray; var output: TStrArray ): boolean;
 
 var testfile   : string;
     //cmdline    : string;
@@ -155,7 +155,7 @@ begin
     ourprocess.parameters.add( '-ENV=user:' + term_get_env('user') );
     ourprocess.parameters.add( '-ENV=password:' + term_get_env( 'password' ) );
     
-    for i := 1 to args.count - 1 do begin
+    for i := 1 to length( args ) - 1 do begin
 
         if args[i] = '' then
             ourprocess.parameters.add( '---empty---argument---fpc---tprocess---bug---' )
@@ -188,7 +188,7 @@ begin
     OutputLines := TStringList.Create;
     OutputLines.LoadFromStream(MemStream);
 
-    term_dump_process_output( OutputLines );
+    term_set_process_output( OutputLines, output );
 
     OutputLines.Free;
     OurProcess.Free;

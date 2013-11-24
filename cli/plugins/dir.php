@@ -59,12 +59,15 @@
         }
         
         $longestLen = 0; // longest name length in the list
+        $longestTypeLen = 0; // longest type length
         
         Object( 'Utils.Class.Loader', 'Sys.Umask' );
         
-        $items->each( function( $item ) use (&$longestLen) {
+        $items->each( function( $item ) use (&$longestLen, &$longestTypeLen ) {
             if ( $longestLen < strlen( $item->owner . ':' . $item->group ) )
                 $longestLen = strlen( $item->owner . ':' . $item->group );
+            if ( $longestTypeLen < strlen( $item->type ) )
+                $longestTypeLen = strlen( $item->type );
         } )->here( function( $me ) use ( &$longestLen ) {
             
             echo "total ", $me->length, "\r";
@@ -73,11 +76,12 @@
             
             return strcmp( $a->name, $b->name );
             
-        } )->each( function( $item ) use ( $longestLen, $term ) {
+        } )->each( function( $item ) use ( $longestLen, $longestTypeLen, $term ) {
             
             echo Umask::mode_to_str( $item->mode ), "  ",
                  str_pad( $item->owner . ':' . $item->group, $longestLen ), "  ",
-                 @date( 'm/d/Y H:i:s', $item->ctime ), '  ', 
+                 @date( 'm/d/Y H:i:s', $item->ctime ), '  ',
+                 $term->color( str_pad( $item->type, $longestTypeLen ), 'light_blue' ), "  ",
                  $term->color( $item->name, $item->isContainer() ? 'cyan' : 'light_gray' ), "\r";
             
         } );

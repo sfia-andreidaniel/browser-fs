@@ -2,7 +2,7 @@ unit libterm;
 
 interface
 
-uses classes, libutils, libpipe;
+uses classes, libutils, libpipe, libcommand;
 
 procedure on_bksp;
 
@@ -18,7 +18,7 @@ procedure on_autocomplete;
 procedure on_key( c: char );
 procedure on_command();
 
-function parse_command( command: string ): TStringList;
+//function parse_command( command: string ): TStringList;
 procedure term_update();
 
 procedure die();
@@ -41,6 +41,7 @@ begin
 
 end;
 
+{
 function parse_command( command: string ): TStringList;
 var y: TStringList;
 begin
@@ -56,6 +57,7 @@ begin
     parse_command := y;
 
 end;
+}
 
 procedure term_update();
 var site: string = '';
@@ -212,14 +214,14 @@ end;
 procedure on_command();
 
 var tcommand   : string = '';      // the terminal command ( unparsed )
-    args       : TStringList;      // the arguments of the parsed command line
-    handled    : boolean = false;  // weather the command has been handled internally
-    supassword : string = '';      // for the "su" command
+    //args       : TStringList;      // the arguments of the parsed command line
+    //handled    : boolean = false;  // weather the command has been handled internally
+    //supassword : string = '';      // for the "su" command
 
 begin
     wr_index := 0;
     
-    handled := false;
+    //handled := false;
     
     if ( command <> '' ) then
     begin
@@ -243,72 +245,7 @@ begin
             exit;
         end;
     
-    args := parse_command( tcommand );
-    
-    //writeln( #13#10'num args: ', args.count, #13#10 );
-    
-    case args.count of
-        1: begin
-            
-            if args[0] = 'exit' then begin
-                handled := true;
-                die();
-            end;
-            
-            if args[0] = 'clear' then begin
-                clrscr();
-                handled := true;
-                term_update();
-            end;
-            
-        end;
-        
-        2: begin
-            
-            // su is a special command where we need to read
-            // the password before running the script
-            if ( args[0] = 'su' ) and ( term_get_env('site') <> '' ) then begin
-                
-                writeln();
-                
-                supassword := read_password();
-                
-                if supassword = '' then
-                begin
-                    textcolor( red );
-                    writeln( 'conversation error' );
-                    textcolor( lightgray );
-                    writeln();
-                    handled := true;
-                end else
-                begin
-                    // add the password as last argument to 'su'
-                    args.add( supassword );
-                end;
-                
-            end;
-            
-        end;
-    end;
-    
-    if handled = false then begin
-        handled := run_command( args );
-        if handled then begin
-            term_update();
-        end;
-    end;
-    
-    if handled = false then
-    begin
-        textcolor( red );
-        write( #10#13'> ' );
-        textcolor( lightgray );
-        write( 'unrecognized command: ' );
-        textcolor( yellow );
-        writeln( tcommand );
-        textcolor( lightgray );
-        term_update();
-    end;
+    exec_command( tcommand );
     
 end;
 
