@@ -1,0 +1,55 @@
+<white>synopsys:</>
+    the command <green>chmod</> is used to change a filesystem umask
+    attribute (file mode bits).
+    
+<white>usage: </><green>chmod</> [<yellow>-r</>] <cyan>$mode</> <brown>$path</>
+
+<white>arguments:</>
+    <yellow>-r</> - weather the change of the <cyan>$mode</> to be propagated on
+         all the objects that are children of the <brown>$path</> or not.
+         
+         this argument is optional, and it defaults to false.
+         
+    <cyan>$mode</> - mandatory argument, representing the new umask of the
+         file or directory.
+         
+         <cyan>$mode</> can be expressed in the following formats:
+            <cyan>octal</> - specify the umask in an octal representation
+                like in traditional unix systems (eg: <cyan>755</>).
+            <cyan>human readable:</> - specify the umask into a human readable
+                format (eg: <cyan>rwx------</>). note that when specifying
+                the umask in a human readable format abbreviations are not
+                allowed, so the umask string must always contain 9 or 10
+                characters (the 10'th character is the "t" sticky flag, which
+                is optional).
+    
+    <brown>$path</> - mandatory argument, representing either
+         a relative path, either an absolute path to the object in for which
+         you want to change it's <cyan>$mode</>
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command will use the privileges of the current logged-in
+      user. form more information see command <green>su</>
+
+    <red>!</> an error will occur if current user don't have enough rights
+      on the <brown>$path</>.
+    
+<white>examples:</>
+    <green>chmod</> <yellow>-r</> <cyan>777</> <brown>"/my files"</> - set the file 
+        bits mode of "/my files" to "777" (octal representation). also, all sub-folders
+        and folders of the "/my files" folder will have the same file mode from now on.
+    <green>chmod</> <yellow>-r</> <cyan>rwxr--r--t</> <brown>"/my files"</> - set the file 
+        bits mode of "/my files" to "rwxr--r--t" (human readable representation). 
+        
+            rwxr--r--t umask has the following meaning:
+                owner can read, write, and execute
+                group can only read
+                the others can only read
+                also a sticky fiag will be set
+        
+        also, all sub-folders
+        and folders of the "/my files" folder will have the same file mode from now on.
+    

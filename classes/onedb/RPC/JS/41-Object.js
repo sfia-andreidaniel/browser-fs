@@ -49,7 +49,7 @@ function OneDB_Object( server, properties ) {
                 return server;
             },
             "set": function() {
-                throw "The '_server' property of a OneDB_Object is read-only";
+                throw Exception( 'Exception.IO', "The '_server' property of a OneDB_Object is read-only" );
             }
         });
         
@@ -88,7 +88,7 @@ function OneDB_Object( server, properties ) {
                                  * "mode", but via the chmod function 
                                  */
                                 return function() {
-                                    throw "The 'mode' property is readOnly. Please use the chmod method instead!";
+                                    throw Exception( 'Exception.IO', "The 'mode' property is readOnly. Please use the chmod method instead!" );
                                 };
                                 
                                 break;
@@ -99,7 +99,7 @@ function OneDB_Object( server, properties ) {
                                 /* but via the chown function 
                                  */
                                 return function() {
-                                    throw "The '" + property + "' property is readOnly. Please use the chown method instead!";
+                                    throw Exception( 'Exception.IO', "The '" + property + "' property is readOnly. Please use the chown method instead!" );
                                 };
                                 
                                 break;
@@ -110,7 +110,7 @@ function OneDB_Object( server, properties ) {
                             case 'url':
                             case 'muid':
                                 return function( v ) {
-                                    throw "The '" + property + "' of a OneDB_Object is read-only!";
+                                    throw Exception( 'Exception.IO', "The '" + property + "' of a OneDB_Object is read-only!" );
                                 };
                                 break;
                             
@@ -412,3 +412,12 @@ OneDB_Object.prototype.chown = function( userGroupOwners, recursive ) {
         "value": ug[1]
     } );
 };
+
+OneDB_Object.prototype.appendChild = function( childNode ) {
+    
+    if ( !childNode || !( childNode instanceof OneDB_Object ) )
+        throw Exception('Exception.FS', 'The "appendChild" method first argument should be an instance of type OneDB_Object');
+    
+    return OneDB.runEndpointMethod( this, 'appendChild', [ childNode ] );
+    
+}

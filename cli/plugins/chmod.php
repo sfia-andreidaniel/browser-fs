@@ -19,13 +19,13 @@
     
     if ( count( $argv ) < 3 || count( $argv ) > 4 || ( count( $argv ) == 4 && $argv[1] != '-r' ) ) {
         
-        echo $term->color( "chown: wrong number or bad usage of arguments! displaying manual...", 'red' ), "\r";
+        echo $term->color( "chmod: wrong number or bad usage of arguments! displaying manual...", 'red' ), "\r";
         
-        term_manual('chown');
+        term_manual('chmod');
     }
     
     $recursive  = ( count($argv) == 4 && $argv[1] == '-r' );
-    $owner      = ( count($argv) == 4 ? $argv[2] : $argv[1] );
+    $mode       = ( count($argv) == 4 ? $argv[2] : $argv[1] );
     $path       = ( count($argv) == 4 ? $argv[3] : $argv[2] );
     
     try {
@@ -87,9 +87,9 @@
         
         }
         
-        $src->chown( $owner, $recursive );
+        $src->chmod( $mode, $recursive );
         
-        echo 'the owner of object ' . $term->color( $src->name, 'yellow' ) . ' was successfully changed to ' . $owner, "\r";
+        echo 'the bit modes of object ' . $term->color( $src->name, 'yellow' ) . ' were successfully changed to ' . $mode, "\r";
         
     } catch ( Exception $e ) {
         

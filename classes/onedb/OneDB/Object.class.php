@@ -799,7 +799,7 @@
                 
             } catch ( Exception $e ) {
                 
-                throw Object( 'Exception.IO', 'failed to change the owner of the object (' . $this->url . ')' );
+                throw Object( 'Exception.IO', 'failed to change the owner of the object (' . $this->url . ')', 104, $e );
                 
             }
             
@@ -892,6 +892,9 @@
                     }
                     
                 }
+                
+                return $anotherObject;
+                
             } catch ( Exception $e ) {
                 throw Object('Exception.IO', 'failed to move object!', 100, $e );
             }

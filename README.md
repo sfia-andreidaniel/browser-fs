@@ -39,8 +39,9 @@ Api:
 
 Cli:
 
-* commands: chmod, cp, route
+* commands: cp, route
 * autocompleter: message "Do you want to display all 372 results?"
+
 
 Administration:
 
