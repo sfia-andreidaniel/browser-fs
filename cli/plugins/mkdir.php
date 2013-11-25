@@ -82,7 +82,7 @@
             throw $e;
         }
         
-        echo $term->color( $name , 'green' ) . " created\r\r";
+        echo $term->color( $name , 'yellow' ) . " created\r\r";
         
     } catch ( Exception $e ) {
         

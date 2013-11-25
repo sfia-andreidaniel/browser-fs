@@ -36,7 +36,7 @@
             }
             
             this.toString = function() {
-                return type + ': ' + this.getMessage() + ' [ ' + ( code ? 'code ' + this.getCode() + ', ' : '' ) + 'in file: "' + this.getFile() + '" at line ' + this.getLine() + ']';
+                return type + ': ' + this.getMessage() + ' [ ' + ( code ? 'code ' + this.getCode() + ',' : '' ) + ' in file: "' + this.getFile() + '" at line ' + this.getLine() + ' ]';
             }
             
             return this;

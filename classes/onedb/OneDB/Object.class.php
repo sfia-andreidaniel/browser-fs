@@ -932,20 +932,32 @@
                 // the object url to $this->url, etc
                 
                 $objectData['_parent'] = $this->_id;
-                $objectData['url'] = self::$_path_->normalize(
-                    $this->url . str_replace( '"', '%22', str_replace( '/', '%2F', urldecode( str_replace( '+', ' ', $objectData['name'] ) ) ) )
+                
+                $objectData['url'] = self::$_path_->resolve(
+                    $this->url . '/' . str_replace( '"', '%22', str_replace( '/', '%2F', urldecode( str_replace( '+', ' ', $objectData['name'] ) ) ) )
                 );
+                
                 $objectData['uid']   = $this->_server->user->uid;
                 $objectData['gid']   = $this->_server->user->gid;
                 $objectData['muid']  = $this->_server->user->uid;
                 $objectData['mode']  = $this->_server->user->umask;
                 $objectData['ctime'] = $objectData['mtime'] = time();
                 
+                //print_r( $objectData );
+                
                 // insert the object in database
                 
-                $this->_server->objects->save( $objectData, [
-                    'fsync' => TRUE
-                ]);
+                try {
+            
+                    $this->_server->objects->save( $objectData, [
+                        'fsync' => TRUE
+                    ]);
+                
+                } catch ( MongoException $e ) {
+                    
+                    throw $e->getCode() != 11000 ? $e : Object( 'Exception.IO', 'another item with the same name allready exists on destination', 0, $e );
+                    
+                }
                 
                 $newObject = $this->_server->getElementById( $objectData[ '_id' ] );
                 
@@ -1017,7 +1029,13 @@
            even if it is a public method.
          */
         public function __clone__() {
-            return $this->_server->objects->findOne( [ '_id' => $this->_id ] );
+            $result = $this->_server->objects->findOne( [ '_id' => $this->_id ] );
+            
+            if ( is_array( $result ) ) {
+                unset( $result[ '_id' ] );
+            }
+            
+            return $result;
         }
         
     }

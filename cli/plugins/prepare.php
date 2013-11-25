@@ -13,7 +13,11 @@
         die(1);
     }
     
-    if ( count( $argv ) < 2 || !in_array( $argv[1], [ 'database', 'environment' ] ) )
+    if ( count( $argv ) < 2 || 
+         count( $argv ) > 3 || 
+         ( count( $argv ) == 3 && $argv[2] == 'database' && $argv[1] != '-force' ) ||
+         ( count( $argv ) == 2 && !in_array( $argv[1], [ 'database', 'environment' ] ) )
+    )
         term_manual('prepare');
     
     function onedbpass() {
@@ -22,7 +26,7 @@
     
     try {
         
-        switch ( $argv[1] ) {
+        switch ( count( $argv ) == 3 ? $argv[2] : $argv[1] ) {
             
             case 'database':
                 
@@ -45,7 +49,7 @@
 
                     if ( $col->findOne() != NULL ) {
 
-                        if ( !isset( $argv[2] ) || $argv[2] != '-force' ) {
+                        if ( !isset( $argv[1] ) || $argv[1] != '-force' ) {
                             
                             die( $term->color( implode( "\r", [
                                 "",
@@ -106,7 +110,7 @@
                 $objects->ensureIndex(
                     [
                         'name' => 1,
-                        'parent' => 1
+                        '_parent' => 1
                     ],
                     [
                         'unique' => TRUE

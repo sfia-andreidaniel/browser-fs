@@ -33,13 +33,12 @@ make things more clear.
 
 Api:
 
-* OneDB_Object.copy()
 * OneDB_Type_File: finish file storage stuff
 * OneDB_Router class
 
 Cli:
 
-* commands: cp, route
+* commands: route
 * autocompleter: message "Do you want to display all 372 results?"
 
 
