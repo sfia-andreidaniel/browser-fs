@@ -26,7 +26,7 @@ function OneDB_Type( ) {
                         ( function( propName, config ) {
     
                             if ( config.on != 'server' ) {
-                            
+    
                                 //console.log( "Defining property " + propName + "..." );
         
                                 var local = config.get 
@@ -101,7 +101,9 @@ function OneDB_Type( ) {
                                         else
 
                                             return function(v) {
-                                            
+                                                
+                                                me._root.__change( 'data.' + config.name, v );
+                                                
                                                 switch ( true ) {
                                             
                                                     // If the method has the FLAG field, we must do an automatically save to the object
@@ -111,7 +113,8 @@ function OneDB_Type( ) {
                                                     
                                                 }
                                                 
-                                                return OneDB.setRemoteProperty( me._root, 'data.' + config.name, v );
+                                                //OneDB.setRemoteProperty( me._root, 'data.' + config.name, v );
+                                                
                                             };
                                         
                                     } )()

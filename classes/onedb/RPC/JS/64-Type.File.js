@@ -38,6 +38,36 @@ OneDB_Types.OneDB_Type_File = {
             "default" : ''
         },
         {
+            "name"    : "fileDuration",
+            "type"    : "float",
+            "readOnly": true,
+            "default" : 0
+        },
+        {
+            "name"    : "fileMime",
+            "type"    : "string",
+            "readOnly": true,
+            "default" : ""
+        },
+        {
+            "name"    : "fileExtension",
+            "type"    : "string",
+            "readOnly": true,
+            "default" : ""
+        },
+        {
+            "name"    : "fileVideoInfo",
+            "type"    : "nullable object",
+            "readOnly": true,
+            "default" : null
+        },
+        {
+            "name"    : "fileAudioInfo",
+            "type"    : "nullable object",
+            "readOnly": true,
+            "default" : null
+        },
+        {
             "name"    : "storageResponseData",
             "type"    : "object",
             "readOnly": false,
