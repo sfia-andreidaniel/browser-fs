@@ -42,7 +42,7 @@
             $where = $parser->resolve( $source );
         
             if ( $where === FALSE )
-                throw Object( 'Exception.IO', 'invalid source path "' . $destination . '"' );
+                throw Object( 'Exception.IO', 'invalid source path "' . $source . '"' );
             
             $src = $client->getElementByPath( $where );
             

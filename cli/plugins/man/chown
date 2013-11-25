@@ -1,0 +1,52 @@
+<white>synopsys:</>
+    the command <green>chown</> is used to change file owner and group
+    of a filesystem object from the database.
+    
+<white>usage: </><green>chown</> [<yellow>-r</>] <cyan>$owner</> <brown>$path</>
+
+<white>arguments:</>
+    <yellow>-r</> - weather the change of the owner to be propagated on
+         all the objects that are children of the <brown>$path</> or not.
+         
+         this argument is optional, and it defaults to false.
+         
+    <cyan>$owner</> - mandatory argument, representing the name of the
+         entity that will be the owner of this object.
+         
+         <cyan>$owner</> can be expressed in the following formats:
+            <cyan>$userid:$groupid</> - full specification of the user and group
+                id of the object (eg: <cyan>32:21</>).
+            <cyan>$userid:</> - change only the user by it's uid, and leave
+                the same group (eg: <cyan>24:</>)
+            <cyan>:$groupid</> - change only the group by it's gid, and leave
+                the same owner (eg: <cyan>:4</>)
+            <cyan>$username:$groupname</> - full specification of the user and
+                group by the name (eg: <cyan>joe:users</>).
+            <cyan>$username:</> - change only the user, and leave the group
+                the same (eg: <cyan>joe</>).
+            <cyan>:$groupname</> - change only the group, and leave the user
+                the same (eg: <cyan>:users</>).
+            <cyan>$userid_or_groupid</> - in onedb, the uid / gid don't encounter
+                collisions, as they have the same auto-increment source.
+                so it is sufficient to specify either a user id either a
+                group id to <green>chown</> command. (eg: <cyan>14</>).
+    
+    <brown>$path</> - mandatory argument, representing either
+         a relative path, either an absolute path to the object in for which
+         you want to change it's <cyan>$owner</>
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command will use the privileges of the current logged-in
+      user. form more information see command <green>su</>
+
+    <red>!</> an error will occur if current user don't have enough rights
+      on the <brown>$path</>.
+    
+<white>examples:</>
+    <green>chown</> <yellow>-r</> <cyan>joe:users</> <brown>"/my files"</> - set the owner of
+        "/my files" to "joe", and the group "users". also, all sub-folders
+        and folders of the "/my files" folder will have the same owner and group.
+    

@@ -87,7 +87,6 @@ var initok: boolean;
          r: tregexprengine;
      index,
        len: longint;
-    result: boolean;
          p: pchar;
         p1: pchar;
 
