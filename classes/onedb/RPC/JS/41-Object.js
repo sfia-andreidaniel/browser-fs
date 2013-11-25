@@ -155,7 +155,7 @@ function OneDB_Object( server, properties ) {
                 lastType = ( typeName || '' ).replace( /[\._]+/g, '_' );
                 
                 if ( !window[ 'OneDB_Type_' + lastType ] )
-                    throw "Failed to set object type: The class OneDB_Type_" + lastType + " is not implemented!";
+                    throw Exception( 'Exception.IO', "Failed to set object type: The class OneDB_Type_" + lastType + " is not implemented!" );
                 
                 myType = new window[ "OneDB_Type_" + typeName ]( this, properties );
                 
@@ -176,6 +176,9 @@ function OneDB_Object( server, properties ) {
             
             "get": function() {
                 return myType || {};
+            },
+            "set": function( val ) {
+                throw Exception( 'Exception.IO', 'the "data" root property of a OneDB_Object is read-only' );
             }
             
         } );
@@ -269,11 +272,11 @@ function OneDB_Object( server, properties ) {
         
         switch ( true ) {
             case !this.has_flag( 'writable' ):
-                throw Exception( 'Exception.Object', "Not enough filesystem permissions to complete this operation" );
+                throw Exception( 'Exception.IO', "Not enough filesystem permissions to complete this operation" );
                 break;
             
             case this.has_flag('unlinked'):
-                throw Exception( 'Exception.Object', "The object was previously deleted from the database, and cannot be saved!" );
+                throw Exception( 'Exception.IO', "The object was previously deleted from the database, and cannot be saved!" );
                 break;
             
             case !this.changed:
@@ -281,15 +284,15 @@ function OneDB_Object( server, properties ) {
                 break;
             
             case this.has_flag( 'readonly' ):
-                throw Exception( 'Exception.Object', "The object cannot be saved because it is read-only!" );
+                throw Exception( 'Exception.IO', "The object cannot be saved because it is read-only!" );
                 break;
             
             case this.has_flag( 'live' ):
-                throw Exception( 'Exceptoin.Object', "Live objects cannot be saved!" );
+                throw Exception( 'Exceptoin.IO', "Live objects cannot be saved!" );
                 break;
             
             case this.has_flag( 'unstable' ):
-                throw Exception( 'Exception.Object', "The object cannot be saved because it has been retrieved from server in an unstable state!" );
+                throw Exception( 'Exception.IO', "The object cannot be saved because it has been retrieved from server in an unstable state!" );
                 break;
         
         }
@@ -377,7 +380,7 @@ OneDB_Object.prototype.__demux = function( data ) {
 
 OneDB_Object.prototype.delete = function() {
     if ( this.has_flag( 'unlinked' ) )
-        throw "Object is allready deleted!";
+        throw Exception( 'Exception.IO', "Object is allready deleted!" );
     
     OneDB.runEndpointMethod( this, 'delete', [] );
     
@@ -413,10 +416,11 @@ OneDB_Object.prototype.chown = function( userGroupOwners, recursive ) {
     } );
 };
 
+// @returns: type <OneDB_Object>: the childNode with it's modified properties.
 OneDB_Object.prototype.appendChild = function( childNode ) {
     
     if ( !childNode || !( childNode instanceof OneDB_Object ) )
-        throw Exception('Exception.FS', 'The "appendChild" method first argument should be an instance of type OneDB_Object');
+        throw Exception('Exception.IO', 'The "appendChild" method first argument should be an instance of type OneDB_Object');
     
     return OneDB.runEndpointMethod( this, 'appendChild', [ childNode ] );
     
