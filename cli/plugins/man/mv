@@ -1,0 +1,32 @@
+<white>synopsys:</>
+    the command <green>mv</> is used to move objects from a location
+    into another location inside the same website context.
+    
+<white>usage: </><green>mv</> <cyan>$source_path</> <brown>$destination_path</>
+
+<white>arguments:</>
+    <cyan>$source_path</> - mandatory argument, representing either a
+         relative path, either an absolute path to the object which you
+         want to move.
+    
+    <brown>$destination_path</> - mandatory argument, representing either
+         a relative path, either an absolute path to the object in which
+         you want to move the <cyan>$source_path</>
+
+<white>important:</>
+    <red>!</> this command requires a website context. for more
+      information see command <green>use</>
+    
+    <red>!</> this command will use the privileges of the current logged-in
+      user. form more information see command <green>su</>
+
+    <red>!</> an error will occur if the <brown>$destination_path</> is allready
+      containing an item with the name of the <cyan>$source_path</>
+    
+    <red>!</> an error will occur if current user don't have enough rights
+      on the <brown>$destination_path</> or the <cyan>$source_path</>.
+    
+    <red>!</> an error will occur if the <brown>$destination_path</> is not a dir.
+
+<white>examples:</>
+    <green>mv</> <cyan>../my_folder</> <brown>"/my files"</> - moves "my_folder" into "my files"

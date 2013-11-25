@@ -33,14 +33,13 @@ make things more clear.
 
 Api:
 
-* OneDB_Object.rename()
 * OneDB_Object.copy()
 * OneDB_Type_File: finish file storage stuff
 * OneDB_Router class
 
 Cli:
 
-* commands: chown, chmod, mv, cp, route
+* commands: chown, chmod, cp, route
 * autocompleter: message "Do you want to display all 372 results?"
 
 Administration:

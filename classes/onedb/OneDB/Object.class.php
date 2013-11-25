@@ -65,14 +65,9 @@
         // An Object Type implementation should NEVER implement these
         // properties.
         public static $_nativeProperties = [
-            '_id',   '_parent',  '_type',
-            'name',
-            'ctime', 'mtime',
-            'gid',   'uid',      'muid',    'mode',
-            'description',
-            'icon',
-            'keywords',          'tags',
-            'online'
+            '_id', '_parent', '_type', 'name', 'ctime', 'mtime',
+            'gid', 'uid', 'muid', 'mode', 'description', 'icon',
+            'keywords', 'tags', 'online'
         ];
         
         // a singleton of the muxer, to do fast object muxing
@@ -150,7 +145,7 @@
          * 
          * Returns: nothing. On error, exception is thrown
          */
-        public function save() {
+        public function save( ) {
             
             if ( $this->_unlinked )
                 return;
@@ -810,6 +805,125 @@
             
         }
         
+        /* The appendChild method is used to make an object a child of
+           current object
+         */
+        public function appendChild( OneDB_Object $anotherObject ) {
+            
+            try {
+            
+                //echo "moving $anotherObject->url into $this->url\r";
+                
+                if ( $this->url == $anotherObject->url )
+                    throw Object( 'Exception.IO', 'the source and the destination are the same!' );
+            
+                if ( $anotherObject->url == '/' )
+                    throw Object( 'Exception.IO', 'the root object cannot be moved!' );
+            
+                if ( !$this->isWritable() )
+                    throw Object( 'Exception.IO', 'not enough permissions on destination!' );
+                
+                if ( !$anotherObject->isWritable() )
+                    throw Object( 'Exception.IO', 'not enough permissions on source!' );
+                
+                if ( !$this->isContainer() )
+                    throw Object( 'Exception.IO', 'the destination is not a directory' );
+
+                $oldUrl = $anotherObject->url;
+            
+                // test if this is child of $anotherObject
+                if ( ( $this->url != '/' ) && strpos( $oldUrl . '/', $this->url ) === 0 )
+                    throw Object( 'Exception.IO', 'the destination is a child of the source' );
+            
+                $anotherObject->parent = $this;
+                
+                $anotherObject->save();
+            
+                if ( $anotherObject->isContainer() ) {
+                    
+                    // we fetch all objects from the database where their url starts with the $oldUrl
+                    
+                    $expr = new MongoRegex(
+                        '/^' . 
+                        addcslashes( $oldUrl . '/', '*/\\.#{}+?%()^:' ) . // ' > mc bug
+                        '([^*]+)/'
+                    );
+                    
+                    $objects = $this->_server->objects;
+                    
+                    $cursor = $objects->find([
+                        'url' => $expr
+                    ], [
+                        '_id' => TRUE,
+                        'url' => TRUE
+                    ] );
+                    
+                    $items = [];
+                    
+                    foreach ( $cursor as $row ) {
+                        //echo "debug: found: $row[url]\r";
+                        $items[] = [
+                            '_id' => $row['_id'],
+                            'url' => $row['url']
+                        ];
+                    }
+                    
+                    $ulen = strlen( $oldUrl ) + 1;
+                    $frag = $anotherObject->url;
+                    
+                    foreach ( $items as $item ) {
+                        
+                        //echo "debug: rename $item[url] into ";
+                        
+                        $item[ 'url' ] = $frag . '/' . substr( $item['url'], $ulen );
+                        
+                        //echo "$item[url]\r";
+                        
+                        $objects->update([
+                            '_id' => $item['_id'],
+                        ],[
+                            '$set' => [
+                                'url' => $item['url']
+                            ]
+                        ],[
+                            'multiple' => FALSE
+                        ]);
+                        
+                    }
+                    
+                }
+            } catch ( Exception $e ) {
+                throw Object('Exception.IO', 'failed to move object!', 100, $e );
+            }
+        }
+        
+        /* Copies $anotherObject ( together with it's sub-structure, recursively ) to this object.
+         */
+        public function copyChild( OneDB_Object $anotherObject ) {
+            try {
+            
+                if ( $this->url == $anotherObject->url )
+                    throw Object( 'Exception.IO', 'the source and the destination are the same!' );
+                
+                if ( $anotherObject->url == '/' )
+                    throw Object( 'Exception.IO', 'the root element cannot be cloned!' );
+                
+                if ( !$this->isWritable() )
+                    throw Object( 'Exception.IO', 'not enough permissions (on destination)!' );
+                
+                if ( !$anotherObject->isReadable() )
+                    throw Object( 'Exception.IO', 'not enough permissions (on source)!' );
+                
+                if ( !$this->isContainer() )
+                    throw Object( 'Exception.IO', 'destination is not a directory!' );
+                
+                throw Object( 'Exception.IO', 'the copying is not implemented!' );
+            
+            } catch ( Exception $e ) {
+                throw Object( 'Exception.IO', 'failed to copy object!', 101, $e );
+            }
+        }
+            
         // WARNING: DO NOT USE THIS FUNCTION DIRECTLY, EVEN IF IT IS DECLARED AS PUBLIC.
         // THIS PUBLIC IS DECLARED AS PUBLIC WITH ANOTHER PURPOSE THAN YOU THINK.
         // USE AND ANALYZE THE chown() method instead!
