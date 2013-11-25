@@ -4,6 +4,26 @@
         
         protected static $_files = NULL;
         
+        private function fix_exception_messages( $source_file, $source_code ) {
+            
+            if ( !is_string( $source_code ) )
+                return $source_code; // We don't want to mess something
+            
+            $line = 0;
+            $lines = preg_split( '/(\r)?\n/', $source_code );
+            
+            $sfile = json_encode( $source_file );
+            
+            for ( $i = 0, $len = count( $lines ); $i<$len; $i++ ) {
+                
+                $lines[$i] = str_replace( '__FILE__', $sfile, $lines[$i] );
+                $lines[$i] = str_replace( '__LINE__', ( $i + 1 ), $lines[$i] );
+                
+            }
+            
+            return implode( "\n", $lines );
+        }
+        
         public function init() {
             
             if ( self::$_files === NULL ) {
@@ -19,7 +39,7 @@
                         self::$_files[] = [
                             'index'    => $matches[1],
                             'name'     => $file,
-                            'contents' => file_get_contents( __DIR__ . '/JS/' . $file )
+                            'contents' => $this->fix_exception_messages( $file, file_get_contents( __DIR__ . '/JS/' . $file ) )
                         ];
                         
                     }

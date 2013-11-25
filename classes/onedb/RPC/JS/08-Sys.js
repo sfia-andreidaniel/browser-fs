@@ -40,7 +40,7 @@
                         break;
                     default:
                         
-                        throw Exception( 'Exception.Sys', '@param uidOrName must be of type int or string' );
+                        throw Exception( 'Exception.Sys', '@param uidOrName must be of type int or string' , 0, null, __FILE__, __LINE__ );
                         
                         break;
                 }
@@ -74,7 +74,7 @@
                         break;
                     default:
                         
-                        throw Exception( 'Exception.Sys', '@param uidOrName must be of type int or string' );
+                        throw Exception( 'Exception.Sys', '@param uidOrName must be of type int or string', 0, null, __FILE__, __LINE__  );
                         
                         break;
                 }

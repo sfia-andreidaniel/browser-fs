@@ -22,7 +22,7 @@
             switch ( true ) {
                 case !Strict.is_string( str ):
                     
-                    if ( _throw ) throw Exception( 'Exception.FS', 'input mode must be string!' );
+                    if ( _throw ) throw Exception( 'Exception.FS', 'input mode must be string!', 0, null, __FILE__, __LINE__  );
                     else return false;
                     
                     break;
@@ -106,7 +106,7 @@
                     break;
                 
                 default:
-                    if ( _throw ) throw Exception( 'Exception.FS', 'invalid mode format!' );
+                    if ( _throw ) throw Exception( 'Exception.FS', 'invalid mode format!', 0, null, __FILE__, __LINE__  );
                     else return false;
                     break;
             }
@@ -141,7 +141,7 @@
             _throw = typeof _throw == 'undefined' ? true : !!_throw;
             
             if ( !Strict.is_int( bitmask ) || bitmask < 0 ) {
-                if ( _throw ) throw Exception( 'Exception.FS', "invalid bitmask. expected int gte 0" );
+                if ( _throw ) throw Exception( 'Exception.FS', "invalid bitmask. expected int gte 0", 0, null, __FILE__, __LINE__  );
                 else return false;
             }
             
@@ -180,7 +180,7 @@
                             //echo "bm2: $bitmask2\n";
 
                             if ( bitmask2 === false ) {
-                                if ( _throw ) throw Exception( 'Exception.FS', 'failed to decode octal or verbose string flag' );
+                                if ( _throw ) throw Exception( 'Exception.FS', 'failed to decode octal or verbose string flag', 0, null, __FILE__, __LINE__  );
                                 else return false;
                             }
                             
@@ -191,7 +191,7 @@
                             break;
                         
                         default:
-                            if ( _throw ) throw Exception( 'Exception.FS', 'invalid string flag representation' );
+                            if ( _throw ) throw Exception( 'Exception.FS', 'invalid string flag representation', 0, null, __FILE__, __LINE__  );
                             else return false;
                             break;
                         
@@ -241,7 +241,7 @@
                                         var bitmask2 = this.str_to_mode( i, false );
 
                                         if ( bitmask2 === false ) {
-                                            if ( _throw ) throw Exception( 'Exception.FS', 'failed to decode octal or verbose string flag' );
+                                            if ( _throw ) throw Exception( 'Exception.FS', 'failed to decode octal or verbose string flag', , 0, null, __FILE__, __LINE__ );
                                             else return false;
                                         }
                             
@@ -250,7 +250,7 @@
                                         break;
                         
                                     default:
-                                        if ( _throw ) throw Exception( 'Exception.FS', 'invalid string flag representation' );
+                                        if ( _throw ) throw Exception( 'Exception.FS', 'invalid string flag representation', 0, null, __FILE__, __LINE__ );
                                         else return false;
                                         break;
                                 }
@@ -258,7 +258,7 @@
                                 break;
                             
                             default:
-                                if ( _throw ) throw Exception( 'Exception.FS', 'invalid string flag representation' );
+                                if ( _throw ) throw Exception( 'Exception.FS', 'invalid string flag representation', 0, null, __FILE__, __LINE__ );
                                 else return false;
                                 break;
                         }

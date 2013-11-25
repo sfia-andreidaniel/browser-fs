@@ -12,7 +12,7 @@ function OneDB_Object_Root( server ) {
                 return server;
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "_server" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "_server" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -21,7 +21,7 @@ function OneDB_Object_Root( server ) {
                 return null;
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "id" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "id" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__ );
             }
         } );
         
@@ -30,7 +30,7 @@ function OneDB_Object_Root( server ) {
                 return '/';
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "name" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "name" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -39,7 +39,7 @@ function OneDB_Object_Root( server ) {
                 return 'Root';
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "type" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "type" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -48,7 +48,7 @@ function OneDB_Object_Root( server ) {
                 return 1; // hardcoded user id of the root account
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "uid" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "uid" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -57,7 +57,7 @@ function OneDB_Object_Root( server ) {
                 return 3; // hradcoded group id of the root account
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "gid" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "gid" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -66,7 +66,7 @@ function OneDB_Object_Root( server ) {
                 return 1; // hardcoded user id of the root account
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "muid" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "muid" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -75,7 +75,7 @@ function OneDB_Object_Root( server ) {
                 return null;
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "parent" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "parent" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -84,7 +84,7 @@ function OneDB_Object_Root( server ) {
                 return 0;
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "ctime" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "ctime" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -93,7 +93,7 @@ function OneDB_Object_Root( server ) {
                 return 0;
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "mtime" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "mtime" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -102,7 +102,7 @@ function OneDB_Object_Root( server ) {
                 return server.sys.user( 'root' );
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'The "owner" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'The "owner" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -111,7 +111,7 @@ function OneDB_Object_Root( server ) {
                 return server.sys.group( 'root' );
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "group" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "group" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -120,7 +120,7 @@ function OneDB_Object_Root( server ) {
                 return 484; // rwxr--r--
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "mode" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "mode" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -129,7 +129,7 @@ function OneDB_Object_Root( server ) {
                 return 'This is the uppermost node in the database tree';
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "description" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "description" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -138,7 +138,7 @@ function OneDB_Object_Root( server ) {
                 return null;
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', 'the "icon" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "icon" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -147,7 +147,7 @@ function OneDB_Object_Root( server ) {
                 return [];
             },
             'set': function(val) {
-                throw Exception( 'Exception.IO', 'the "keywords" property of a OneDB_Object_Root is read-only');
+                throw Exception( 'Exception.IO', 'the "keywords" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__ );
             }
         });
         
@@ -156,7 +156,7 @@ function OneDB_Object_Root( server ) {
                 return [];
             },
             "set": function( val ) {
-                throw Exception('Exception.IO', 'the "tags" property of a OneDB_Object_Root is read-only' );
+                throw Exception('Exception.IO', 'the "tags" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -165,7 +165,7 @@ function OneDB_Object_Root( server ) {
                 return true;
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "online" property of a OneDB_Object_Root is read-only' );
+                throw Exception( 'Exception.IO', 'the "online" property of a OneDB_Object_Root is read-only', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -174,7 +174,7 @@ function OneDB_Object_Root( server ) {
                 return '/';
             },
             "set": function( val ) {
-                throw Exception( 'Exception.IO', 'the "url" property of a OneDB_Object_Root is read-only!' );
+                throw Exception( 'Exception.IO', 'the "url" property of a OneDB_Object_Root is read-only!', 0, null, __FILE__, __LINE__  );
             }
         });
         
@@ -183,7 +183,7 @@ function OneDB_Object_Root( server ) {
                 return 22; // CONTAINER ^ ROOT ^ READONLY
             },
             "set": function(val) {
-                throw Exception( 'Exception.IO', "The '_flags' property of a OneDB_Object_Root is read-only!" );
+                throw Exception( 'Exception.IO', "The '_flags' property of a OneDB_Object_Root is read-only!", 0, null, __FILE__, __LINE__  );
             }
         } );
         
@@ -273,19 +273,19 @@ Object.defineProperty( OneDB_Object_Root.prototype, "childNodes", {
 // this method is implemented only for compatibility between OneDB_Object_Root
 // and OneDB_Object, but it throws exception when called
 OneDB_Object_Root.prototype.save = function() {
-    throw Exception( 'Exception.IO', "The root object cannot be saved!" );
+    throw Exception( 'Exception.IO', "The root object cannot be saved!", 0, null, __FILE__, __LINE__  );
 };
 
 // this method is implemented only for compatibility between OneDB_Object_Root
 // and the OneDB_Object, but it throws exception when called
 OneDB_Object_Root.prototype.chmod = function( mask, recursive ) {
-    throw Exception( 'Exception.IO', "The root object cannot be chmoded!" );
+    throw Exception( 'Exception.IO', "The root object cannot be chmoded!", 0, null, __FILE__, __LINE__  );
 }
 
 // this method is implemented only for compatibility between OneDB_Object_Root
 // and the OneDB_Object, but it throws exception when called.
 OneDB_Object_Root.prototype.chown = function( userAndGroup, recursive ) {
-    throw Exception( 'Exception.IO', "The root object cannot be chowned. It always belong to the 'root' account" );
+    throw Exception( 'Exception.IO', "The root object cannot be chowned. It always belong to the 'root' account", 0, null, __FILE__, __LINE__  );
 }
 
 // "moves" a childNode and makes the parent of the child the
@@ -293,7 +293,17 @@ OneDB_Object_Root.prototype.chown = function( userAndGroup, recursive ) {
 // @param childNode: type <OneDB_Object>.
 OneDB_Object_Root.prototype.appendChild = function( childNode ) {
     if ( !childNode || !( childNode instanceof OneDB_Object ) )
-        throw Exception('Exception.IO', 'The "appendChild" method first argument should be an instance of type OneDB_Object');
+        throw Exception('Exception.IO', 'The "appendChild" method first argument should be an instance of type OneDB_Object', 0, null, __FILE__, __LINE__ );
+    
+    return OneDB.runEndpointMethod( this, 'appendChild', [ childNode ] );
+}
+
+// "copies" a childNode together with it's all sub-nodes in the
+// root of the current object.
+// @param childNode: type <OneDB_Object>
+OneDB_Object_Root.prototype.copyChild = function( childNode ) {
+    if ( !childNode || !( childNode instanceof OneDB_Object ) )
+        throw Exception('Exception.IO', 'The "appendChild" method first argument should be an instance of type OneDB_Object', 0, null, __FILE__, __LINE__ );
     
     return OneDB.runEndpointMethod( this, 'appendChild', [ childNode ] );
 }
