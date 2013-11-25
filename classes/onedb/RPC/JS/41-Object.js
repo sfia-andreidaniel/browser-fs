@@ -72,24 +72,52 @@ function OneDB_Object( server, properties ) {
                         return localProperty;
                     },
                     "set": ( function() {
+                        
+                        switch ( property ) {
                             
-                        if ( property != '_flags' ) {
+                            case '_flags':
+                                // The '_flags' property will always be forced to be an integer, and not
+                                // commited to the server on change
+                                return function( ival ) {
+                                    localProperty = ~~ival;
+                                };
+                                break;
                             
-                            if ( [ 'id', 'ctime', 'mtime', 'url', 'gid', 'uid', 'muid', 'mode' ].indexOf( property ) >= 0 )
+                            case 'mode':
+                                /* The mode property is not changeable directly via the object property
+                                   "mode", but via the chmod function */
+                                
+                                // the chmod function is defined here to have access to the "localProperty" variable.
+                                me.chmod = function( mode, recursive ) {
+                                    recursive = recursive || false;
+                                    localProperty = OneDB.runEndpointMethod( me, 'chmod', [ mode, recursive ] );
+                                };
+                                
+                                return function() {
+                                    throw "The 'mode' property is readOnly. Please use the chmod method instead!";
+                                };
+                                
+                                break;
+                            
+                            case 'id':
+                            case 'ctime':
+                            case 'mtime':
+                            case 'url':
+                            case 'gid':
+                            case 'uid':
+                            case 'muid':
                                 return function( v ) {
                                     throw "The '" + property + "' of a OneDB_Object is read-only!";
                                 };
-                            else
+                                break;
+                            
+                            default:
                                 return function( data ) {
                                     localProperty = data;
                                     me.__change( property, data );
                                 };
-                        } else {
-                            // The '_flags' property will always be forced to be an integer, and not
-                            // commited to the server on change
-                            return function( ival ) {
-                                localProperty = ~~ival;
-                            };
+                                break;
+                            
                         }
                     } )()
                 });
@@ -348,4 +376,3 @@ OneDB_Object.prototype.delete = function() {
     // Add the deleted flag
     this._flags = ( this._flags ^ this._flags_list.UNLINKED );
 };
-

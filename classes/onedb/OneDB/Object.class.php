@@ -203,6 +203,10 @@
             // to populate the properties
             if ( $this->_type !== NULL ) $this->_type->exportOwnProperties( $props );
             
+            // Test if the object is writable. If not, abort saving...
+            if ( !$this->isWritable() )
+                throw Object( 'Exception.IO', 'Not enough permissions to save object ' . $this->url );
+            
             // try to do a save in the database.
             try {
                 
@@ -402,9 +406,11 @@
         // Removes the object from collection.
         public function delete() {
             
+            // unlink childrens ...
             if ( $this->isContainer() )
                 $this->find([])->each( function( $item ) { $item->__unlink__(); });
             
+            // unlink myself ...
             $this->__unlink__();
             
         }
@@ -419,6 +425,10 @@
             
             // has been unlinked before?
             if ( $this->_unlinked ) return;
+            
+            // test if object is writable by current user
+            if ( !$this->isWritable() )
+                throw Object( 'Exception.IO', 'Not enough permissions to delete object: ' . $this->url );
             
             // set the unlinked object flag 
             $this->_unlinked = TRUE;
@@ -576,6 +586,56 @@
                    + ( $this->isReadable()  ? self::F_READABLE : 0 )
                    + ( $this->isWritable()  ? self::F_WRITABLE : 0 )
                    + ( $this->isExecutable()? self::F_EXECUTABLE : 0 );
+        }
+        
+        /* Changes the object file mode
+         * @param $mode: can be:
+         *     <string> octal mode representation
+         *     <string> verbose mask representation
+         *     <int>    mask representation as a combination of UMask flags
+         */
+        public function chmod( $mode, $recursive = FALSE ) {
+            
+            try {
+            
+                // test if object is writable by current user
+                if ( !$this->isWritable() )
+                    throw Object( 'Exception.IO', 'Not enough permissions to chmod object' );
+            
+                switch ( TRUE ) {
+                    case is_string( $mode ):
+                        $mode = Umask::str_to_mode( $mode );
+                        break;
+                    
+                    case is_int( $mode ):
+                        if ( $mode < 0 || $mode > Umask::MAX_UMASK )
+                            throw Object('Exception.IO', 'Invalid file mode!' );
+                        break;
+                    
+                    default:
+                        throw Object( 'Exception.IO', 'Invalid chmod $mode argument. Expected string or integer!' );
+                        break;
+                }
+                
+                $this->_mode = $mode;
+                $this->_changed = TRUE;
+                
+                // If the $recursive flag is set and the object is a container
+                // we set the same mode to all the sub-objects of this object
+
+                if ( $recursive && $this->isContainer() )
+                    $this->find([])->each( function( $item ) use ( $mode ) {
+                        $item->chmod( $mode, FALSE );
+                    });
+            
+                return $mode;
+            
+            } catch ( Exception $e ) {
+                
+                throw Object( 'Exception.IO', 'Failed to set object file mode ' . $mode . ' ( object path: "' . $this->url . '" )', 0, $e );
+                
+            }
+            
         }
     }
     

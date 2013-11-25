@@ -34,7 +34,6 @@ make things more clear.
 Api:
 
 * OneDB_Object.chown()
-* OneDB_Object.chmod()
 * OneDB_Object.rename()
 * OneDB_Object.copy()
 * OneDB_Type_File: finish file storage stuff

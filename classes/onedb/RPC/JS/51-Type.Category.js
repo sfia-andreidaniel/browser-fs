@@ -10,3 +10,12 @@ function OneDB_Type_Category( ) {
 };
 
 OneDB_Type_Category.prototype = new OneDB_Type();
+
+OneDB_Types.OneDB_Type_Category = {
+    "properties": [
+        
+    ],
+    "methods": [
+        
+    ]
+};
