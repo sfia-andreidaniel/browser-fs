@@ -85,16 +85,21 @@ function OneDB_Object( server, properties ) {
                             
                             case 'mode':
                                 /* The mode property is not changeable directly via the object property
-                                   "mode", but via the chmod function */
-                                
-                                // the chmod function is defined here to have access to the "localProperty" variable.
-                                me.chmod = function( mode, recursive ) {
-                                    recursive = recursive || false;
-                                    localProperty = OneDB.runEndpointMethod( me, 'chmod', [ mode, recursive ] );
-                                };
-                                
+                                 * "mode", but via the chmod function 
+                                 */
                                 return function() {
                                     throw "The 'mode' property is readOnly. Please use the chmod method instead!";
+                                };
+                                
+                                break;
+                            
+                            case 'uid':
+                            case 'gid':
+                                /* the uid and gid property is not changeable directly via "uid" and "gid"
+                                /* but via the chown function 
+                                 */
+                                return function() {
+                                    throw "The '" + property + "' property is readOnly. Please use the chown method instead!";
                                 };
                                 
                                 break;
@@ -103,8 +108,6 @@ function OneDB_Object( server, properties ) {
                             case 'ctime':
                             case 'mtime':
                             case 'url':
-                            case 'gid':
-                            case 'uid':
                             case 'muid':
                                 return function( v ) {
                                     throw "The '" + property + "' of a OneDB_Object is read-only!";
@@ -221,6 +224,11 @@ function OneDB_Object( server, properties ) {
                 "name": "objectName",
                 "type": "nullable string",
                 "default": null
+            },
+            {
+                "name": "flags",
+                "type": "integer",
+                "default": 0
             }
         ] );
         
@@ -375,4 +383,32 @@ OneDB_Object.prototype.delete = function() {
     
     // Add the deleted flag
     this._flags = ( this._flags ^ this._flags_list.UNLINKED );
+};
+
+// the chmod function is defined here to have access to the "localProperty" variable.
+OneDB_Object.prototype.chmod = function( mode, recursive ) {
+    recursive = ( !!recursive ) || false;
+    
+    this.on( 'property-resync', {
+        'name': "mode",
+        "value": OneDB.runEndpointMethod( this, 'chmod', [ mode, recursive ] )
+    } );
+    
+};
+
+// the chown function is defined here to have access to the "localProperty" variable.
+OneDB_Object.prototype.chown = function( userGroupOwners, recursive ) {
+    recursive = ( !!recursive ) || false;
+
+    var ug = OneDB.runEndpointMethod( this, 'chown', [ userGroupOwners, recursive ] );
+
+    this.on( 'property-resync', {
+        "name": "uid",
+        "value": ug[0]
+    } );
+
+    this.on( 'property-resync', {
+        "name": "gid",
+        "value": ug[1]
+    } );
 };

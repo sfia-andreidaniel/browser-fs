@@ -91,6 +91,14 @@
             
         }
         
+        public function chmod( $mode, $recursive = FALSE ) {
+            throw Object( 'Exception.IO', 'the root object cannot be chmoded' );
+        }
+        
+        public function chown( $userGroup, $recursive = FALSE ) {
+            throw Object( 'Exception.IO', 'the root object cannot be chowned. It always belong to the "root" account.' );
+        }
+        
     }
     
     OneDB_Object_Root::prototype()->defineProperty( '_id', [

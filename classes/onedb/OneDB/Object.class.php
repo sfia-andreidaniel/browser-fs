@@ -20,6 +20,10 @@
         const F_WRITABLE   =  512; // weather the object is writable or not
         const F_EXECUTABLE = 1024; // weather the object can be executed or not
         
+        // object creation modes. referring to object name.
+        const F_CREATE_NORMAL             = 0; // do not check if another object exists in db in the parent with the same name
+        const F_CREATE_NOCONFLICT         = 2; // check if another object exists in db in the parent with the same name
+        const F_CREATE_PRESERVE_EXTENSION = 4; // check if another object exists in db in the parent with the same name + preserve object extension in the name
         
         protected $_server      = NULL; // link to OneDB_Client
         
@@ -346,9 +350,20 @@
         /* Creates a child object inside this object.
          *
          * Note that this works only if the object is a container.
+         *
+         * @param $objectType: <string> - a valid OneDB.Type.<$objectType> class
+         *    e.g. for creating a "Foo" object, a class OneDB.Type.Foo is assumed to be
+         *    implemented
+         *
+         * @param $objectName: <nullable string>
+         *    if not null, then a name will be assigned to the object on creation.
+         *
+         * @param $flags: <integer>, can be *one* of the flags:
+         *    self::F_CREATE_NORMAL, self::F_CREATE_NOCONFLICT, self::F_CREATE_PRESERVE_EXTENSION
+         *
          */
          
-        public function create( $objectType, $objectName = NULL ) {
+        public function create( $objectType, $objectName = NULL, $flags = 0 ) {
             
             if ( $this->_changed )
                 throw Object( 'Exception.OneDB', "Object is in an unsaved state, save it first before creating something inside it!" );
@@ -362,14 +377,78 @@
             if ( $this->isReadOnly() )
                 throw Object( 'Exception.OneDB', "Object is ReadOnly!" );
             
+            if ( $objectName !== NULL && !in_array( $flags, [ self::F_CREATE_NORMAL, self::F_CREATE_NOCONFLICT, self::F_CREATE_PRESERVE_EXTENSION ] ) )
+                throw Object( 'Exception.IO', 'Bad creation flag used at method "create", 3rd argument!' );
+            
             try {
                 
                 $item = Object( 'OneDB.Object', $this->_server );
                 $item->parent = $this;
                 $item->type = $objectType;
                 
-                if ( $objectName )
+                if ( $objectName ) {
+
+                    if ( !is_string( $objectName ) )
+                        throw Object( 'Exception.FS', 'Object name should be either null either string (first arg of create method)' );
+
                     $item->name = $objectName;
+                    
+                    switch ( $flags ) {
+                        
+                        // no check name, fastest but unsafest, because when saving object
+                        // an exception can be thrown if another object with the same name exists
+                        // as a $child of this parent
+                        case self::F_CREATE_NORMAL:
+                            $item->name = $objectName; 
+                            break;
+                        
+                        case self::F_CREATE_NOCONFLICT:
+                        case self::F_CREATE_PRESERVE_EXTENSION:
+                        
+                            $item->autoCommit = FALSE;
+                            
+                            $myNames = [];
+                            
+                            // fetch all the names of the items.
+                            $this->childNodes->each( function( $item ) use ( &$myNames ) {
+                                $myNames[] = $item->name;
+                            } );
+                        
+                            if ( $flags == self::F_CREATE_NOCONFLICT ) {
+                                $namePart       = $objectName;
+                                $extensionPart  = '';
+                            } else {
+                            
+                                $extensionPart  = explode( '.', $objectName );
+                                $extensionPart  = count( $extensionPart ) > 1
+                                    ? ( '.' . end( $extensionPart ) )
+                                    : '';
+                                $namePart = substr( $objectName, 0, ( $len = strlen( $extensionPart ) ) ? ( strlen( $objectName ) - $len ) : strlen( $objectName ) );
+                            }
+                            
+                            $incrementPart = 0;
+                        
+                            do {
+                                
+                                $suggestedName = $incrementPart == 0
+                                    ? $namePart . $extensionPart
+                                    : $namePart . ' (' . $incrementPart . ')' . $extensionPart;
+                                
+                                $incrementPart ++;
+                                
+                            } while ( in_array( $suggestedName, $myNames ) );
+                        
+                            $item->name = $suggestedName;
+                        
+                            //throw Object( 'Exception.FS', 'These flags are not supported yet ("' . $namePart . '", "' . $extensionPart . '")' );
+                        
+                            break;
+                        
+                    }
+                    
+                    $item->save();
+                    
+                }
                 
                 return $item;
                 
@@ -412,33 +491,6 @@
             
             // unlink myself ...
             $this->__unlink__();
-            
-        }
-        
-        // WARNING: DO NOT USE THIS FUNCTION DIRECTLY, EVEN IF IT IS DECLARED AS PUBLIC.
-        // THIS PUBLIC IS DECLARED AS PUBLIC WITH ANOTHER PURPOSE THAN YOU THINK.
-        // USE AND ANALYZE THE delete() method instead!
-        
-        // @notes: the __unlink__ method does not unlink the sub-childs of the object.
-        // this is why we call the delete() method instead, which does that.
-        public function __unlink__() {
-            
-            // has been unlinked before?
-            if ( $this->_unlinked ) return;
-            
-            // test if object is writable by current user
-            if ( !$this->isWritable() )
-                throw Object( 'Exception.IO', 'Not enough permissions to delete object: ' . $this->url );
-            
-            // set the unlinked object flag 
-            $this->_unlinked = TRUE;
-            
-            // if the object has an _id, it implies that the object has been saved
-            // before in the database. so we remove it.
-            if ( $this->_id ) {
-                // make sure we delete only a single object from database.
-                $this->_server->objects->remove([ '_id' => $this->_id ], [ 'justOne' => TRUE ]);
-            }
             
         }
         
@@ -637,6 +689,174 @@
             }
             
         }
+        
+        /* @param: $userGroup
+               type int, representing a valid uid / gid
+               type <string> in format "user:group" name
+               type <string> in format "user:" name
+               type <string> in format ":group" name
+           @recursive: weather or not to change the owner to child nodes or not
+           @return: <array> [ newUID, newGID ]
+         */
+        public function chown( $userGroup, $recursive = FALSE ) {
+            
+            try {
+            
+                if ( !$this->isWritable() )
+                    throw Object( 'Exception.IO', 'Not enough permissions to change the owner of this object' );
+                
+                $setUid = FALSE;
+                $setGid = FALSE;
+                
+                switch ( TRUE ) {
+                    
+                    case is_int( $userGroup ):
+                        
+                        $tmp = $this->_server->sys->user( $userGroup );
+                        
+                        if ( $tmp === NULL ) {
+                            
+                            $tmp = $this->_server->sys->group( $userGroup );
+                            
+                            if ( $tmp === NULL )
+                                throw Object( 'Exception.IO', 'Argument (' . $userGroup . ') is not a valid uid or gid from this website' );
+                            
+                            $setGid = $tmp->gid;
+                            
+                        } else {
+                            
+                            $setUid = $tmp->uid;
+                            
+                        }
+                        
+                        break;
+                    
+                    case is_string( $userGroup ):
+                        
+                        if ( !preg_match( '/^([\d]+|[a-z\d]+((\.[a-z\d]+)+)?)?\:([\d]+|[a-z\d]+((\.[a-z\d]+)+)?)?$/i', $userGroup, $matches ) )
+                            throw Object( 'Exception.IO', 'Argument (' . $userGroup . ') is not respecting the format user:group, userID:groupID, user:, or :group' );
+                        
+                        $unameOrUid = isset( $matches[1] ) && strlen( $matches[1] )
+                            ? $matches[1]
+                            : NULL;
+                        
+                        $gnameOrGid = isset( $matches[4] ) && strlen( $matches[4] )
+                            ? $matches[4]
+                            : NULL;
+                        
+                        if ( $unameOrUid !== NULL && preg_match( '/^[\d]+$/', $unameOrUid ) )
+                            $unameOrUid = (int)$unameOrUid;
+                        
+                        if ( $gnameOrGid !== NULL && preg_match( '/^[\d]+$/', $gnameOrGid ) )
+                            $gnameOrGid = (int)$gnameOrGid;
+                        
+                        if ( $unameOrUid !== NULL ) {
+                            
+                            $u = $this->_server->sys->user( $unameOrUid );
+                            
+                            if ( $u === NULL )
+                                throw Object( 'Exception.IO', 'user ' . $unameOrUid . ' was not found!' );
+                            
+                            $setUid = $u->uid;
+                            
+                        }
+                        
+                        if ( $gnameOrGid !== NULL ) {
+                            
+                            $g = $this->_server->sys->group( $gnameOrGid );
+                            
+                            if ( $g === NULL )
+                                throw Object( 'Exception.IO', 'group ' . $gnameOrGid . ' was not found!' );
+                            
+                            $setGid = $g->gid;
+                            
+                        }
+                        
+                        break;
+                    
+                    default:
+                        
+                        throw Object( 'Exception.IO', 'chown: invalid argument (1st argument)!' );
+                        
+                        break;
+                    
+                }
+                
+                $setUid = $setUid === FALSE
+                    ? $this->_uid
+                    : $setUid;
+                
+                $setGid = $setGid === FALSE
+                    ? $this->_gid
+                    : $setGid;
+                
+                $this->__chown__( $setUid, $setGid );
+                
+                if ( $recursive && $this->isContainer() )
+                
+                    $this->find( [] )->each( function( $item ) use ( $setUid, $setGid ) {
+                        
+                        $item->__chown__( $setUid, $setGid );
+                        
+                    } );
+            
+                return [ $setUid, $setGid ];
+                
+            } catch ( Exception $e ) {
+                
+                throw Object( 'Exception.IO', 'failed to change the owner of the object (' . $this->url . ')' );
+                
+            }
+            
+        }
+        
+        // WARNING: DO NOT USE THIS FUNCTION DIRECTLY, EVEN IF IT IS DECLARED AS PUBLIC.
+        // THIS PUBLIC IS DECLARED AS PUBLIC WITH ANOTHER PURPOSE THAN YOU THINK.
+        // USE AND ANALYZE THE chown() method instead!
+        
+        // @notes: the __chown__ method does not change the owner of the sub-childs of the object.
+        // this is why we call cohwn() method instead, which does that
+        
+        public function __chown__( $uid, $gid ) {
+            
+            if ( is_int( $uid ) && is_int( $gid ) ) {
+            
+                $this->_uid = $uid;
+                $this->_gid = $gid;
+            
+            }
+            
+            $this->_changed = TRUE;
+            
+        }
+
+        // WARNING: DO NOT USE THIS FUNCTION DIRECTLY, EVEN IF IT IS DECLARED AS PUBLIC.
+        // THIS PUBLIC IS DECLARED AS PUBLIC WITH ANOTHER PURPOSE THAN YOU THINK.
+        // USE AND ANALYZE THE delete() method instead!
+        
+        // @notes: the __unlink__ method does not unlink the sub-childs of the object.
+        // this is why we call the delete() method instead, which does that.
+        public function __unlink__() {
+            
+            // has been unlinked before?
+            if ( $this->_unlinked ) return;
+            
+            // test if object is writable by current user
+            if ( !$this->isWritable() )
+                throw Object( 'Exception.IO', 'Not enough permissions to delete object: ' . $this->url );
+            
+            // set the unlinked object flag 
+            $this->_unlinked = TRUE;
+            
+            // if the object has an _id, it implies that the object has been saved
+            // before in the database. so we remove it.
+            if ( $this->_id ) {
+                // make sure we delete only a single object from database.
+                $this->_server->objects->remove([ '_id' => $this->_id ], [ 'justOne' => TRUE ]);
+            }
+            
+        }
+        
     }
     
     OneDB_Object::prototype()->defineProperty( 'server', [

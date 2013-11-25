@@ -156,12 +156,14 @@ function OneDB_Object_Root( server ) {
                 "name": "objectName",
                 "type": "nullable string",
                 "default": null
+            },
+            {
+                "name": "flags",
+                "type": "integer",
+                "default": 0
             }
         ] );
         
-        this.save = function() {
-            throw "The root object cannot be saved!";
-        };
         
     }
     
@@ -209,3 +211,15 @@ Object.defineProperty( OneDB_Object_Root.prototype, "childNodes", {
         return OneDB.getRemoteProperty( this, "childNodes" );
     }
 });
+
+OneDB_Object_Root.prototype.save = function() {
+    throw Exception( 'IO', "The root object cannot be saved!" );
+};
+
+OneDB_Object_Root.prototype.chmod = function( mask, recursive ) {
+    throw Exception( 'IO', "The root object cannot be chmoded!" );
+}
+
+OneDB_Object_Root.prototype.chown = function( userAndGroup, recursive ) {
+    throw Exception( 'IO', "The root object cannot be chowned. It always belong to the 'root' account" );
+}

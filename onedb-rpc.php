@@ -9,6 +9,8 @@
     
     require_once __DIR__ . "/bootstrap.php";
     
+    ini_set( 'display_errors', 'off' );
+    
     $stdout = '';
     
     // setup a rpc exception handler to modify the output of the rpc
