@@ -971,6 +971,8 @@
                     } );
                     
                 }
+                
+                return $newObject;
             
             } catch ( Exception $e ) {
                 throw Object( 'Exception.IO', 'failed to copy object!', 101, $e );
