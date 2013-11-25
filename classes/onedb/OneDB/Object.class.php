@@ -898,6 +898,9 @@
         }
         
         /* Copies $anotherObject ( together with it's sub-structure, recursively ) to this object.
+         *
+         * WARNING: BECAUSE THIS FUNCTION IS USING RECURSION, YOU MUST ENSURE THAT YOU HAVE ENOUGH
+         *          RAM MEMORY FOR THE PROCESS TO FINISH.
          */
         public function copyChild( OneDB_Object $anotherObject ) {
             try {
@@ -917,7 +920,42 @@
                 if ( !$this->isContainer() )
                     throw Object( 'Exception.IO', 'destination is not a directory!' );
                 
-                throw Object( 'Exception.IO', 'the copying is not implemented!' );
+                $objectData = $anotherObject->__clone__();
+                
+                if ( $objectData === NULL )
+                    throw Object( 'Exception.IO', 'source object is not clonable or not saved in database!' );
+                
+                // modify the object _parent to $this->_id, and
+                // the object url to $this->url, etc
+                
+                $objectData['_parent'] = $this->_id;
+                $objectData['url'] = self::$_path_->normalize(
+                    $this->url . str_replace( '"', '%22', str_replace( '/', '%2F', urldecode( str_replace( '+', ' ', $objectData['name'] ) ) ) )
+                );
+                $objectData['uid']   = $this->_server->user->uid;
+                $objectData['gid']   = $this->_server->user->gid;
+                $objectData['muid']  = $this->_server->user->uid;
+                $objectData['mode']  = $this->_server->user->umask;
+                $objectData['ctime'] = $objectData['mtime'] = time();
+                
+                // insert the object in database
+                
+                $this->_server->objects->save( $objectData, [
+                    'fsync' => TRUE
+                ]);
+                
+                $newObject = $this->_server->getElementById( $objectData[ '_id' ] );
+                
+                if ( $newObject === NULL )
+                    throw Object( 'Exception.IO', 'failed to fetch the object after insertion!' );
+                
+                if ( $anotherObject->isContainer() ) {
+                    
+                    $anotherObject->childNodes->each( function( $node ) use ( &$newObject ) {
+                        $newObject->copyChild( $node );
+                    } );
+                    
+                }
             
             } catch ( Exception $e ) {
                 throw Object( 'Exception.IO', 'failed to copy object!', 101, $e );
@@ -969,6 +1007,14 @@
                 $this->_server->objects->remove([ '_id' => $this->_id ], [ 'justOne' => TRUE ]);
             }
             
+        }
+        
+        /* Returns a physical representation of the object in the database.
+           This method is not intended to be used directly by the programmer,
+           even if it is a public method.
+         */
+        public function __clone__() {
+            return $this->_server->objects->findOne( [ '_id' => $this->_id ] );
         }
         
     }
