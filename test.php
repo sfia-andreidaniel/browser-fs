@@ -6,6 +6,10 @@
     
     $file = $connection->getElementByPath( '/myfile' );
     
-    print_r( $file->views->getView( 'item', 'index' )->run() );
+    //print_r( $file->views->getView( 'item', 'index' )->run() );
+    
+    //print_r( $file->views->enumerateViews() );
+    
+    //$file->views->deleteView( 'item.index.Document' );
     
 ?>

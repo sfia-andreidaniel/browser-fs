@@ -105,6 +105,37 @@
             $this->_object->_change( '_views_', $this->_properties );
         }
         
+        public function enumerateViews() {
+            $out = [];
+
+            foreach ( array_keys( $this->_properties ) as $key ) {
+                if ( preg_match( '/^(item|category)\.([^\#]+)(\#(.*))?$/i', $key, $matches ) ) {
+                    $out[] = [
+                        'type' => $matches[1],
+                        'name' => $matches[2],
+                        'for'  => isset( $matches[4] ) ? $matches[4] : NULL,
+                        'id'   => $key
+                    ];
+                }
+            }
+            
+            return $out;
+        }
+        
+        public function deleteView( $viewId ) {
+            
+            if ( !is_string( $viewId ) )
+                throw Object( 'Exception.OneDB', 'argument #1 should be of type string!' );
+            
+            if ( isset( $this->_properties[ $viewId ] ) ) {
+                
+                unset( $this->_properties[ $viewId ] );
+                
+                $this->_object->_change( '_views_', $this->_properties );
+                
+            }
+        }
+        
         public function toObject() {
             return $this->_properties;
         }
