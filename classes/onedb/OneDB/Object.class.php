@@ -38,7 +38,9 @@
         protected $_gid         = NULL; // owner group gid
         protected $_muid        = NULL; // last owner uid that modified this object
         protected $_mode        = NULL; // object filesystem mode ( related to chmod )
-
+        
+        protected $_views       = NULL; // link to object views ( for category, article )
+        
         protected $_description = NULL; // description of this object
         protected $_icon        = NULL; // icon of this object if any
         protected $_keywords    = [];   // keywords of this object
@@ -49,10 +51,11 @@
         protected $_parent      = NULL; // parent of the object. when not null is of type OneDB_Object
         
         // VERY internal flags of the object
-        protected $_autoCommit  = TRUE; // weather to automatically save the object on destructor
-        protected $_changed     = FALSE;// weather the object has been changed
-        protected $_type        = NULL; // the type that implements this object. when not null it should be <OneDB_Type_*>
-        protected $_unlinked    = FALSE;// is this object unlinked?
+        protected $_autoCommit     = TRUE; // weather to automatically save the object on destructor
+        protected $_changed        = FALSE;// weather the object has been changed
+        protected $_type           = NULL; // the type that implements this object. when not null it should be <OneDB_Type_*>
+        protected $_unlinked       = FALSE;// is this object unlinked?
+        protected $_viewsSingleton = NULL; // a singleton to object views.
 
         // Weather or not this object is a container.
         // If the object is a container, it can hold childrens inside.
@@ -67,7 +70,7 @@
         public static $_nativeProperties = [
             '_id', '_parent', '_type', 'name', 'ctime', 'mtime',
             'gid', 'uid', 'muid', 'mode', 'description', 'icon',
-            'keywords', 'tags', 'online'
+            'keywords', 'tags', 'online', 'views'
         ];
         
         // a singleton of the muxer, to do fast object muxing
@@ -189,6 +192,8 @@
             $props[ 'ctime' ] = $this->_ctime;
             $props[ 'mtime' ] = $this->_mtime;
             
+            $props[ 'views' ] = $this->_views;
+            
             // set-up other object properties.
             $props[ 'name'        ] = $this->_name;
             $props[ 'description' ] = $this->_description;
@@ -270,6 +275,8 @@
             $out[ 'ctime' ] = $this->_ctime;
             $out[ 'mtime' ] = $this->_mtime;
             $out[ 'mode'  ] = $this->_mode;
+
+            $out[ 'views' ] = $this->_views;
             
             $out[ 'description' ] = $this->_description;
             $out[ 'icon'     ] = $this->_icon;
@@ -286,6 +293,13 @@
         
         // callback that is called by the object type implementation typically
         public function _change( $propertyName, $propertyValue ) {
+            
+            switch ( $propertyName ) {
+                case '_views_':
+                    $this->_views = $propertyValue;
+                    break;
+            }
+            
             $this->_changed = TRUE;
         }
         
@@ -318,6 +332,8 @@
             $this->_gid   = $fromData[ 'gid' ];
             $this->_muid  = $fromData[ 'muid' ];
             $this->_mode  = $fromData[ 'mode' ];
+            
+            $this->_views = $fromData[ 'views' ];
 
             $this->_description = $fromData[ 'description' ];
             $this->_icon     = $fromData[ 'icon' ];
@@ -537,7 +553,7 @@
                 
                     switch ( TRUE ) {
                         // FROM RPC SIDE WE DON'T UPDATE THE UID, GID, MUID, CTIME, MTIME, MODE OF THE OBJECT
-                        case in_array( $prop['name'], [ 'uid', 'gid', 'muid', 'ctime', 'mtime', 'mode' ] ):
+                        case in_array( $prop['name'], [ 'uid', 'gid', 'muid', 'ctime', 'mtime', 'mode', 'views' ] ):
                             break;
                         // is the property a direct property of this object?
                         case strpos( $prop['name'], '.' ) === FALSE:
@@ -571,6 +587,8 @@
             $props[ 'mtime' ] = $this->_mtime;
             $props[ 'mode'  ] = $this->_mode;
 
+            $props[ 'views' ] = $this->_views;
+
             $props[ 'name'  ] = $this->_name;
             $props[ 'description' ] = $this->_description;
             $props[ 'icon'  ] = $this->_icon;
@@ -603,6 +621,8 @@
             $props[ 'ctime'  ] = $this->_ctime;
             $props[ 'mtime'  ] = $this->_mtime;
             $props[ 'mode'   ] = $this->_mode;
+            
+            $props[ 'views'  ] = $this->_views;
             
             $props[ 'description' ] = $this->_description;
             $props[ 'icon'     ] = $this->_icon;
@@ -1319,6 +1339,14 @@
                 : $this->_server->sys->group( $this->_gid );
         }
     ]);
+    
+    OneDB_Object::prototype()->defineProperty( 'views', [
+        "get" => function() {
+            return $this->_viewsSingleton === NULL
+                ? ( $this->_viewsSingleton = Object( 'OneDB.Object.Views', $this, $this->_views ) )
+                : $this->_viewsSingleton;
+        }
+    ] );
     
     OneDB_Object::$_muxer_ = Object('RPC.Muxer');
     OneDB_Object::$_path_  = Object('Utils.Parsers.Path');
