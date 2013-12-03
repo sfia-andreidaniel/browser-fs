@@ -1,0 +1,83 @@
+#! BLOCKS:      HEADER, MAIN, FOOTER
+#! AUTHOR:      browserfs.org team
+#! DESCRIPTION: browserfs simple frontend, header, main, footer
+<!-- BEGIN: main --><!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- BEGIN: _begin_ -->
+    
+    <meta name="keywords" content="{keywords}" />
+    
+    <meta name="description" content="{description}" />
+
+#! DO NOT ALTER THIS SECTION
+    <!-- BEGIN: _code_ -->
+
+
+    {src}<!-- END: _code_ --><!-- BEGIN: _inlinescript_ -->
+
+    <script>
+        {src}
+    </script><!-- END: _inlinescript_ --><!-- BEGIN: _inlinecss_ -->
+
+
+    <style>
+        {src}
+    </style>
+    
+    <!-- END: _inlinecss_ --><!-- BEGIN: _css_ -->
+
+    <link rel="stylesheet" type="text/css" href="{src}" /><!-- END: _css_ -->
+    <!-- BEGIN: _script_ -->
+
+    <script type="text/javascript" src="{src}" ></script><!-- END: _script_ -->
+    <!-- END: _begin_ -->
+
+#! END OF SECTION
+
+</head>
+<body>
+    <header>
+        <!-- this is the header element of the website -->
+        <!-- BEGIN: HEADER -->
+            {value}
+        <!-- END: HEADER -->
+    </header>
+    <main role="main">
+        <!-- this is the main section of the website -->
+        <!-- BEGIN: MAIN -->
+            {value}
+        <!-- END: MAIN -->
+    </main>
+    <footer>
+        <!-- this is where you're placing the footer of your website -->
+        <!-- BEGIN: FOOTER -->
+            {value}
+        <!-- END: FOOTER -->
+    </footer>
+
+#! DO NOT ALTER THIS SECTION
+    <!-- BEGIN: _end_ --><!-- BEGIN: _code_ -->
+
+    {src}<!-- END: _code_ --><!-- BEGIN: _inlinescript_ -->
+
+<script>
+        {src}
+    </script><!-- END: _inlinescript_ --><!-- BEGIN: _inlinecss_ -->
+
+
+    <style>
+        {src}
+    </style><!-- END: _inlinecss_ --><!-- BEGIN: _css_ -->
+
+
+    <link rel="stylesheet" type="text/css" href="{src}" /><!-- END: _css_ -->
+    <!-- BEGIN: _script_ -->
+
+    <script type="text/javascript" src="{src}" ></script><!-- END: _script_ -->
+    <!-- END: _end_ -->
+#! END OF SECTION
+
+</body>
+</html><!-- END: main -->
