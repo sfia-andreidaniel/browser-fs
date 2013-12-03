@@ -23,6 +23,10 @@
             
         }
         
+        public function __mux() {
+            return $this->_widget->__mux();
+        }
+        
     }
     
 ?>

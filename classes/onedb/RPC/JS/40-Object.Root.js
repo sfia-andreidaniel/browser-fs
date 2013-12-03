@@ -187,6 +187,14 @@ function OneDB_Object_Root( server ) {
             }
         } );
         
+        var viewsSingleton = null;
+        
+        Object.defineProperty( this, "views", {
+            "get": function(){
+                return viewsSingleton || ( viewsSingleton = new OneDB_Object_Views( this, true ) );
+            }
+        });
+        
         this.addServerMethod( 'find', [
             {
                 "name": "query",
@@ -220,7 +228,6 @@ function OneDB_Object_Root( server ) {
                 "default": 0
             }
         ] );
-        
         
     }
     

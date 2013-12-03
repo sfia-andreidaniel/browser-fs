@@ -1,5 +1,7 @@
 <?php
     
+    require_once __DIR__ . '/../Object.class.php';
+    
     /* The role of a view is to bind an object with a widget
      *
      * The views in OneDB are inheritable, so that if we require a view
@@ -9,7 +11,7 @@
      *
      */
     
-    class OneDB_Object_Views extends Object {
+    class OneDB_Object_Views extends Object implements IDemuxable {
         
         protected $_properties = [];
         private   $_object     = NULL;
@@ -140,6 +142,9 @@
             return $this->_properties;
         }
         
+        public static function __demux( $muxedData ) {
+            return OneDB_Object::__demux( $muxedData )->views;
+        }
     }
     
 ?>

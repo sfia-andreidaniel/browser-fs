@@ -68,9 +68,31 @@ function OneDB_Object( server, properties ) {
                 var localProperty = properties[ property ] || ( property == '_flags' ? 0 : null );
                 
                 Object.defineProperty( me, property, {
-                    "get": function() {
+                    "get": ( function() {
+                        
+                        switch ( property ) {
+                            case 'views':
+                                var viewsSingleton = null;
+                                
+                                return function() {
+                                    return viewsSingleton === null
+                                        ? ( viewsSingleton = new OneDB_Object_Views( this ) )
+                                        : viewsSingleton;
+                                };
+                                
+                                break;
+                            
+                            default:
+                                
+                                return function() {
+                                    return localProperty;
+                                };
+                                
+                                break;
+                        }
+                        
                         return localProperty;
-                    },
+                    } )(),
                     "set": ( function() {
                         
                         switch ( property ) {
@@ -89,6 +111,13 @@ function OneDB_Object( server, properties ) {
                                  */
                                 return function() {
                                     throw Exception( 'Exception.IO', "The 'mode' property is readOnly. Please use the chmod method instead!", 0, null, __FILE__, __LINE__ );
+                                };
+                                
+                                break;
+                            
+                            case 'views':
+                                return function() {
+                                    throw Exception( 'Exception.IO', 'The "views" property is readonly', 0, null, __FILE__, __LINE__ );
                                 };
                                 
                                 break;
@@ -352,6 +381,7 @@ OneDB_Object.prototype._nativeProperties = [
     'tags',
     'online',
     'url',
+    'views',
     '_flags'
 ];
 

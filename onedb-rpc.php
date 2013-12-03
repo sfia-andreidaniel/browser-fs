@@ -25,6 +25,20 @@
         
     });
     
+    set_error_handler( function( $errno, $errstr, $errfile, $errline ) {
+        
+        if ( E_RECOVERABLE_ERROR === $errno ) {
+            
+            die( json_encode([
+                'ok' => FALSE,
+                'error' => TRUE,
+                'reason' => 'Exception.Recoverable: ' . $errstr
+            ]) );
+        }
+        
+        return FALSE;
+    } );
+    
     // on shutdown, we dump the stdout to client
     register_shutdown_function( function() use ( &$stdout ) {
         

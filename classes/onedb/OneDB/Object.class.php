@@ -622,7 +622,8 @@
             $props[ 'mtime'  ] = $this->_mtime;
             $props[ 'mode'   ] = $this->_mode;
             
-            $props[ 'views'  ] = $this->_views;
+            // there's no need to mux the _views property as all it's methods are running on server-side
+            // $props[ 'views'  ] = $this->_views;
             
             $props[ 'description' ] = $this->_description;
             $props[ 'icon'     ] = $this->_icon;
