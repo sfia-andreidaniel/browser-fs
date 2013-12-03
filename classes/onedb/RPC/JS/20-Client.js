@@ -81,6 +81,14 @@ function OneDB_Client( websiteName, userName, storageEngine, shadowChallenge ) {
         }
     ] );
     
+    this.addServerMethod( "getRouter", [
+        {
+            "name": "url",
+            "type": "string",
+            "default": ""
+        }
+    ] );
+    
     ( function( me ) {
         var lsys = 0,
             _cache= null;
@@ -135,8 +143,6 @@ OneDB_Client.prototype.__demux = function( muxedData ) {
 }
 
 OneDB_Client.prototype.__mux = function() {
-    var mux = this._initArgs[0] + ':' + ( this._initArgs[1] || '' ) + ':' + this._initArgs[3];
-    //console.log( "muxing: ", mux );
-    return mux;
+    return this._initArgs[0] + ':' + ( this._initArgs[1] || '' ) + ':' + this._initArgs[3];
 }
 

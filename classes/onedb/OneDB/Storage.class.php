@@ -134,7 +134,7 @@
                 return NULL;
             
             // determine the extension of the original file format
-            $originalFileNameExtension = preg_match( '/\.([a-z\d]+)/i', $formats[ $original ], $matches )
+            $originalFileNameExtension = preg_match( '/\.([a-z\d]+)/i', $formats[ 'original' ], $matches )
                 ? strtolower( $matches[ 1 ] )
                 : '';
             
@@ -161,22 +161,31 @@
                         
                         $testVersion = $matches[1];
                         
-                        if ( isset( $formats[ $testVersion ] ) && isset( $matches[2] ) && $matches[ 2 ] == ' if ' ) {
+                        if ( isset( $formats[ $testVersion ] ) ) {
                             
-                            $ifOriginalVersion = isset( $matches[ 3 ] )
-                                ? $matches[3]
-                                : NULL;
+                            if ( isset( $matches[2] ) && $matches[ 2 ] == ' if ' ) {
                             
-                            if ( $ifOriginalVersion !== NULL ) {
+                                $ifOriginalVersion = isset( $matches[ 3 ] )
+                                    ? $matches[3]
+                                    : NULL;
                                 
-                                $ifOriginalVersion = preg_split( '/[\s\,]+/', $ifOriginalVersion );
-                                
-                                foreach( $ifOriginalVersion as $ifVersion ) {
+                                if ( $ifOriginalVersion !== NULL ) {
                                     
-                                    if ( $ifVersion == $originalFileNameExtension )
-                                        return $formats[ $testVersion ];
+                                    $ifOriginalVersion = preg_split( '/[\s\,]+/', $ifOriginalVersion );
+                                    
+                                    foreach( $ifOriginalVersion as $ifVersion ) {
+                                        
+                                        if ( $ifVersion == $originalFileNameExtension )
+                                            return $formats[ $testVersion ];
+                                        
+                                    }
                                     
                                 }
+                            
+                            } else {
+                                
+                                if ( isset( $matches[1] ) && isset( $formats[ $matches[1] ] ) )
+                                    return $formats[ $matches[1] ];
                                 
                             }
                             

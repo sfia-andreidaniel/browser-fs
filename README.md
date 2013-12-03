@@ -33,7 +33,6 @@ make things more clear.
 
 Api:
 
-* OneDB_Type_File: finish file storage stuff
 * OneDB_Router class
 
 Cli:

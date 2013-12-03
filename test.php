@@ -2,16 +2,16 @@
 
     require_once __DIR__ . "/bootstrap.php";
     
-    $parser = Object( 'Utils.Parsers.Path' );
+    $connection = OneDB::connect( 'loopback', 'root', 'toor' );
     
-    if ( $parser->isCommonParent( '/foo car/mar', '/foo+car/phar/../foo' ) )
-        echo "yes\n";
-    else
-        echo "no\n";
+    /*
+    $file = $connection->getElementByPath( '/myfile' );
     
-    echo $parser->decode( '/foo%20bar/car+mar' ), "\n";
+    echo $file->data->getFileFormat( '360p.mp4' ), "\n";
+    */
     
-    if ( $parser->isEqual( '/foo%20bar/car+mar', '/foo+bar/../foo+bar//car+mar/.' ) )
-        echo "equal\n";
+    $router = $connection->getRouter( '/bfs/picture/529d9b5a888218bd0e8b4567.jpg#width=400,height=300' );
+    
+    print_r( Object( 'RPC.Muxer' )->mux( $connection ) );
 
 ?>

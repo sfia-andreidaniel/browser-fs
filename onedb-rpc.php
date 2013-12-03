@@ -209,7 +209,7 @@
                 $instance = $demuxer->demux( $instance, DEMUX_ENSURE_INSTANCE );
                 $args     = $demuxer->demux( $args    , DEMUX_ENSURE_ARRAY );
                 
-                if ( get_class( $instance ) != $on )
+                if ( get_class( $instance ) != $on && ( !isset( $instance::$__muxType ) || $instance::$__muxType != $on ) )
                     throw Object( 'Exception.RPC', 'The demuxed instance snapshot is not a "' . $on . '"' );
                 
                 if ( strpos( $method, '.' ) === FALSE )

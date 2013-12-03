@@ -264,6 +264,18 @@
             return Object( 'OneDB.Iterator', $out, $this );
         }
         
+        /* Returns the appropriate OneDB_Router for the $requestURL,
+           or throws an exception if something goes wrong
+         */
+        public function getRouter( $requestURL ) {
+            
+            if ( !is_string( $requestURL ) || !strlen( $requestURL ) )
+                throw Object( 'Exception.Router', 'Invalid argument. Expected non-empty string' );
+            
+            return Object( 'OneDB.Router', $requestURL, $this );
+            
+        }
+        
         /* This method is intended for internal usage, and should not be
            exposed via rpc.
          */

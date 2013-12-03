@@ -77,6 +77,11 @@
                 
                 case ( $className = $this->is_instantiated_type( $mixed ) ) ? TRUE : FALSE:
                     
+                    // Test if a static property exists called $__muxType. If that property
+                    // exist, the className will be forced at that value
+                    if ( isset( $className::$__muxType ) )
+                        $className = $className::$__muxType;
+                    
                     switch ( TRUE ) {
                         // If the class implements a __mux method, we return that method
                         case method_exists( $mixed, '__mux' ):
