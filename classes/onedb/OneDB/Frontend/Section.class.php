@@ -65,6 +65,13 @@
             }
             
         }
+        
+        public function assign( $propertyName, $propertyValue ) {
+            
+            $this->_tpl->assign( $propertyName, $propertyValue );
+            $this->_needParse = TRUE;
+            
+        }
     }
     
 ?>

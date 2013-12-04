@@ -6,17 +6,19 @@
     
     class OneDB_Frontend extends Object {
         
-        public    $_tpl    = NULL;
-        protected $_path   = NULL;
-        protected $_name   = NULL;
-        protected $_blocks = NULL;
+        public    $_tpl               = NULL;
+        protected $_path              = NULL;
+        protected $_name              = NULL;
+        protected $_blocks            = NULL;
         
-        protected $_begin  = NULL;
-        protected $_end    = NULL;
+        protected $_begin             = NULL;
+        protected $_end               = NULL;
         
-        protected $_parsed = FALSE;
+        protected $_parsed            = FALSE;
         
-        protected $_text   = FALSE;
+        protected $_text              = FALSE;
+        protected $_buffer            = '';
+        protected $_blocks_singletons = [];
         
         /* @param: $frontendName: <string> => a file which exists in
                    /etc/frontend/<$frontendName>.html
@@ -64,7 +66,7 @@
                 
             }
             
-            $out = implode( "\n", $out );
+            $out = $this->_buffer = implode( "\n", $out );
             
             $this->_tpl = new Template_XTemplate ( $out );
         }
@@ -75,6 +77,10 @@
                     $this->_blocks = preg_split( '/[\s\,]+/', trim( $matches[1] ) );
                     break;
             }
+        }
+        
+        public function assign( $propertyName, $propertyValue ) {
+            $this->_begin->assign( $propertyName, $propertyValue );
         }
         
         public function getText() {
@@ -107,6 +113,11 @@
                     break;
                 
                 case in_array( $propertyName, $this->_blocks ):
+                    
+                    return isset( $this->_blocks_singletons[ $propertyName ] )
+                        ? $this->_blocks_singletons[ $propertyName ]
+                        : $this->_blocks_singletons[ $propertyName ] = Object( 'OneDB.Frontend.PageBlock', 'main.' . $propertyName, $this->_tpl );
+                    
                     break;
                 
                 default:
@@ -114,6 +125,15 @@
             }
         }
         
+        public function __mux() {
+            
+            return [
+                $this->_name,
+                $this->_buffer,
+                $this->_blocks
+            ];
+            
+        }
     }
     
 ?>

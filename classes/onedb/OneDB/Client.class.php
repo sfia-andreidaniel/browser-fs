@@ -21,6 +21,8 @@
 
         protected $_user        = NULL;     // <Sys_Security_User>       instance of the user this website is operating
         protected $_sys         = NULL;     // <Sys_Security_Management> local server accounts enumerator
+        protected $_frontend    = NULL;     // <OneDB.Frontend>          instance singleton to the frontend
+        protected $_frontendName= NULL;     // <string>                  the name of the frontend this connection's site's using
         
         protected static $_path_ = NULL;    // singleton of <Utils.Parsers.Path>
         
@@ -87,6 +89,9 @@
             try {
             
                 $uri    = self::$_cfg->{$this->_websiteName}->connection->server;
+                
+                $this->_frontendName = self::$_cfg->{$this->_websiteName}->frontend;
+                
                 $this->_databaseName = $this->getDatabaseName( $uri );
             
                 if ( $this->_databaseName === NULL )
@@ -353,6 +358,20 @@
     OneDB_Client::prototype()->defineProperty( 'websiteName', [
         "get" => function() {
             return $this->_websiteName;
+        }
+    ] );
+    
+    OneDB_Client::prototype()->defineProperty( 'frontendName', [
+        "get" => function() {
+            return $this->_frontendName;
+        }
+    ] );
+    
+    OneDB_Client::prototype()->defineProperty( 'frontend', [
+        "get" => function() {
+            return $this->_frontend === NULL
+                ? $this->_frontend = Object( 'OneDB.Frontend', $this->_frontendName )
+                : $this->_frontend;
         }
     ] );
     

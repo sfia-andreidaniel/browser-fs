@@ -2,7 +2,7 @@
 
     require_once __DIR__ . "/bootstrap.php";
     
-    //$connection = OneDB::connect( 'loopback', 'root', 'toor' );
+    $connection = OneDB::connect( 'loopback', 'root', 'toor' );
     
     //$file = $connection->getElementByPath( '/myfile' );
     
@@ -12,6 +12,7 @@
     
     //$file->views->deleteView( 'item.index.Document' );
     
+    /*
     $frontend = Object( 'OneDB.Frontend', 'simple' );
     
     $frontend->begin->add( 'script', 'js/foo.js' );
@@ -28,5 +29,16 @@
     $frontend->end->add( 'script', 'function( foo ) {}', TRUE );
     $frontend->end->add( 'css', 'body { background-color: red; }', TRUE );
     
-    echo $frontend->getText();
+    $frontend->MAIN->add( '<h1>Wellcome</h1>' );
+    $frontend->MAIN->add( '<h2>Wellcome</h2>' );
+    
+    print_r( $frontend->__mux() );
+    */
+    //echo $frontend->getText();
+    
+    $connection->frontend->assign( 'keywords', 'site keywords' );
+    $connection->frontend->assign( 'description', 'site content' );
+    
+    echo $connection->frontend->getText(), "\n";
+    
 ?>

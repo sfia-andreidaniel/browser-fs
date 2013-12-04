@@ -105,6 +105,18 @@ function OneDB_Client( websiteName, userName, storageEngine, shadowChallenge ) {
         } );
     } )( this );
     
+    ( function( me ) {
+        
+        var frontend = null;
+        
+        Object.defineProperty( me, "frontend", {
+            "get": function() {
+                return frontend || ( frontend = OneDB.getRemoteProperty( me, "frontend" ) );
+            }
+        });
+        
+    } )( this );
+    
     Object.defineProperty( this, 'user', {
         "get": function() {
             return this.sys.user( this.runAs );
