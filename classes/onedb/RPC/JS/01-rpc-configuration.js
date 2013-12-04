@@ -6,6 +6,6 @@ Object.defineProperty( window, "OneDBRpc", {
         // FEEL FREE TO ALTER THIS STRING IF YOUR INSTALLED ONEDB RPC IS LOCATED
         // ON OTHER URL.
         
-        return '/onedb-rpc.php';
+        return window.BFS_RPC || '/onedb-rpc.php';
     }
 });
