@@ -1,7 +1,7 @@
 /* BrowserFS menu */
 
 function BFS_Toolbar( app ) {
-    
+    /*
     [{
         "name": "Common Tasks",
         "items": [{
@@ -19,4 +19,5 @@ function BFS_Toolbar( app ) {
         app.toolbars.setTitles(false);
         
     });
+    */
 }

@@ -1,4 +1,4 @@
-.BFS_IconsPanel {
+.BFS_View {
     display: block;
     position: absolute;
     left: 202px;
@@ -8,7 +8,7 @@
     background-color: #ddd;
 }
 
-.BFS_IconsPanel > .body {
+.BFS_View > .body {
     display: block;
     position: relative;
     width: 100%;
