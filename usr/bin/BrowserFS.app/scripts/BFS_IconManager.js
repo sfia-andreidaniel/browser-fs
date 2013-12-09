@@ -56,5 +56,47 @@ function BFS_IconManager() {
         return canvases[canvasKey].toDataURL();
     }
     
+    var standardTypes = [
+        'Category',
+        'Category.Search',
+        'Category.WebService',
+        'Category.Aggregator',
+        'Document',
+        'Widget',
+        'List',
+        'Poll'
+    ];
+    
+    this.createIcon = function( objectOneDB, width, height ) {
+        
+        var type = objectOneDB.type + '';
+        
+        //console.log( 'Create icon: ', type, width, height );
+        
+        switch ( true ) {
+            
+            case standardTypes.indexOf( type ) >= 0:
+                
+                var img = this.createImage( type + ".svg", width, height );
+                
+                //console.log( img );
+                
+                return img;
+                break;
+            
+            case type == 'File':
+                
+                return this.createImage( 'File.svg', width, height );
+                break;
+            
+            default:
+            
+                return this.createImage( 'Item.svg', width, height );
+                break;
+            
+        }
+        
+    };
+    
     return this;
 }

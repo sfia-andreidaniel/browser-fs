@@ -3,7 +3,8 @@ function BFS_AddressBar( app ) {
     var holder = $('div', 'BFS_AddressBar' ),
         body   = holder.appendChild( $('div', 'body' ) ),
         inputMode = 0, // will be boolean
-        href   = '/';
+        href   = '/',
+        cwd    = null;
     
     body.appendChild( new DOMLabel( 'Address: ', {
         "x": 0,
@@ -113,7 +114,31 @@ function BFS_AddressBar( app ) {
 
             holder.editable = false;
             
+            var newWorkingDirectory = false;
             
+            try {
+            
+                newWorkingDirectory = app.connection.getElementByPath( str );
+                
+                if ( newWorkingDirectory === null )
+                    throw Exception( 'Exception.IO', 'Invalid location' );
+                
+                cwd = newWorkingDirectory;
+                
+                app.appHandler( 'cmd_refresh' );
+                
+                href = cwd.url;
+                
+            } catch ( Error ) {
+                
+                DialogBox( Error + '', {
+                    "caption": "Error opening location",
+                    "childOf": app,
+                    "modal": true
+                } );
+                
+                return;
+            }
 
         }
         
@@ -122,6 +147,24 @@ function BFS_AddressBar( app ) {
     app.handlers.cmd_open_address = function() {
         holder.editable = true;
     }
+    
+    app.handlers.cmd_refresh = function() {
+        
+        app.interface.view.clear();
+        
+        if ( !app.connection || !cwd )
+            return;
+        
+        cwd.find( { "childOf": cwd.id } ).each( function() {
+            app.interface.view.addItem( this );
+        } );
+        
+    }
+    
+    app.interface.bind( 'connected', function() {
+        cwd = app.connection.rootNode;
+        holder.href = '/';
+    } );
     
     return holder;
     

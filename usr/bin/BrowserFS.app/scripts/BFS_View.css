@@ -16,4 +16,40 @@
     margin: 0;
     overflow-x: auto;
     overflow-y: scroll;
+    -webkit-user-select: none;
+}
+
+.BFS_View .icon {
+    display: block;
+    background-repeat: no-repeat;
+    cursor: default;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.BFS_View.medium .icon {
+    width: 100px;
+    height: 30px;
+    color: white;
+    background-position: 50% 10px;
+    padding-top: 80px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    outline: 1px solid black;
+    color: black;
+}
+
+.BFS_View.large .icon {
+    width: 140px;
+    height: 30px;
+    color: white;
+    background-position: 50% 10px;
+    padding-top: 150px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    outline: 1px solid black;
+    color: black;
 }

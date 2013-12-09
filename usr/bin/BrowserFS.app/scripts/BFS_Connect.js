@@ -123,7 +123,7 @@ function BFS_Connect( app ) {
                 
                 dlg.close();
                 
-                dlg.interface.on( 'connected', connection );
+                app.interface.on( 'connected', connection );
                 
             } catch ( Error ) {
                 
