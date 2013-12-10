@@ -59,11 +59,6 @@ function BFS_View_Icon( view, object ) {
                     view.activeItem = this;
                     break;
                 
-                case evt.which == 1 && !evt.ctrlKey && evt.shiftKey:
-                    
-                    
-                    
-                    break;
             }
             
         }, false );

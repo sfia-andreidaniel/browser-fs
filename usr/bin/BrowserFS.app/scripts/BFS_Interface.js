@@ -10,17 +10,25 @@ function BFS_Interface( app ) {
         }
     } );
 
-    // application menu
-    BFS_Menu( app );
-    // application toolbar
-    BFS_Toolbar( app );
     
+    interface.bind( 'resources-loaded', function() {
+        
+        // application menu
+        BFS_Menu( app );
+        // application toolbar
+        BFS_Toolbar( app );
+        
+    } );
+
     // initialize the icon manager
-    interface.iconsManager = new BFS_IconManager();
+    interface.iconsManager = new BFS_IconManager( app );
     
     // initialize the selection manager
     interface.selection = new BFS_Selection( app );
 
+    // application launcher
+    interface.launcher = new BFS_Launcher( app );
+    
     // application activity panel
     interface.panel    = app.insert( new BFS_Panel( app ) );
 
@@ -29,6 +37,9 @@ function BFS_Interface( app ) {
 
     // application location address bar
     interface.location = app.insert( new BFS_AddressBar( app ) );
+    
+    // application search bar
+    interface.search = app.insert( new BFS_SearchBar( app ) );
     
     Object.defineProperty( app, "location", {
         

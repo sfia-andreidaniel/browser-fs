@@ -179,3 +179,11 @@ function OneDB_Type( ) {
 }
 
 OneDB_Type.prototype = new OneDB_Class();
+
+OneDB_Type.prototype._explain_ = function() {
+    return [
+        'permissions: ' + Umask.mode_to_str( this._root.mode ),
+        'owner: ' + this._root.owner + ':' + this._root.group,
+        'online: ' + ( this._root.online ? 'yes' : 'no' )
+    ];
+}

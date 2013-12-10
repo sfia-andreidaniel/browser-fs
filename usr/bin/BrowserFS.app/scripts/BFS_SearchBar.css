@@ -1,0 +1,43 @@
+.BFS_SearchBar {
+    
+    position: absolute;
+    right: 0px;
+    width: 150px;
+    top: 4px;
+    height: 30px;
+    display: block;
+    
+}
+
+.DOM2Window.no-search-bar .BFS_SearchBar {
+    display: none !important;
+}
+
+.BFS_SearchBar > .body {
+    
+    position: relative;
+    display: block;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    
+}
+
+.BFS_SearchBar > .body > input[type=text] {
+    width: 113px;
+    margin: 3px;
+    height: 18px;
+    border-radius: 4px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABFUlEQVR42pXS64mEQAwHcFEUXyiK4gs8/CCIT6zAEixpS7gStoQtJaVMCbnkmDsUZj0v8GOd/DPBXVbTLmpd150AwQM+79pfNU3TY55nlGBZlhd//vQ4f3u57/t9GAYkYhzH7Zjxmfuc85xyQdd1QJBsb/JN5qBc0LYtErj6ipzznDJsmgbJ82oB5zynDOu6RnL5BpzznDKsqgoIlmWp/A24zznPKRcURbHneY5EZFl2WsJn7nPOc6eLSZKE5EleaZp+EpRA9uDQO/8PoigKCcRxjEw+7+S3J333T5eDIAgJEDzS7pTruovneUDwQPi+v91aYNu2IHggHMdZtLtlmiYQlIRlWfcvcxmGEeq6DoyeP7R/1hf8fHBChZW6NAAAAABJRU5ErkJggg==);
+    background-position: 4px 50%;
+    padding-left: 24px;
+    background-repeat: no-repeat;
+    border-width: 1px;
+    background-color: transparent;
+}
+
+.BFS_SearchBar > .body > input[type=text]:focus {
+    background-color: white;
+    outline: none;
+}

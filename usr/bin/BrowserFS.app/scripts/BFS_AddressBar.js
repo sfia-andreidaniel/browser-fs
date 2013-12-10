@@ -1,10 +1,12 @@
 function BFS_AddressBar( app ) {
     
-    var holder = $('div', 'BFS_AddressBar' ),
-        body   = holder.appendChild( $('div', 'body' ) ),
-        inputMode = 0, // will be boolean
-        href   = '/',
-        cwd    = null;
+    var holder     = $('div', 'BFS_AddressBar' ),
+        body       = holder.appendChild( $('div', 'body' ) ),
+        inputMode  = 0, // will be boolean
+        href       = '/',
+        cwd        = null,
+        pathParser = new OneDB_Path(),
+        visible    = true;
     
     body.appendChild( new DOMLabel( 'Address: ', {
         "x": 0,
@@ -21,12 +23,24 @@ function BFS_AddressBar( app ) {
         "set": function( bool ) {
             bool = !!bool;
 
-            if ( bool === editable )
-                return;
-            
             editable = bool;
             
             holder.render();
+        }
+        
+    } );
+    
+    Object.defineProperty( holder, "visible", {
+        
+        "get": function() {
+            return visible;
+        },
+        "set": function( bool ) {
+            
+            visible = !!bool;
+            
+            app[ visible ? 'removeClass' : 'addClass' ]( 'no-address-bar' );
+            
         }
         
     } );
@@ -63,6 +77,13 @@ function BFS_AddressBar( app ) {
             }, 100 );
         }, false );
         
+        input.addCustomEventListener( 'update', function( url ) {
+            
+            input.value = url;
+            input.select();
+            
+        } );
+        
         return input;
     }
     
@@ -74,6 +95,47 @@ function BFS_AddressBar( app ) {
         setTimeout( function() {
             app.focus();
         }, 1 );
+        
+        navigable.addCustomEventListener( 'update', function( url ) {
+            
+            //navigable.innerHTML = '';
+            
+            while( navigable.firstChild )
+                navigable.removeChild( navigable.firstChild ).purge();
+            
+            var locHref = href,
+                parts   = [];
+            
+            while ( locHref ) {
+                
+                parts.push( {
+                    "label": pathParser.basename( locHref ) || '/',
+                    "url"  : locHref || '/'
+                } );
+                
+                locHref = pathParser.substract( locHref, 1 );
+                
+            }
+            
+            parts = parts.reverse();
+            
+            for ( var i=0, len = parts.length; i<len; i++ ) {
+                
+                ( function( segment ) {
+                    
+                    navigable.appendChild( new Button( segment.label, function() {
+                        
+                        holder.href = segment.url;
+                        
+                    } ) );
+                    
+                } )( parts[i] );
+                
+            }
+            
+        } );
+        
+        console.log( 'created a navigable' );
         
         return navigable;
         
@@ -91,18 +153,25 @@ function BFS_AddressBar( app ) {
         inputMode = null;
         
         if ( editable )
-            inputMode = body.appendChild( createEditable() );
+            inputMode = body.appendChild( new createEditable() );
         else
-            inputMode = body.appendChild( createNavigable() );
+            inputMode = body.appendChild( new createNavigable() );
+        
+        inputMode.onCustomEvent( 'update', href );
         
         app.paint();
         
     }
     
     holder.editable = false;
+    holder.visible  = true;
     
     Keyboard.bindKeyboardHandler( app, "ctrl e", function(){
-        holder.editable = !holder.editable;
+        if ( holder.visible )
+            holder.editable = !holder.editable;
+        else {
+            holder.visible = true;
+        }
     } );
     
     Object.defineProperty( holder, "href", {
@@ -111,6 +180,11 @@ function BFS_AddressBar( app ) {
             return href;
         },
         "set": function( str ) {
+        
+            var testStr = pathParser.resolve( str );
+            
+            if ( testStr === false )
+                throw Exception('Exception.IO', 'invalid path "' + str + '"' );
 
             holder.editable = false;
             
@@ -118,7 +192,7 @@ function BFS_AddressBar( app ) {
             
             try {
             
-                newWorkingDirectory = app.connection.getElementByPath( str );
+                newWorkingDirectory = app.connection.getElementByPath( testStr );
                 
                 if ( newWorkingDirectory === null )
                     throw Exception( 'Exception.IO', 'Invalid location' );
@@ -128,6 +202,8 @@ function BFS_AddressBar( app ) {
                 app.appHandler( 'cmd_refresh' );
                 
                 href = cwd.url;
+                
+                inputMode.onCustomEvent( 'update', href );
                 
             } catch ( Error ) {
                 

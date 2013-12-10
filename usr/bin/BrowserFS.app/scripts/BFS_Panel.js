@@ -11,13 +11,33 @@ function BFS_Panel( app ) {
         var holder    = body.appendChild( $('div', 'Panel' ) ),
             titlebar  = holder.appendChild( $('div', 'title' ) ),
             caption   = titlebar.appendChild( $('div', 'label' ) ),
-            panelBody = holder.appendChild( $('div', 'body' ) );
+            panelBody = holder.appendChild( $('div', 'body' ) ),
+            expanded  = true,
+            btnExpand = titlebar.appendChild( $('div', 'toggle' ) ).chain( function() {
+                this.onclick = function() { holder.expanded = !holder.expanded; };
+            });
         
         caption.appendChild( $text( panelTitle || 'Panel' ) );
         
         holder.insert = function( DOMNode ) {
             return panelBody.appendChild( DOMNode );
         };
+        
+        Object.defineProperty( holder, "body", {
+            "get": function() {
+                return panelBody;
+            }
+        } );
+        
+        Object.defineProperty( holder, "expanded", {
+            "get": function() {
+                return expanded;
+            },
+            "set": function( bool ) {
+                expanded = !!bool;
+                holder[ expanded ? 'removeClass' : 'addClass' ]( 'collapsed' );
+            }
+        } );
         
         caption.setAttr( 'dragable', '1' );
         

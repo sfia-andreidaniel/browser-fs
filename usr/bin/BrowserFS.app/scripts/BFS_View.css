@@ -2,6 +2,10 @@
     left: 0px !important;
 }
 
+.DOM2Window.no-address-bar.no-search-bar .BFS_View {
+    top: 4px !important;
+}
+
 .BFS_View {
     display: block;
     position: absolute;

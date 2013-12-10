@@ -604,6 +604,33 @@ function BFS_View( app ) {
         panel.activeItem = items[ items.length - 1 ];
     } );
     
+    Keyboard.bindKeyboardHandler( panel, 'ctrl a', panel.commands.selection_set_all = function() {
+        
+        for ( var i=0, len = items.length; i<len; i++ )
+            if ( !items[i].selected )
+                app.interface.selection.add( items[i] );
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'ctrl i', panel.commands.selection_invert = function() {
+        
+        for ( var i=0, len = items.length; i<len; i++ ) {
+            
+            if ( !items[i].selected )
+                app.interface.selection.add( items[i] );
+            else
+                app.interface.selection.remove( items[i] );
+            
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'enter', panel.commands.cmd_open = function() {
+        
+        app.interface.on( 'open' );
+        
+    } );
+    
     /* Panel mouse bindings */
     
     panel.addEventListener( 'mousedown', function(evt) {
@@ -613,6 +640,14 @@ function BFS_View( app ) {
             if ( !evt.ctrlKey && !evt.shiftKey )
                 app.interface.selection.clear();
 
+        }
+        
+    } );
+    
+    body.addEventListener( 'dblclick', function( evt ){
+        
+        if ( evt.target && evt.target.hasClass( 'icon' ) && !evt.ctrlKey && !evt.shiftKey ) {
+            app.interface.on( 'open' );
         }
         
     } );

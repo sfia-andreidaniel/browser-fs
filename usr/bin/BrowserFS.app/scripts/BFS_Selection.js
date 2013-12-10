@@ -46,7 +46,70 @@ function BFS_Selection( app ) {
             items.splice( index )[0].selected = false;
         }
         app.interface.on( 'selection-changed' );
+    };
+    
+    Object.defineProperty( this, "length", {
+        "get": function() {
+            return items.length;
+        }
+    } );
+    
+    this.item = function( index ) {
+        return items[ ~~index ];
+    };
+    
+    var pluralize = function( str ) {
+        return str.replace( /y$/, 'i' ) + 'es';
     }
+    
+    this.explain = function() {
+        
+        return {
+            "length": items.length,
+            "description": items.length == 0
+                ? ""
+                : ( items.length == 1 ? items[0].inode.name : items.length + " items" ),
+            "types": ( function() {
+                var out = {},
+                    itemType,
+                    out2 = [];
+
+                for ( var i=0, len = items.length; i<len; i++ ) {
+                    
+                    itemType = items[i].inode.type.split( '.' )[0];
+                    
+                    out[ itemType ] = out[ itemType ] || 0;
+                    
+                    out[ itemType ]++;
+                    
+                }
+                
+                for ( var k in out ) {
+                    
+                    if ( out.propertyIsEnumerable( k ) && out.hasOwnProperty( k ) ) {
+                        out2.push( { "type": k, "length": out[ k ] }.chain( function() {
+                            
+                            this.toString = function() {
+                                return this.length == 1 ? "1 " + this.type : this.length + " " + pluralize( this.type );
+                            };
+                            
+                        } ) );
+                    }
+                    
+                }
+                
+                return out2;
+                
+            } )(),
+            "selectionType": items.length == 0
+                ? 'empty'
+                : ( items.length == 1
+                    ? 'single'
+                    : 'multiple'
+                )
+        };
+        
+    };
     
     return this;
 }
