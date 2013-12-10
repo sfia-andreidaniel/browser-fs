@@ -40,7 +40,7 @@ function BFS_AddressBar( app ) {
             }
         }).setAttr("style", "position: absolute; left: 60px" );
         
-        input.value = '/';
+        input.value = href || '/';
         
         setTimeout( function() {
             

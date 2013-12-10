@@ -141,8 +141,8 @@ function BFS_Connect( app ) {
         $import("0001-dlg").insert($import("0002-lbl"));
         $import("0001-dlg").insert($import("0003-lbl"));
         $import("0001-dlg").insert($import("0004-lbl"));
-        $import("0001-dlg").insert($import("0001-btn"));
         $import("0001-dlg").insert($import("0002-btn"));
+        $import("0001-dlg").insert($import("0001-btn"));
         $import("0001-dlg").insert($import("0001-drop"));
         $import("0001-dlg").insert($import("0001-text"));
         $import("0001-dlg").insert($import("0002-text"));

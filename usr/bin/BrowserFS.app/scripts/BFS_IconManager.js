@@ -48,8 +48,9 @@ function BFS_IconManager() {
         var ctx = canvases[ canvasKey ].getContext( '2d' ),
             img = images[ resourceName ];
         
-        ctx.fillStyle = '#000000ff';
+        ctx.fillStyle = '#ffff';
         ctx.fillRect( 0, 0, width, height );
+        //ctx.globalCompositeOperation = 'source-over';
         
         ctx.drawImage( img, 0, 0, img.width, img.height, 0, 0, width, height );
         

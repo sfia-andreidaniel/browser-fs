@@ -17,6 +17,9 @@ function BFS_Interface( app ) {
     
     // initialize the icon manager
     interface.iconsManager = new BFS_IconManager();
+    
+    // initialize the selection manager
+    interface.selection = new BFS_Selection( app );
 
     // application activity panel
     interface.panel    = app.insert( new BFS_Panel( app ) );
@@ -26,5 +29,16 @@ function BFS_Interface( app ) {
 
     // application location address bar
     interface.location = app.insert( new BFS_AddressBar( app ) );
+    
+    Object.defineProperty( app, "location", {
+        
+        "get": function() {
+            return interface.location.href;
+        },
+        "set": function( value ) {
+            interface.location.href = value;
+        }
+        
+    } );
     
 }

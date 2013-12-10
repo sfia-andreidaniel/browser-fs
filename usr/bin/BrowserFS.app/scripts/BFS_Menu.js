@@ -160,32 +160,50 @@ function BFS_Menu( app ) {
         "enabled": true,
         "items": [{
             "caption": "Small Icons",
-            "id": "cmd_view_small",
+            "id": "cmd_view_icons_small",
             "icon": "",
             "shortcut": "",
             "input": "radio:view",
-            "enabled": true
+            "enabled": true,
+            "handler": app.appHandler,
+            "checked": function() {
+                return app.interface.view.iconSize == 'small';
+            }
         }, {
             "caption": "Normal Icons",
-            "id": "cmd_view_normal",
+            "id": "cmd_view_icons_medium",
             "icon": "",
             "shortcut": "",
             "input": "radio:view",
-            "enabled": true
+            "enabled": true,
+            "handler": app.appHandler,
+            "checked": function() {
+                return app.interface.view.iconSize == 'medium';
+            }
         }, {
             "caption": "Large Icons",
-            "id": "cmd_view_large",
+            "id": "cmd_view_icons_large",
             "icon": "",
             "shortctut": "",
             "input": "radio:view",
-            "enabled": true
+            "enabled": true,
+            "handler": app.appHandler,
+            "checked": function() {
+                return app.interface.view.iconSize == 'large';
+            }
         }, null, {
             "caption": "Tasks Panel",
             "id": "cmd_view_tasks_panel",
             "icon": "",
             "shortcut": "",
             "input": "checkbox",
-            "enabled": true
+            "enabled": true,
+            "handler": function( visibility ) {
+                app.interface.panel.visible = visibility;
+            },
+            "checked": function() {
+                return app.interface.panel.visible;
+            }
         }]
     }, {
         "caption": "Tools",

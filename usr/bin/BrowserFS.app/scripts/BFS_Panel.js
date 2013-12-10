@@ -1,8 +1,9 @@
 /* BrowserFS left panel */
 function BFS_Panel( app ) {
     
-    var panel = $('div', 'BFS_Panel' ),
-        body  = panel.appendChild( $('div', 'body' ) );
+    var panel   = $('div', 'BFS_Panel' ),
+        body    = panel.appendChild( $('div', 'body' ) ),
+        visible = true;
     
     /* Creates a panel in the panel area */
     panel.createPanel = function( panelTitle ) {
@@ -30,6 +31,17 @@ function BFS_Panel( app ) {
         BFS_Panel_Places( app, panel );
         
     }, 100 );
+    
+    Object.defineProperty( panel, "visible", {
+        "get": function() {
+            return visible;
+        },
+        "set": function( boolVal ) {
+            visible = !!boolVal;
+            app[ visible ? "removeClass": "addClass" ]( "panel-off" );
+            app.onCustomEvent( 'resizeRun' );
+        }
+    } );
     
     return panel;
     

@@ -1,3 +1,7 @@
+.DOM2Window.panel-off .BFS_View {
+    left: 0px !important;
+}
+
 .BFS_View {
     display: block;
     position: absolute;
@@ -28,28 +32,45 @@
     top: 0px;
 }
 
+.BFS_View.small .icon {
+    max-width: 173px;
+    height: 18px;
+    background-position: 5px 50%;
+    padding: 2px 2px 2px 25px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    color: black;
+}
+
+
 .BFS_View.medium .icon {
     width: 100px;
     height: 30px;
-    color: white;
     background-position: 50% 10px;
     padding-top: 80px;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
-    outline: 1px solid black;
     color: black;
 }
 
 .BFS_View.large .icon {
     width: 140px;
     height: 30px;
-    color: white;
     background-position: 50% 10px;
     padding-top: 150px;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
-    outline: 1px solid black;
     color: black;
+}
+
+.BFS_View .icon.selected {
+    background-color: #333;
+    color: white;
+}
+
+.BFS_View .icon.active {
+    outline: 1px dotted #888;
 }

@@ -2,17 +2,18 @@
 function BFS_View( app ) {
     
     var panel = $('div', 'BFS_View' ),
-        body  = panel.appendChild( $('div', 'body.medium' ) );
+        body  = panel.appendChild( $('div', 'body medium' ) );
     
     // link to app icons manager
     panel.icons = app.interface.iconsManager;
+    panel.app   = app;
     
     var sizes = {
         "small": {
             "iconWidth": 16,
             "iconHeight": 16,
             "itemWidth": 200,
-            "itemHeight": 18
+            "itemHeight": 22
         },
         "medium": {
             "iconWidth": 64,
@@ -30,14 +31,19 @@ function BFS_View( app ) {
 
     size = 'medium',
     
-    iconWidth = sizes[size].iconWidth,
-    iconHeight= sizes[size].iconHeight,
-    itemWidth = sizes[size].itemWidth,
-    itemHeight= sizes[size].itemHeight,
+    iconWidth    = sizes[size].iconWidth,
+    iconHeight   = sizes[size].iconHeight,
+    itemWidth    = sizes[size].itemWidth,
+    itemHeight   = sizes[size].itemHeight,
     
-    sortBy = 'type',
+    itemsPerLine = 0,
+    selectionStartIndex= -1, // when the shift key has been pressed, which index was focused
     
-    items = [];
+    sortBy = '',
+    
+    items = [],
+    
+    activeItem = null;
     
     Object.defineProperty( panel, "iconWidth", {
         "get": function() {
@@ -63,7 +69,13 @@ function BFS_View( app ) {
         }
     } );
     
-    Object.defineProperty( panel, "size", {
+    Object.defineProperty( panel, "itemsPerLine", {
+        "get": function() {
+            return itemsPerLine;
+        }
+    } );
+    
+    Object.defineProperty( panel, "iconSize", {
         
         "get": function() {
             return size;
@@ -80,9 +92,46 @@ function BFS_View( app ) {
             itemWidth  = sizes[ size ].itemWidth;
             itemHeight = sizes[ size ].itemHeight;
             
+            app.interface.on( 'view.iconSize', size );
+            
             panel._paint_();
         }
         
+    } );
+    
+    Object.defineProperty( panel, "selectionStartIndex", {
+        
+        "get": function() {
+            return selectionStartIndex;
+        }
+        
+    } );
+    
+    Object.defineProperty( panel, "length", {
+        "get": function() {
+            return items.length;
+        }
+    } );
+    
+    panel.item = function( index ) {
+        return items[ ~~index ];
+    }
+    
+    Object.defineProperty( panel, "activeItem", {
+        "get": function() {
+            return activeItem;
+        },
+        "set": function( item ) {
+            if ( activeItem )
+                activeItem.removeClass( 'active' );
+            
+            activeItem = item ? item : null;
+            
+            if ( activeItem ) {
+                activeItem.addClass( 'active' );
+                activeItem.scrollIntoViewIfNeeded();
+            }
+        }
     } );
     
     var iconsArranger = Cowboy.debounce( 20, false, function() {
@@ -90,59 +139,61 @@ function BFS_View( app ) {
         var cx = 0,
             cy = 0,
             winWidth = body.offsetWidth,
-            winHeight = body.offsetHeight;
+            winHeight = body.offsetHeight,
+            maxItemWidth = 0,
+            iWidth = itemWidth,
+            itemsPerLineLocal = 0;
+        
+        if ( size == 'small' ) {
+            
+            for ( var i=0, len=items.length; i<len; i++ )
+                if ( maxItemWidth < items[i].offsetWidth )
+                    maxItemWidth = items[i].offsetWidth;
+            
+            iWidth = Math.min( itemWidth, maxItemWidth );
+            
+        }
+        
+        itemsPerLineLocal = 0;
+        itemsPerLine      = 0;
         
         for ( var i=0, len = items.length; i<len; i++ ) {
             items[i].style.left = cx + "px";
             items[i].style.top  = cy + "px";
-            cx += ( itemWidth + 10 );
-            if ( cx > winWidth ) {
+            cx += ( iWidth + 10 );
+            itemsPerLineLocal++;
+            if ( ( cx + iWidth + 10 ) > winWidth ) {
+                itemsPerLine = Math.max( itemsPerLineLocal, itemsPerLine );
+                itemsPerLineLocal = 0;
                 cx = 0;
                 cy += ( itemHeight + 10 );
             }
         }
         
+        itemsPerLine = Math.max( itemsPerLineLocal, itemsPerLine );
+        
     } );
     
-    var typeCompare = function( item1, item2 ) {
-        var type1 = item1.inode.type.split( '.' )[0].toLowerCase(),
-            type2 = item2.inode.type.split( '.' )[0].toLowerCase();
-        
-        return type1 == 'category' &&
-               type2 == 'category'
-            ? 0
-            : ( type1 == 'category'
-                ? -1
-                : 1
-            );
-    }
-    
-    var nameCompare = function( inode1, inode2 ) {
-        
-        var result;
-        
-        if ( result = typeCompare( inode1, inode2 ) == 0 ) {
-            return inode1.inode.name.toLowerCase().strcmp( inode2.inode.name.toLowerCase() );
-        } else
-            return result;
-        
-    };
-    
     var itemsSorter = Cowboy.debounce( 20, false, function() {
-        
-        switch ( sortBy ) {
-            case 'type':
-                items.sort( typeCompare );
-                break;
-            case 'name':
-                items.sort( nameCompare );
-                break;
-            default:
-                items.sort( nameCompare );
-                break;
-        }
-        
+        items.sort( ( BFS_View_Sorters[ sortBy ] || BFS_View_Sorters.name ) );
         iconsArranger();
+    } );
+    
+    Object.defineProperty( panel, "sortBy", {
+        "get": function() {
+            return sortBy;
+        },
+        "set": function( str ) {
+            if ( !BFS_View_Sorters[ str ] )
+                throw "Bad sort-by value!";
+            if ( str == sortBy )
+                return;
+            sortBy = str;
+            
+            app.interface.on( 'view.sortBy', str );
+            
+            itemsSorter();
+        }
     } );
     
     panel.addItem = function( obj ) {
@@ -150,29 +201,421 @@ function BFS_View( app ) {
         itemsSorter();
     };
     
+    // Clears the panel
     panel.clear = function() {
+        
+        panel.activeItem = null;         //clear the active panel item
+        
+        while ( items.length )           // remove all the panel items
+            body.removeChild( items.shift() ).purge();
 
-        // Clears the panel
-        while ( items.length )
-            body.removeChild( items.shift() );
-
+        app.interface.selection.clear(); //clear the application selection
     };
     
     panel.setItems = function( itemsList ) {
-        
         // Set items of the panel
-        
+        panel.clear();
+
+        for ( var i=0, len = ( itemsList || [] ).length; i<len; i++ )
+            panel.addItem( itemsList[i] );
     };
     
     panel._paint_ = function() {
-    
         for ( var i=0, len = items.length; i<len; i++ )
             items[i]._paint_();
-        
         iconsArranger();
     }
     
-    panel.size = 'large';
+    panel.getIconIndex = function( icon ) {
+        return items.indexOf( icon );
+    };
+    
+    panel.getIconRow   = function( icon ) {
+        return ~~( items.length / icon.index );
+    };
+    
+    panel.getIconColumn= function( icon ) {
+        return icon.index % itemsPerLine;
+    }
+    
+    // add a main application resize event listener in order to resort the
+    // icons to fit the viewport
+    app.addCustomEventListener( 'resizeRun', function() {
+        iconsArranger();
+    } );
+    
+    panel.iconSize = 'small';
+    panel.sortBy   = 'type';
+    
+    /* Define application handlers */
+    app.handlers.cmd_view_icons_small = function() {
+        panel.iconSize = 'small';
+    };
+    
+    app.handlers.cmd_view_icons_medium = function() {
+        panel.iconSize = 'medium';
+    };
+    
+    app.handlers.cmd_view_icons_large = function() {
+        panel.iconSize = 'large';
+    };
+    
+    /* Bind panel keyboard bindings */
+    
+    panel.tabIndex = 0;
+
+    panel.commands = {};
+
+    panel.addEventListener( 'keydown', function(evt) {
+        
+        if ( evt.keyCode == 16 && items.length ) {
+            
+            panel.activeItem = panel.activeItem || items[0];
+            selectionStartIndex = panel.activeItem.index;
+            
+            //console.log( 'selection start index: ', selectionStartIndex );
+            
+        }
+        
+    }, true );
+    
+    panel.addEventListener( 'keyup', function( evt ) {
+        
+        if ( evt.keyCode == 16 ) {
+            selectionStartIndex = -1;
+            //console.log( 'selection start index: ', selectionStartIndex );
+        }
+        
+    }, true );
+
+    Keyboard.bindKeyboardHandler( panel, 'left', panel.commands.selection_set_left = function() {
+        
+        app.interface.selection.clear();
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index ) > 0 ) {
+            panel.activeItem = items[ index - 1 ];
+        }
+
+        app.interface.selection.add( panel.activeItem );
+        
+    } );
+
+    Keyboard.bindKeyboardHandler( panel, 'ctrl left', panel.commands.cursor_move_left = function() {
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index ) > 0 ) {
+            panel.activeItem = items[ index - 1 ];
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'shift left', panel.commands.selection_extend_left = function() {
+        
+        var index, previousItem;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null ) {
+            panel.activeItem = index[0];
+            selectionStartIndex = 0;
+        }
+        
+        if ( ( index = panel.activeItem.index ) > 0 ) {
+            
+            previousItem = panel.activeItem;
+            
+            panel.activeItem = items[ index - 1 ];
+            
+            app.interface.selection.add( panel.activeItem );
+            
+            if ( selectionStartIndex < previousItem.index )
+                app.interface.selection.remove( previousItem );
+            else
+                app.interface.selection.add( previousItem );
+            
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'right', panel.commands.selection_set_right = function() {
+        
+        app.interface.selection.clear();
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null ) {
+            panel.activeItem = items[0];
+            app.interface.selection.add( items[0] );
+            return;
+        }
+        
+        if ( ( index = panel.activeItem.index ) < items.length - 1 ) {
+            panel.activeItem = items[ index + 1 ];
+        }
+
+        app.interface.selection.add( panel.activeItem );
+        
+    } );
+
+    Keyboard.bindKeyboardHandler( panel, 'ctrl right', panel.commands.cursor_move_right = function() {
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index ) < items.length - 1 ) {
+            panel.activeItem = items[ index + 1 ];
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'shift right', panel.commands.selection_extend_right = function() {
+        
+        var index, previousItem;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null ) {
+            panel.activeItem = items[0];
+            selectionStartIndex = 0;
+        }
+        
+        if ( ( index = panel.activeItem.index ) < items.length - 1 ) {
+            
+            previousItem = panel.activeItem;
+            panel.activeItem = items[ index + 1 ];
+            app.interface.selection.add( panel.activeItem );
+            
+            if ( selectionStartIndex > previousItem.index )
+                app.interface.selection.remove( previousItem );
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'up', panel.commands.selection_set_up = function() {
+        
+        app.interface.selection.clear();
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index - itemsPerLine ) >= 0 ) {
+            panel.activeItem = items[ index ];
+        }
+
+        app.interface.selection.add( panel.activeItem );
+        
+    } );
+
+    Keyboard.bindKeyboardHandler( panel, 'ctrl up', panel.commands.cursor_move_up = function() {
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index - itemsPerLine ) >= 0 ) {
+            panel.activeItem = items[ index ];
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'shift up', panel.commands.selection_extend_up = function() {
+        
+        var index, previousItem, loopIndex;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null ) {
+            panel.activeItem = items[0];
+            selectionStartIndex = 0;
+        }
+        
+        if ( ( index = panel.activeItem.index - itemsPerLine ) >= 0 ) {
+            
+            loopIndex = panel.activeItem.index;
+            
+            app.interface.selection.add( panel.activeItem = items[index] );
+            
+            do {
+                
+                previousItem = items[ loopIndex ];
+                
+                if ( selectionStartIndex >= loopIndex ) {
+                    app.interface.selection.add( previousItem );
+                } else {
+                    app.interface.selection.remove( previousItem );
+                }
+                
+                loopIndex--;
+                
+            } while ( loopIndex > index );
+            
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'down', panel.commands.selection_set_down = function() {
+        
+        app.interface.selection.clear();
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index + itemsPerLine ) < items.length ) {
+            panel.activeItem = items[ index ];
+        }
+        
+        app.interface.selection.add( panel.activeItem );
+        
+    } );
+
+    Keyboard.bindKeyboardHandler( panel, 'ctrl down', panel.commands.cursor_move_down = function() {
+        
+        var index;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null )
+            panel.activeItem = items[0];
+        
+        if ( ( index = panel.activeItem.index + itemsPerLine ) < items.length ) {
+            panel.activeItem = items[ index ];
+        }
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'shift down', panel.commands.selection_extend_down = function() {
+        
+        var index, previousItem, loopIndex;
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null ) {
+            panel.activeItem = items[0];
+            selectionStartIndex = 0;
+        }
+        
+        if ( ( index = panel.activeItem.index + itemsPerLine ) < items.length ) {
+            
+            loopIndex = panel.activeItem.index;
+            
+            app.interface.selection.add( panel.activeItem = items[ index ] );
+            
+            do {
+                
+                previousItem = items[ loopIndex ];
+                
+                if ( selectionStartIndex <= loopIndex ) {
+                    app.interface.selection.add( previousItem );
+                } else {
+                    app.interface.selection.remove( previousItem );
+                }
+                
+                loopIndex++;
+                
+            } while ( loopIndex < index );
+            
+        }
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'ctrl space', panel.commands.selection_toggle_current = function() {
+        
+        if ( !items.length )
+            return;
+        
+        if ( panel.activeItem === null ) {
+            panel.activeItem = items[0];
+        }
+        
+        app.interface.selection.xor( panel.activeItem );
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'home', panel.commands.selection_set_first = function() {
+        
+        if ( !items.length )
+            return;
+        
+        app.interface.selection.set( panel.activeItem = items[0] );
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'ctrl home', panel.commands.cursor_move_first = function() {
+        if ( !items.length )
+            return;
+        
+        panel.activeItem = items[0];
+    });
+    
+    Keyboard.bindKeyboardHandler( panel, 'end', panel.commands.selection_set_last = function() {
+        
+        if ( !items.length )
+            return;
+        
+        app.interface.selection.set( panel.activeItem = items[ items.length - 1 ] );
+        
+    } );
+    
+    Keyboard.bindKeyboardHandler( panel, 'ctrl end', panel.commands.cursor_move_end = function() {
+        if ( !items.length )
+            return;
+        
+        panel.activeItem = items[ items.length - 1 ];
+    } );
+    
+    /* Panel mouse bindings */
+    
+    panel.addEventListener( 'mousedown', function(evt) {
+        
+        if ( evt.target == body && evt.which == 1 ) {
+            
+            if ( !evt.ctrlKey && !evt.shiftKey )
+                app.interface.selection.clear();
+
+        }
+        
+    } );
     
     return panel;
     

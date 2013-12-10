@@ -1,3 +1,7 @@
+.DOM2Window.panel-off .BFS_Panel {
+    display: none !important;
+}
+
 .BFS_Panel {
     display: block;
     position: absolute;
