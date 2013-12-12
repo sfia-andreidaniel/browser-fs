@@ -1,3 +1,7 @@
 .BrowserFS-Dialog {
 
 }
+
+.BrowserFS-Dialog div {
+    -webkit-user-select: none;
+}

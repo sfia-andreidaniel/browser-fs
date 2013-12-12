@@ -69,14 +69,21 @@ function BFS_Connect( app ) {
 
         $export("0004-lbl", (new DOMLabel("Password:")).setAttr("style", "top: 155px; left: 10px; width: 65px; position: absolute; text-overflow: ellipsis"));
 
+        dlg.closeCallback = function() {
+            if ( connection === null ) {
+                app.forceClose = true;
+                app.close();
+            }
+            setTimeout( function() {
+                dlg.purge();
+            }, 100 );
+            return true;
+        }
+
         $export("0001-btn", (new Button("Cancel", (function() {
             
             dlg.close();
-            dlg.purge();
             
-            if ( connection === null ) {
-                app.close();
-            }
             
         }))).setAttr("style", "bottom: 10px; right: 10px; position: absolute"));
 
@@ -111,13 +118,14 @@ function BFS_Connect( app ) {
             }
         }));
 
-        $export("0002-btn", (new Button("Connect", (function() {
+        $export("0002-btn", (new Button("Connect", dlg.handlers.cmd_connect = (function( reuseConnection ) {
             
-            var conn;
+            var conn = reuseConnection || null;
             
             try {
                 
-                conn = OneDB.login( websites.value, userName.value, password.value );
+                if ( !conn )
+                    conn = OneDB.login( websites.value, userName.value, password.value );
                 
                 connection = conn;
                 
@@ -146,6 +154,14 @@ function BFS_Connect( app ) {
         $import("0001-dlg").insert($import("0001-drop"));
         $import("0001-dlg").insert($import("0001-text"));
         $import("0001-dlg").insert($import("0002-text"));
+        
+        Keyboard.bindKeyboardHandler( dlg, "enter", function() {
+            dlg.handlers.cmd_connect();
+        } );
+        
+        Keyboard.bindKeyboardHandler( dlg, "esc", function() {
+            dlg.close();
+        } );
 
         setTimeout(function() {
             dlg.paint();

@@ -1,0 +1,6 @@
+.BFS_View > .body > .selection {
+    position: absolute;
+    background-color: rgba( 0, 0, 255, .3 );
+    display: block;
+    z-index: 100000;
+}

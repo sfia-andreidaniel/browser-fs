@@ -4,7 +4,7 @@ function BFS_Common_Commands( app ) {
     
     app.closeCallback = function() {
         
-        if ( !closeConfirmed ) {
+        if ( !closeConfirmed && !app.forceClose ) {
         
             DialogBox( "Are you sure you want to quit BrowserFS?", {
                 
@@ -45,7 +45,13 @@ function BFS_Common_Commands( app ) {
     };
     
     app.handlers.cmd_location_up_level = function() {
-        app.location += '/../';
+        if ( app.location != '/' )
+            app.location += '/../';
+        else DialogBox( 'You are allready at the top level', {
+            "childOf": app,
+            "modal": true,
+            "caption": "Cannot go upper than this"
+        } );
     }
     
     Keyboard.bindKeyboardHandler( app, 'alt up', function() {

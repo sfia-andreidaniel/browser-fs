@@ -3,15 +3,23 @@ function BFS_Selection( app ) {
     var items = [];
     
     this.clear = function() {
+
         while ( items.length )
             items.shift().selected = false;
+
         app.interface.on( 'selection-changed' );
     };
     
-    this.add = function( ) {
-        items = items.unique( items.merge( Array.prototype.slice.call( arguments, 0 ) ) );
-        for ( var i=0, len = arguments.length; i<len; i++ )
-            arguments[i].selected = true;
+    this.add = function( singleItem ) {
+    
+        for ( var i=0, len = items.length; i<len; i++ )
+            if ( items[i] == singleItem )
+                return;
+
+        items.push( singleItem );
+
+        singleItem.selected = true;
+
         app.interface.on( 'selection-changed' );
     };
     
@@ -22,8 +30,10 @@ function BFS_Selection( app ) {
             if ( items[i] == singleItem )
                 return;
         }
+        
         items.push( singleItem );
         singleItem.selected = true;
+        
         app.interface.on( 'selection-changed' );
     };
     
@@ -43,7 +53,7 @@ function BFS_Selection( app ) {
             item.selected = true;
             items.push( item );
         } else {
-            items.splice( index )[0].selected = false;
+            items.splice( index, 1 )[0].selected = false;
         }
         app.interface.on( 'selection-changed' );
     };

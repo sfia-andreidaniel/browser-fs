@@ -136,8 +136,8 @@ function BFS_View( app ) {
     
     var iconsArranger = Cowboy.debounce( 20, false, function() {
         
-        var cx = 0,
-            cy = 0,
+        var cx = 10,
+            cy = 10,
             winWidth = body.offsetWidth,
             winHeight = body.offsetHeight,
             maxItemWidth = 0,
@@ -165,7 +165,7 @@ function BFS_View( app ) {
             if ( ( cx + iWidth + 10 ) > winWidth ) {
                 itemsPerLine = Math.max( itemsPerLineLocal, itemsPerLine );
                 itemsPerLineLocal = 0;
-                cx = 0;
+                cx = 10;
                 cy += ( itemHeight + 10 );
             }
         }
@@ -633,16 +633,13 @@ function BFS_View( app ) {
     
     /* Panel mouse bindings */
     
-    panel.addEventListener( 'mousedown', function(evt) {
+    body.addEventListener( 'mousedown', function( evt ){
         
-        if ( evt.target == body && evt.which == 1 ) {
-            
-            if ( !evt.ctrlKey && !evt.shiftKey )
-                app.interface.selection.clear();
-
+        if ( evt.target == body && evt.which == 1 && !evt.ctrlKey ) {
+            app.interface.selection.clear();
         }
         
-    } );
+    }, true );
     
     body.addEventListener( 'dblclick', function( evt ){
         
@@ -651,6 +648,8 @@ function BFS_View( app ) {
         }
         
     } );
+    
+    new BFS_View_Mouse_Selection( body, app );
     
     return panel;
     

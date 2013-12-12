@@ -32,8 +32,8 @@
     background-repeat: no-repeat;
     cursor: default;
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 10px;
+    top: 10px;
 }
 
 .BFS_View.small .icon {
