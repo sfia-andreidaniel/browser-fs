@@ -39,6 +39,7 @@ function BFS_Backend() {
             
             /* Initialize the application handlers */
             BFS_Connect( dlg );
+            BFS_Common_Commands( dlg );
             
             dlg.appHandler( 'cmd_connect' );
             

@@ -108,49 +108,49 @@ function BFS_Menu( app ) {
         "items": [{
             "caption": "Cut",
             "id": "cmd_edit_cut",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-cut.png}",
             "shortcut": "Ctrl + X",
             "enabled": true,
             "handler": app.appHandler
         }, {
             "caption": "Copy",
             "id": "cmd_edit_copy",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-copy.png}",
             "shortcut": "Ctrl + C",
             "enabled": true,
             "handler": app.appHandler
         }, {
             "caption": "Paste",
             "id": "cmd_edit_paste",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-paste.png}",
             "shortcut": "Ctrl + V",
             "enabled": true,
             "handler": app.appHandler
         }, null, {
             "caption": "Select All",
             "id": "cmd_select_all",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-select-all.png}",
             "shortcut": "Ctrl + A",
             "enabled": true,
             "handler": app.appHandler
         }, {
             "caption": "Invert Selection",
             "id": "cmd_select_invert",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-select-invert.png}",
             "shortcut": "Ctrl + I",
             "enabled": true,
             "handler": app.appHandler
         }, null, {
             "caption": "Find",
             "id": "cmd_search",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-find.png}",
             "shortcut": "Ctrl + F",
             "enabled": true,
             "handler": app.appHandler
         }, null, {
             "caption": "Properties",
             "id": "cmd_properties",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/edit-properties.png}",
             "shortcut": "Alt + Enter",
             "enabled": true,
             "handler": app.appHandler
@@ -161,7 +161,7 @@ function BFS_Menu( app ) {
         "items": [{
             "caption": "Small Icons",
             "id": "cmd_view_icons_small",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/small-icons.png}",
             "shortcut": "",
             "input": "radio:view",
             "enabled": true,
@@ -172,7 +172,7 @@ function BFS_Menu( app ) {
         }, {
             "caption": "Normal Icons",
             "id": "cmd_view_icons_medium",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/medium-icons.png}",
             "shortcut": "",
             "input": "radio:view",
             "enabled": true,
@@ -183,7 +183,7 @@ function BFS_Menu( app ) {
         }, {
             "caption": "Large Icons",
             "id": "cmd_view_icons_large",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/large-icons.png}",
             "shortctut": "",
             "input": "radio:view",
             "enabled": true,
@@ -194,7 +194,7 @@ function BFS_Menu( app ) {
         }, null, {
             "caption": "Tasks Panel",
             "id": "cmd_view_tasks_panel",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/task-panel.png}",
             "shortcut": "",
             "input": "checkbox",
             "enabled": true,
@@ -207,7 +207,7 @@ function BFS_Menu( app ) {
         } , {
             "caption": "Search Bar",
             "id": "cmd_view_search_bar",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/search-bar.png}",
             "shortcut": "",
             "input": "checkbox",
             "enabled": true,
@@ -220,7 +220,7 @@ function BFS_Menu( app ) {
         } , {
             "caption": "Address Bar",
             "id": "cmd_view_address_bar",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/address-bar.png}",
             "shortcut": "",
             "input": "checkbox",
             "enabled": true,
@@ -237,7 +237,7 @@ function BFS_Menu( app ) {
         "items": [{
             "caption": "Options",
             "id": "cmd_tools_options",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/tools-preferences.png}",
             "shortcut": "",
             "input": "",
             "enabled": true
@@ -248,7 +248,7 @@ function BFS_Menu( app ) {
         "items": [{
             "caption": "Online Help",
             "id": "cmd_help",
-            "icon": "",
+            "icon": "data:image/png;base64,{$include resources/menu/help-online.png}",
             "shortcut": "F1",
             "enabled": true
         } , null, {
