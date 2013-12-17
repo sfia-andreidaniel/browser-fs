@@ -78,3 +78,24 @@
 .BFS_View .icon.active {
     outline: 1px dotted #888;
 }
+
+.BFS_View .icon > input[type=text] {
+    border: none;
+    outline: none;
+}
+
+.BFS_View .icon.rename {
+    z-index: 100;
+}
+
+.BFS_View.small .icon > input[type=text] {
+    margin: -1px -1px -2px 0px;
+}
+
+.BFS_View.medium .icon > input[type=text] {
+    max-width: 90px;
+}
+
+.BFS_View.large .icon > input[type=text] {
+    max-width: 130px;
+}

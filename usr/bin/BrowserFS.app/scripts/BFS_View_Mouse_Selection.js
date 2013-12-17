@@ -4,7 +4,7 @@ function BFS_View_Mouse_Selection( /*<BFS_View_Body>*/ body, app ) {
         origin  = { "x": 0, "y": 0, "x1": 0, "y1": 0 },
         visible = false,
         active  = false,
-        effect  = 'set'
+        effect  = 'set',
     
     bodyMouseMove = function( e ) {
         
@@ -106,7 +106,7 @@ function BFS_View_Mouse_Selection( /*<BFS_View_Body>*/ body, app ) {
     
     body.addEventListener( 'mousedown', function( e ) {
         
-        if ( e.which != 1 || e.target != body || active )
+        if ( e.which != 1 || e.target != body || active || !!body.querySelector( '.icon.rename' ))
             return;
         
         effect = e.ctrlKey ? 'add' : 'set';

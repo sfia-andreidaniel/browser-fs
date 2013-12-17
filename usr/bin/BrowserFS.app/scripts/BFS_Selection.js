@@ -2,6 +2,13 @@ function BFS_Selection( app ) {
     
     var items = [];
     
+    this.clone = function() {
+        var n = new BFS_Selection( app );
+        for ( var i=0, len = items.length; i<len; i++ )
+            n.add( items[i], true );
+        return n;
+    }
+    
     this.clear = function() {
 
         while ( items.length )
@@ -10,17 +17,22 @@ function BFS_Selection( app ) {
         app.interface.on( 'selection-changed' );
     };
     
-    this.add = function( singleItem ) {
+    this.add = function( singleItem, fast ) {
     
-        for ( var i=0, len = items.length; i<len; i++ )
-            if ( items[i] == singleItem )
-                return;
+        fast = fast || false;
+    
+        if ( !fast ) {
+            for ( var i=0, len = items.length; i<len; i++ )
+                if ( items[i] == singleItem )
+                    return;
+        }
 
         items.push( singleItem );
 
-        singleItem.selected = true;
-
-        app.interface.on( 'selection-changed' );
+        if ( !fast ) {
+            singleItem.selected = true;
+            app.interface.on( 'selection-changed' );
+        }
     };
     
     this.set = function( singleItem ) {

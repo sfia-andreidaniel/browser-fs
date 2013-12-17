@@ -1,8 +1,8 @@
 var BFS_View_Sorters = BFS_View_Sorters || {};
 
 BFS_View_Sorters.type = function( item1, item2 ) {
-    var type1 = item1.inode.type.split( '.' )[0].toLowerCase(),
-        type2 = item2.inode.type.split( '.' )[0].toLowerCase();
+    var type1 = item1.inode.type.split( '_' )[0].toLowerCase(),
+        type2 = item2.inode.type.split( '_' )[0].toLowerCase();
     
     return type1 == 'category' &&
            type2 == 'category'

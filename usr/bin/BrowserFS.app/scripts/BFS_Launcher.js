@@ -15,13 +15,20 @@ function BFS_Launcher( app ) {
         if ( selection.length != 1 )
             return;
         
-        if ( selection.item(0).inode.has_flag( 'container' ) ) {
+        var actions = app.interface.filesAssoc.getActions( selection ),
+            action  = null;
+        
+        for ( var i=0, len = actions.length; i<len; i++ ) {
             
-            app.location = selection.item( 0 ).inode.url;
-            return;
+            if ( actions[i]['default'] ) {
+                action = actions[i];
+                break;
+            }
             
         }
-
+        
+        if ( action )
+            action.handler( selection );
     };
     
     return this;

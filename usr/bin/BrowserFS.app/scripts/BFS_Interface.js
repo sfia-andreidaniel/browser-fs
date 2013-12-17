@@ -23,6 +23,10 @@ function BFS_Interface( app ) {
     // initialize the icon manager
     interface.iconsManager = new BFS_IconManager( app );
     
+    // interface fileTypes
+    interface.filesAssoc = new BFS_FilesAssociations( app );
+    BFS_Actions( app );
+    
     // initialize the selection manager
     interface.selection = new BFS_Selection( app );
 

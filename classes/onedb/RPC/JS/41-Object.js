@@ -316,8 +316,8 @@ function OneDB_Object( server, properties ) {
                 throw Exception( 'Exception.IO', "The object cannot be saved because it is read-only!", 0, null, __FILE__, __LINE__  );
                 break;
             
-            case this.has_flag( 'live' ):
-                throw Exception( 'Exceptoin.IO', "Live objects cannot be saved!", 0, null, __FILE__, __LINE__  );
+            case this.has_flag( 'live' ) && !this.has_flag( 'container' ):
+                throw Exception( 'Exception.IO', "Live objects cannot be saved!", 0, null, __FILE__, __LINE__  );
                 break;
             
             case this.has_flag( 'unstable' ):

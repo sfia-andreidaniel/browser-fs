@@ -135,7 +135,7 @@ function BFS_AddressBar( app ) {
             
         } );
         
-        console.log( 'created a navigable' );
+        //console.log( 'created a navigable' );
         
         return navigable;
         
@@ -172,6 +172,14 @@ function BFS_AddressBar( app ) {
         else {
             holder.visible = true;
         }
+    } );
+    
+    Object.defineProperty( holder, "inode", {
+        
+        "get": function() {
+            return cwd || null;
+        }
+        
     } );
     
     Object.defineProperty( holder, "href", {
@@ -231,7 +239,7 @@ function BFS_AddressBar( app ) {
         if ( !app.connection || !cwd )
             return;
         
-        cwd.find( { "childOf": cwd.id } ).each( function() {
+        cwd.childNodes.each( function() {
             app.interface.view.addItem( this );
         } );
         

@@ -35,6 +35,18 @@ function _BFS_Clipboard_() {
             setClipboard( selectionItemsList, 'copy' );
         }
         
+        Object.defineProperty( this, "length", {
+            "get": function() {
+                return items.length;
+            }
+        } );
+        
+        Object.defineProperty( this, "effect", {
+            "get": function() {
+                return effect;
+            }
+        } );
+        
         return this;
     }
     

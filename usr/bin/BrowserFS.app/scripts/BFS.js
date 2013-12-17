@@ -74,6 +74,7 @@ function BFS( dialogFlags ) {
                 }
             });
             
+            BFS_Shared( dlg );
             
             /* Initialize the interface */
             
@@ -82,8 +83,11 @@ function BFS( dialogFlags ) {
             /* Initialize the application handlers */
             BFS_Connect( dlg );
             BFS_Common_Commands( dlg );
+            BFS_Creator( dlg );
             
             dlg.appHandler( 'cmd_connect', dialogFlags.connection || null );
+            
+            window.bfs = dlg;
             
             return dlg;
 

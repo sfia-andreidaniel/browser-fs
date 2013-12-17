@@ -75,6 +75,88 @@ function BFS_View_Icon( view, object ) {
             }
         } );
         
+        ( function( icon ) {
+        
+            var renameMode = false,
+                input      = null,
+                canceled   = false;
+            
+            Object.defineProperty( icon, "renameMode", {
+                "get": function() {
+                    return renameMode;
+                },
+                "set": function( bool ) {
+                    
+                    var newName;
+                    
+                    bool = !!bool;
+                    
+                    if ( bool == renameMode )
+                        return;
+
+                    renameMode = bool;
+                    
+                    icon[ renameMode ? 'addClass' : 'removeClass' ]( 'rename' );
+                    
+                    if ( bool === false ) {
+                        
+                        icon.parentNode.parentNode.keyboardEnabled = true;
+                        
+                        icon.parentNode.parentNode.focus();
+                        
+                        newName = input.value;
+                        
+                        // we set the icon name with the text value from the input
+                        
+                        icon.removeChild( input );
+                        
+                        input.purge();
+                        
+                        input = null;
+                        
+                        icon.name = icon.name;
+                        
+                        if ( newName != icon.name && !canceled )
+                            icon.parentNode.parentNode.onCustomEvent( 'rename', { "source": icon, "old": icon.name, "new": newName } );
+                        
+                    } else {
+
+                        icon.parentNode.parentNode.keyboardEnabled = false;
+
+                        icon.innerHTML = '';
+                        
+                        input = icon.appendChild( new TextBox( icon.name ) );
+                        
+                        input.style.width = Math.min( input.value.visualWidth( input.value ), 150 ) + "px"
+                        
+                        input.focus();
+                        input.select();
+                        
+                        Keyboard.bindKeyboardHandler( input, 'enter', function() {
+                            canceled = false;
+                            icon.renameMode = false;
+                        });
+                        
+                        Keyboard.bindKeyboardHandler( input, 'esc', function() {
+                            canceled = true;
+                            icon.renameMode = false;
+                        } );
+                        
+                        input.addEventListener( 'input', function( evt ) {
+                            input.style.width = Math.min( input.value.visualWidth( input.value ), 150 ) + "px";
+                        }, false );
+                        
+                        input.addEventListener( 'blur', function( evt ) {
+                            icon.renameMode = false;
+                        }, true );
+                        
+                    }
+                    
+                }
+            });
+            
+        })( this );
+        
         this._paint_();
         
     } );

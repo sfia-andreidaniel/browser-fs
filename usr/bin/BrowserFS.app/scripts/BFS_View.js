@@ -197,8 +197,10 @@ function BFS_View( app ) {
     } );
     
     panel.addItem = function( obj ) {
-        items.push( body.appendChild( new BFS_View_Icon( panel, obj ) ) );
+        var result;
+        items.push( result = body.appendChild( new BFS_View_Icon( panel, obj ) ) );
         itemsSorter();
+        return result;
     };
     
     // Clears the panel
@@ -266,29 +268,20 @@ function BFS_View( app ) {
 
     panel.commands = {};
 
-    panel.addEventListener( 'keydown', function(evt) {
-        
+    panel.commands.keyDownHandler = function(evt) {
         if ( evt.keyCode == 16 && items.length ) {
-            
             panel.activeItem = panel.activeItem || items[0];
             selectionStartIndex = panel.activeItem.index;
-            
-            //console.log( 'selection start index: ', selectionStartIndex );
-            
         }
-        
-    }, true );
+    };
     
-    panel.addEventListener( 'keyup', function( evt ) {
-        
+    panel.commands.keyUpHandler = function( evt ) {
         if ( evt.keyCode == 16 ) {
             selectionStartIndex = -1;
-            //console.log( 'selection start index: ', selectionStartIndex );
         }
-        
-    }, true );
+    };
 
-    Keyboard.bindKeyboardHandler( panel, 'left', panel.commands.selection_set_left = function() {
+    panel.commands.selection_set_left = function() {
         
         app.interface.selection.clear();
         
@@ -306,9 +299,9 @@ function BFS_View( app ) {
 
         app.interface.selection.add( panel.activeItem );
         
-    } );
+    };
 
-    Keyboard.bindKeyboardHandler( panel, 'ctrl left', panel.commands.cursor_move_left = function() {
+    panel.commands.cursor_move_left = function() {
         
         var index;
         
@@ -322,9 +315,9 @@ function BFS_View( app ) {
             panel.activeItem = items[ index - 1 ];
         }
         
-    } );
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'shift left', panel.commands.selection_extend_left = function() {
+    panel.commands.selection_extend_left = function() {
         
         var index, previousItem;
         
@@ -351,9 +344,9 @@ function BFS_View( app ) {
             
         }
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'right', panel.commands.selection_set_right = function() {
+    };
+
+    panel.commands.selection_set_right = function() {
         
         app.interface.selection.clear();
         
@@ -374,9 +367,9 @@ function BFS_View( app ) {
 
         app.interface.selection.add( panel.activeItem );
         
-    } );
+    };
 
-    Keyboard.bindKeyboardHandler( panel, 'ctrl right', panel.commands.cursor_move_right = function() {
+    panel.commands.cursor_move_right = function() {
         
         var index;
         
@@ -390,9 +383,9 @@ function BFS_View( app ) {
             panel.activeItem = items[ index + 1 ];
         }
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'shift right', panel.commands.selection_extend_right = function() {
+    };
+
+    panel.commands.selection_extend_right = function() {
         
         var index, previousItem;
         
@@ -414,9 +407,9 @@ function BFS_View( app ) {
                 app.interface.selection.remove( previousItem );
         }
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'up', panel.commands.selection_set_up = function() {
+    };
+
+    panel.commands.selection_set_up = function() {
         
         app.interface.selection.clear();
         
@@ -434,9 +427,9 @@ function BFS_View( app ) {
 
         app.interface.selection.add( panel.activeItem );
         
-    } );
+    };
 
-    Keyboard.bindKeyboardHandler( panel, 'ctrl up', panel.commands.cursor_move_up = function() {
+    panel.commands.cursor_move_up = function() {
         
         var index;
         
@@ -450,9 +443,9 @@ function BFS_View( app ) {
             panel.activeItem = items[ index ];
         }
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'shift up', panel.commands.selection_extend_up = function() {
+    };
+
+    panel.commands.selection_extend_up = function() {
         
         var index, previousItem, loopIndex;
         
@@ -486,9 +479,9 @@ function BFS_View( app ) {
             
         }
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'down', panel.commands.selection_set_down = function() {
+    };
+
+    panel.commands.selection_set_down = function() {
         
         app.interface.selection.clear();
         
@@ -506,9 +499,9 @@ function BFS_View( app ) {
         
         app.interface.selection.add( panel.activeItem );
         
-    } );
+    };
 
-    Keyboard.bindKeyboardHandler( panel, 'ctrl down', panel.commands.cursor_move_down = function() {
+    panel.commands.cursor_move_down = function() {
         
         var index;
         
@@ -522,9 +515,9 @@ function BFS_View( app ) {
             panel.activeItem = items[ index ];
         }
         
-    } );
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'shift down', panel.commands.selection_extend_down = function() {
+    panel.commands.selection_extend_down = function() {
         
         var index, previousItem, loopIndex;
         
@@ -557,9 +550,9 @@ function BFS_View( app ) {
             } while ( loopIndex < index );
             
         }
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'ctrl space', panel.commands.selection_toggle_current = function() {
+    };
+
+    panel.commands.selection_toggle_current = function() {
         
         if ( !items.length )
             return;
@@ -570,49 +563,49 @@ function BFS_View( app ) {
         
         app.interface.selection.xor( panel.activeItem );
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'home', panel.commands.selection_set_first = function() {
+    };
+
+    panel.commands.selection_set_first = function() {
         
         if ( !items.length )
             return;
         
         app.interface.selection.set( panel.activeItem = items[0] );
         
-    } );
-    
-    Keyboard.bindKeyboardHandler( panel, 'ctrl home', panel.commands.cursor_move_first = function() {
+    };
+
+    panel.commands.cursor_move_first = function() {
         if ( !items.length )
             return;
         
         panel.activeItem = items[0];
-    });
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'end', panel.commands.selection_set_last = function() {
+    panel.commands.selection_set_last = function() {
         
         if ( !items.length )
             return;
         
         app.interface.selection.set( panel.activeItem = items[ items.length - 1 ] );
         
-    } );
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'ctrl end', panel.commands.cursor_move_end = function() {
+    panel.commands.cursor_move_end = function() {
         if ( !items.length )
             return;
         
         panel.activeItem = items[ items.length - 1 ];
-    } );
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'ctrl a', panel.commands.selection_set_all = function() {
+    panel.commands.selection_set_all = function() {
         
         for ( var i=0, len = items.length; i<len; i++ )
             if ( !items[i].selected )
                 app.interface.selection.add( items[i] );
         
-    } );
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'ctrl i', panel.commands.selection_invert = function() {
+    panel.commands.selection_invert = function() {
         
         for ( var i=0, len = items.length; i<len; i++ ) {
             
@@ -623,13 +616,91 @@ function BFS_View( app ) {
             
         }
         
-    } );
+    };
     
-    Keyboard.bindKeyboardHandler( panel, 'enter', panel.commands.cmd_open = function() {
-        
+    panel.commands.cmd_open = function() {
         app.interface.on( 'open' );
+    };
+    
+    ( function() {
         
-    } );
+        var panelKeyboardEnabled = false;
+        
+        Object.defineProperty( panel, "keyboardEnabled", {
+            "get": function() {
+                return panelKeyboardEnabled;
+            },
+            "set": function( bool ) {
+                bool = !!bool;
+                
+                if ( bool == panelKeyboardEnabled )
+                    return;
+                
+                panelKeyboardEnabled = bool;
+                
+                switch ( bool ) {
+                    case true:
+    
+                        panel.addEventListener( 'keydown', panel.commands.keyDownHandler , true );
+                        panel.addEventListener( 'keyup',   panel.commands.keyUpHandler,    true );
+
+                        Keyboard.bindKeyboardHandler( panel, 'left',        panel.commands.selection_set_left );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl left',   panel.commands.cursor_move_left );
+                        Keyboard.bindKeyboardHandler( panel, 'shift left',  panel.commands.selection_extend_left );
+                        Keyboard.bindKeyboardHandler( panel, 'right',       panel.commands.selection_set_right );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl right',  panel.commands.cursor_move_right );
+                        Keyboard.bindKeyboardHandler( panel, 'shift right', panel.commands.selection_extend_right );
+                        Keyboard.bindKeyboardHandler( panel, 'up',          panel.commands.selection_set_up );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl up',     panel.commands.cursor_move_up );
+                        Keyboard.bindKeyboardHandler( panel, 'shift up',    panel.commands.selection_extend_up );
+                        Keyboard.bindKeyboardHandler( panel, 'down',        panel.commands.selection_set_down );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl down',   panel.commands.cursor_move_down );
+                        Keyboard.bindKeyboardHandler( panel, 'shift down',  panel.commands.selection_extend_down );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl space',  panel.commands.selection_toggle_current );
+                        Keyboard.bindKeyboardHandler( panel, 'home',        panel.commands.selection_set_first );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl home',   panel.commands.cursor_move_first );
+                        Keyboard.bindKeyboardHandler( panel, 'end',         panel.commands.selection_set_last );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl end',    panel.commands.cursor_move_end );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl a',      panel.commands.selection_set_all );
+                        Keyboard.bindKeyboardHandler( panel, 'ctrl i',      panel.commands.selection_invert );
+                        Keyboard.bindKeyboardHandler( panel, 'enter',       panel.commands.cmd_open );
+                        break;
+                    
+                    case false:
+                        panel.removeEventListener( 'keydown', panel.commands.keyDownHandler , true );
+                        panel.removeEventListener( 'keyup',   panel.commands.keyUpHandler,    true );
+                        
+                        Keyboard.unbindKeyboardHandlers( panel, [
+                            'left',
+                            'ctrl left',
+                            'shift left',
+                            'right',
+                            'ctrl right',
+                            'shift right',
+                            'up',
+                            'ctrl up',
+                            'shift up',
+                            'down',
+                            'ctrl down',
+                            'shift down',
+                            'ctrl space',
+                            'home',
+                            'ctrl home',
+                            'end',
+                            'ctrl end',
+                            'ctrl a',
+                            'ctrl i',
+                            'enter'
+                        ] );
+                        
+                        break;
+                }
+            }
+        });
+    
+    })();
+    
+    panel.keyboardEnabled = true;
     
     /* Panel mouse bindings */
     
@@ -638,6 +709,8 @@ function BFS_View( app ) {
         if ( evt.target == body && evt.which == 1 && !evt.ctrlKey ) {
             app.interface.selection.clear();
         }
+        
+        panel.focus();
         
     }, true );
     
@@ -649,7 +722,51 @@ function BFS_View( app ) {
         
     } );
     
+    panel.addCustomEventListener( 'rename', function( info ) {
+        
+        if ( !info['new'] || info['new'] == info['old'] )
+            return false;
+        
+        try {
+
+            info.source.inode.name = info['new'];
+        
+            info.source.inode.save();
+            
+            info.source.name = info['new'];
+            
+        } catch ( e ) {
+            
+            DialogBox( e + '', {
+                "caption": "Error renaming",
+                "childOf": app,
+                "modal": true
+            });
+            
+        }
+        
+        //console.log( info );
+        
+    } );
+    
+    /* Application bidingins */
+    
+    app.handlers.cmd_file_rename = function() {
+        
+        if ( app.interface.selection.length == 1 && app.interface.view.activeItem == app.interface.selection.item(0) ) {
+            
+            app.interface.view.activeItem.renameMode = true;
+            
+        }
+        
+    };
+    
+    Keyboard.bindKeyboardHandler( app, 'f2', function() {
+        app.appHandler('cmd_file_rename');
+    } );
+    
     new BFS_View_Mouse_Selection( body, app );
+    new BFS_View_Context_Menu( body, app );
     
     return panel;
     

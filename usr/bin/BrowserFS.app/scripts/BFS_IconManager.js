@@ -10,10 +10,10 @@ function BFS_IconManager( app ) {
         "File#text.svg"          : "{$include resources/mime/File#text.svg}",
         "Document.svg"           : "{$include resources/mime/Document.svg}",
         "Item.svg"               : "{$include resources/mime/Item.svg}",
-        "Category.Search.svg"    : "{$include resources/mime/Category.Search.svg}",
-        "Category.WebService.svg": "{$include resources/mime/Category.WebService.svg}",
         "Category.svg"           : "{$include resources/mime/Category.svg}",
-        "Category.Aggregator.svg": "{$include resources/mime/Category.Aggregator.svg}",
+        "Category_Search.svg"    : "{$include resources/mime/Category.Search.svg}",
+        "Category_WebService.svg": "{$include resources/mime/Category.WebService.svg}",
+        "Category_Aggregator.svg": "{$include resources/mime/Category.Aggregator.svg}",
         "List.svg"               : "{$include resources/mime/List.svg}"
     }, 
     
@@ -81,9 +81,9 @@ function BFS_IconManager( app ) {
     
     var standardTypes = [
         'Category',
-        'Category.Search',
-        'Category.WebService',
-        'Category.Aggregator',
+        'Category_Search',
+        'Category_WebService',
+        'Category_Aggregator',
         'Document',
         'Widget',
         'List',

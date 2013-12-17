@@ -2,6 +2,13 @@
 
 function BFS_Menu( app ) {
     
+    app.shared.menu = {
+        "view": {
+            "caption": "Icon Size",
+            "items": []
+        }
+    };
+    
     app.menu = [{
         "caption": "File",
         "enabled": true,
@@ -21,30 +28,30 @@ function BFS_Menu( app ) {
                 "caption": "Folder",
                 "icon"   : app.interface.iconsManager.createImage( 'Category.svg', 16, 16 ),
                 "enabled": true,
-                "id"     : "cmd_create_Category",
-                "handler": app.appHandler,
+                "id"     : "",
+                "handler": function() { app.appHandler( 'cmd_create', 'Category' ); },
                 "items": [{
                         "caption": "- Other folder types -",
                         "enabled": false
                     },
                     {
                         "caption": "Search Folder",
-                        "icon"   : app.interface.iconsManager.createImage( 'Category.Search.svg', 16, 16 ),
+                        "icon"   : app.interface.iconsManager.createImage( 'Category_Search.svg', 16, 16 ),
                         "enabled": true,
-                        "id"     : "cmd_create_Category_Search",
-                        "handler": app.appHandler
+                        "id"     : "",
+                        "handler": function() { app.appHandler( 'cmd_create', 'Category.Search' ); }
                     }, {
                         "caption": "WebService Folder",
-                        "icon"   : app.interface.iconsManager.createImage( 'Category.WebService.svg', 16, 16 ),
+                        "icon"   : app.interface.iconsManager.createImage( 'Category_WebService.svg', 16, 16 ),
                         "enabled": true,
-                        "id"     : "cmd_create_Category_WebService",
-                        "handler": app.appHandler
+                        "id"     : "",
+                        "handler": function(){ app.appHandler( 'cmd_create', 'Category.WebService' ); }
                     }, {
                         "caption": "Aggregator Folder",
-                        "icon"   : app.interface.iconsManager.createImage( 'Category.Aggregator.svg', 16, 16 ),
+                        "icon"   : app.interface.iconsManager.createImage( 'Category_Aggregator.svg', 16, 16 ),
                         "enabled": true,
-                        "id"     : "cmd_create_Category_Aggregator",
-                        "handler": app.appHandler
+                        "id"     : "",
+                        "handler": function() { app.appHandler( 'cmd_create', 'Category.Aggregator' ); }
                     }
                 ]
             }, {
@@ -52,50 +59,61 @@ function BFS_Menu( app ) {
                 "icon"   : app.interface.iconsManager.createImage( 'Document.svg', 16, 16 ),
                 "enabled": true,
                 "id"     : "cmd_create_Document",
-                "handler": app.appHandler
+                "handler": function() { app.appHandler( 'cmd_create', 'Document' ); }
             }, {
                 "caption": "List",
                 "icon"   : app.interface.iconsManager.createImage( 'List.svg', 16, 16 ),
                 "enabled": true,
                 "id"     : "cmd_create_List",
-                "handler": app.appHandler
+                "handler": function() { app.appHandler( 'cmd_create', 'List' ); }
             }, {
                 "caption": "Widget",
                 "icon"   : app.interface.iconsManager.createImage( 'Widget.svg', 16, 16 ),
                 "enabled": true,
                 "id"     : "cmd_create_Widget",
-                "handler": app.appHandler
+                "handler": function() { app.appHandler( 'cmd_create', 'Widget' ); }
             }, {
                 "caption": "File",
                 "icon"   : app.interface.iconsManager.createImage( 'File.svg', 16, 16 ),
                 "enabled": true,
                 "id"     : "cmd_create_File",
-                "handler": app.appHandler
+                "handler": function() { app.appHandler( 'cmd_create', 'File' ); }
             }]
-        }, null, {
+        }.chain( function() {
+            app.shared.menu.create = this;
+        } ), null, {
             "caption": "Rename",
             "icon": "data:image/png;base64,{$include resources/menu/rename.png}",
             "enabled": true,
             "id": "cmd_file_rename",
-            "handler": app.appHandler
-        }, {
+            "handler": app.appHandler,
+            "shortcut": "F2"
+        }.chain( function() {
+            app.shared.menu.menu_rename = this;
+        } ), {
             "caption": "Delete",
             "icon": "data:image/png;base64,{$include resources/menu/delete.png}",
             "id": "cmd_file_delete",
             "handler": app.appHandler
-        }, {
+        }.chain( function() {
+            app.shared.menu.menu_delete = this;
+        } ), {
             "caption": "Copy To...",
             "icon": "data:image/png;base64,{$include resources/menu/copy-to.png}",
             "enabled": true,
             "id": "cmd_file_copy_to",
             "handler": app.appHandler
-        }, {
+        }.chain( function() {
+            app.shared.menu.menu_copy_to = this;
+        } ), {
             "caption": "Move To...",
             "icon": "data:image/png;base64,{$include resources/menu/move-to.png}",
             "enabled": true,
             "id": "cmd_file_move_to",
             "handler": app.appHandler
-        }, null, {
+        }.chain( function() {
+            app.shared.menu.menu_move_to = this;
+        } ), null, {
             "caption": "Exit",
             "icon": "",
             "enabled": true,
@@ -112,21 +130,32 @@ function BFS_Menu( app ) {
             "shortcut": "Ctrl + X",
             "enabled": true,
             "handler": app.appHandler
-        }, {
+        }.chain( function() {
+            app.shared.menu.menu_cut = this;
+        } ), {
             "caption": "Copy",
             "id": "cmd_edit_copy",
             "icon": "data:image/png;base64,{$include resources/menu/edit-copy.png}",
             "shortcut": "Ctrl + C",
             "enabled": true,
             "handler": app.appHandler
-        }, {
+        }.chain( function() {
+            app.shared.menu.menu_copy = this;
+        } ), {
             "caption": "Paste",
             "id": "cmd_edit_paste",
             "icon": "data:image/png;base64,{$include resources/menu/edit-paste.png}",
             "shortcut": "Ctrl + V",
             "enabled": true,
-            "handler": app.appHandler
-        }, null, {
+            "handler": app.appHandler,
+            "disabled": function() {
+                return BFS_Clipboard.length == 0;
+            }
+        }.chain( function() {
+            
+            app.shared.menu.pasteMenu = this;
+            
+        } ), null, {
             "caption": "Select All",
             "id": "cmd_select_all",
             "icon": "data:image/png;base64,{$include resources/menu/edit-select-all.png}",
@@ -154,7 +183,9 @@ function BFS_Menu( app ) {
             "shortcut": "Alt + Enter",
             "enabled": true,
             "handler": app.appHandler
-        }]
+        }.chain( function() {
+            app.shared.menu.properties = this;
+        } )]
     }, {
         "caption": "View",
         "enabled": true,
@@ -169,7 +200,11 @@ function BFS_Menu( app ) {
             "checked": function() {
                 return app.interface.view.iconSize == 'small';
             }
-        }, {
+        }.chain( function() {
+            
+            app.shared.menu.view.items.push( this );
+            
+        } ), {
             "caption": "Normal Icons",
             "id": "cmd_view_icons_medium",
             "icon": "data:image/png;base64,{$include resources/menu/medium-icons.png}",
@@ -180,7 +215,11 @@ function BFS_Menu( app ) {
             "checked": function() {
                 return app.interface.view.iconSize == 'medium';
             }
-        }, {
+        }.chain( function() {
+            
+            app.shared.menu.view.items.push( this );
+            
+        } ), {
             "caption": "Large Icons",
             "id": "cmd_view_icons_large",
             "icon": "data:image/png;base64,{$include resources/menu/large-icons.png}",
@@ -191,7 +230,11 @@ function BFS_Menu( app ) {
             "checked": function() {
                 return app.interface.view.iconSize == 'large';
             }
-        }, null, {
+        }.chain( function() {
+            
+            app.shared.menu.view.items.push( this );
+            
+        } ), null, {
             "caption": "Tasks Panel",
             "id": "cmd_view_tasks_panel",
             "icon": "data:image/png;base64,{$include resources/menu/task-panel.png}",
