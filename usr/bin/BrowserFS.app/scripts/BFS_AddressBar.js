@@ -50,7 +50,7 @@ function BFS_AddressBar( app ) {
         
         var input = ( new TextBox('') ).setAnchors({
             "width": function( w,h ) {
-                return w - 70 + ( app.flags.applicationMode == 'shell' ? 0 : 140 ) + "px";
+                return w - 70 + "px";
             }
         }).setAttr("style", "position: absolute; left: 60px" );
         
@@ -212,6 +212,8 @@ function BFS_AddressBar( app ) {
                 href = cwd.url;
                 
                 inputMode.onCustomEvent( 'update', href );
+                
+                app.onCustomEvent( 'location-changed', href );
                 
             } catch ( Error ) {
                 

@@ -303,8 +303,7 @@ function BFS_Menu( app ) {
         }]
     }].chain( function() {
         
-        if ( app.flags.applicationMode == 'shell' )
-            app.menu = this;
+        app.menu = this;
         
     } );
     

@@ -5,7 +5,8 @@ function BFS_SearchBar( app ) {
         
         input = body.appendChild( new TextBox('') ).setAttr( 'placeholder', 'Search' ),
         
-        visible = true;
+        visible = true,
+        enabled = true;
     
     Object.defineProperty( holder, "visible", {
         
@@ -24,20 +25,32 @@ function BFS_SearchBar( app ) {
         
     } );
     
-    holder.visible = app.flags.applicationMode == 'shell';
+    Object.defineProperty( holder, 'enabled', {
+        
+        "get": function() {
+            return enabled;
+        },
+        "set": function( bool ) {
+            enabled = !!bool;
+        }
+        
+    } );
     
-    if ( app.flags.applicationMode == 'shell' )
-
-        Keyboard.bindKeyboardHandler( app, 'ctrl f', function() {
-            
-            if ( holder.visible )
-                input.focus();
-            else {
-                holder.visible = true;
-                input.focus();
-            }
-            
-        } );
+    holder.visible = true;
+    
+    Keyboard.bindKeyboardHandler( app, 'ctrl f', function() {
+        
+        if ( !enabled )
+            return;
+        
+        if ( holder.visible )
+            input.focus();
+        else {
+            holder.visible = true;
+            input.focus();
+        }
+        
+    } );
     
     return holder;
     

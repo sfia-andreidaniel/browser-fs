@@ -63,9 +63,6 @@ function BFS_Panel( app ) {
         }
     } );
     
-    if ( app.flags.applicationMode != 'shell' )
-        panel.visible = false;
-    
     return panel;
     
 }

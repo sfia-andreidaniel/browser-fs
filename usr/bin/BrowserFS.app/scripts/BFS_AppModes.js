@@ -1,21 +1,20 @@
 function BFS_AppModes( app ) {
     
-    switch ( app.flags.applicationMode ) {
+    window[ 'BFS_AppMode_' + app.flags.applicationMode ]( app );
+    
+    app.createDialog = function( dialogMode, cwd ) {
         
-        case 'shell':
-            break;
-        
-        case 'desktop':
-            break;
-        
-        case 'open':
-            break;
-        
-        case 'save':
-            break;
-        
-        case 'folder':
-            break;
+        var dlg = new BFS( {
+            
+            "applicationMode": dialogMode,
+            "connection": app.connection || ( function() {
+                throw new Exception( 'OneDB.GeneralException', 'Cannot create a dialog while the main application is not connected' );
+            } )(),
+            "width": BFS_Globals.appModes[ dialogMode ].width,
+            "height": BFS_Globals.appModes[ dialogMode ].height,
+            "location": cwd || null
+
+        } );
         
     }
     

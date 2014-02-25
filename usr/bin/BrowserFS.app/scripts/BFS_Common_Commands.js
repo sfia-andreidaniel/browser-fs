@@ -4,7 +4,7 @@ function BFS_Common_Commands( app ) {
     
     app.closeCallback = function() {
         
-        if ( !closeConfirmed && !app.forceClose ) {
+        if ( !closeConfirmed && !app.forceClose && [ 'shell', 'desktop' ].indexOf( app.flags.applicationMode ) >= 0 ) {
         
             DialogBox( "Are you sure you want to quit BrowserFS?", {
                 
