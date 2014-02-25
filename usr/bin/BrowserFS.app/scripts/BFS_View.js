@@ -4,6 +4,8 @@ function BFS_View( app ) {
     var panel = $('div', 'BFS_View' ),
         body  = panel.appendChild( $('div', 'body medium' ) );
     
+    panel.addClass( 'app-mode-' + app.flags.applicationMode );
+    
     // link to app icons manager
     panel.icons = app.interface.iconsManager;
     panel.app   = app;

@@ -16,6 +16,11 @@
     background-color: #ddd;
 }
 
+.BFS_View.app-mode-open,
+.BFS_View.app-mode-save {
+    bottom: 0px;
+}
+
 .BFS_View > .body {
     display: block;
     position: relative;

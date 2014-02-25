@@ -138,13 +138,19 @@ function BFS_View_Context_Menu( body, app ) {
                     
                     out.push( null );
                     
-                    out.push( app.shared.menu.menu_rename );
+                    if ( app.interface.selection.length == 1 )
+                        out.push( app.shared.menu.menu_rename );
+                    
                     out.push( app.shared.menu.menu_copy_to );
                     out.push( app.shared.menu.menu_move_to );
                     
                     out.push( null );
                     
                     out.push( app.shared.menu.menu_delete );
+
+                    out.push( null );
+                    
+                    out.push( app.shared.menu.properties );
                     
                     break;
                 

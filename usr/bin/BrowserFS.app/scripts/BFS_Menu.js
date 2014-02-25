@@ -9,7 +9,7 @@ function BFS_Menu( app ) {
         }
     };
     
-    app.menu = [{
+    [{
         "caption": "File",
         "enabled": true,
         "items": [{
@@ -301,6 +301,11 @@ function BFS_Menu( app ) {
             "shortcut": "",
             "enabled": true
         }]
-    }];
+    }].chain( function() {
+        
+        if ( app.flags.applicationMode == 'shell' )
+            app.menu = this;
+        
+    } );
     
 }

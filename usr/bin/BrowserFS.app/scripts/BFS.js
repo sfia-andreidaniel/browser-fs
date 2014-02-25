@@ -33,7 +33,7 @@ function BFS( dialogFlags ) {
     
     dialogFlags = dialogFlags || {};
     
-    dialogFlags.applicationMode = dialogFlags.applicationMode || 'shell';
+    dialogFlags.applicationMode = dialogFlags.applicationMode || 'open';
     
     /* Test if dialogFlags.applicationMode is valid */
     if ( [ 'shell', 'desktop', 'open', 'save', 'folder' ].indexOf( dialogFlags.applicationMode ) == -1 )
@@ -70,7 +70,7 @@ function BFS( dialogFlags ) {
             
             Object.defineProperty( dlg, "flags", {
                 "get": function() {
-                    return flags;
+                    return dialogFlags;
                 }
             });
             

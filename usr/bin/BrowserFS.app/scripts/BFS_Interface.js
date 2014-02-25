@@ -56,4 +56,7 @@ function BFS_Interface( app ) {
         
     } );
     
+    // Extended functionality depending on application mode (app.flags.applicationMode)
+    BFS_AppModes( app );
+    
 }

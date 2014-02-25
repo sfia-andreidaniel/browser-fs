@@ -21,7 +21,7 @@ function BFS_View_Mouse_Selection( /*<BFS_View_Body>*/ body, app ) {
             
         }
         
-        origin.x1 = e.target == body ? e.layerX : ( function( targ, x ) {
+        origin.x1 = e.target == body ? ( e.layerX + body.scrollLeft ) : ( function( targ, x ) {
             while ( targ != body ) {
                 x += targ.offsetLeft;
                 targ = targ.parentNode;
@@ -29,7 +29,7 @@ function BFS_View_Mouse_Selection( /*<BFS_View_Body>*/ body, app ) {
             return x;
         } )( e.target, e.layerX );
 
-        origin.y1 = e.layerY == body ? e.layerY : ( function( targ, y ) {
+        origin.y1 = e.target == body ? ( e.layerY + body.scrollTop ) : ( function( targ, y ) {
             while ( targ != body ) {
                 y += targ.offsetTop;
                 targ = targ.parentNode;
@@ -111,8 +111,8 @@ function BFS_View_Mouse_Selection( /*<BFS_View_Body>*/ body, app ) {
         
         effect = e.ctrlKey ? 'add' : 'set';
         
-        origin.x = origin.x1 = e.layerX;
-        origin.y = origin.y1 = e.layerY;
+        origin.x = origin.x1 = e.layerX + body.scrollLeft;
+        origin.y = origin.y1 = e.layerY + body.scrollTop;
         
         active = true;
         

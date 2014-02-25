@@ -24,18 +24,20 @@ function BFS_SearchBar( app ) {
         
     } );
     
-    holder.visible = true;
+    holder.visible = app.flags.applicationMode == 'shell';
     
-    Keyboard.bindKeyboardHandler( app, 'ctrl f', function() {
-        
-        if ( holder.visible )
-            input.focus();
-        else {
-            holder.visible = true;
-            input.focus();
-        }
-        
-    } );
+    if ( app.flags.applicationMode == 'shell' )
+
+        Keyboard.bindKeyboardHandler( app, 'ctrl f', function() {
+            
+            if ( holder.visible )
+                input.focus();
+            else {
+                holder.visible = true;
+                input.focus();
+            }
+            
+        } );
     
     return holder;
     
