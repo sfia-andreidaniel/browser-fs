@@ -5,9 +5,9 @@
 
     class OneDB_Type_Category_WebService extends OneDB_Type_Category {
         
-        static $_isReadOnly  = FALSE;
-        static $_isContainer = TRUE;
-        static $_isLive      = TRUE;
+        static public $_isReadOnly  = FALSE;
+        static public $_isContainer = TRUE;
+        static public $_isLive      = TRUE;
         
         protected $_webserviceMaxObjects = -1; // -1 unlimited
         protected $_webserviceUrl        = ''; // the url of the webservice

@@ -9,6 +9,9 @@ function BFS_AppMode_shell( app ) {
         app.interface.view.iconSize = 'medium';
 
         BFS_cmd_file_delete( app );
+        BFS_cmd_edit_cut( app );
+        BFS_cmd_edit_copy( app );
+        BFS_cmd_edit_paste( app );
 
     } );
     

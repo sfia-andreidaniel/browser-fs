@@ -6,6 +6,7 @@
         
         static public $_isReadOnly  = FALSE;
         static public $_isContainer = TRUE;
+        static public $_isLive      = TRUE;
         
         protected $_query = [];
         

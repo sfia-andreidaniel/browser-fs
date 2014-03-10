@@ -832,7 +832,10 @@
         public function appendChild( OneDB_Object $anotherObject ) {
             
             try {
-            
+                
+                if ( $this->isLive() )
+                    throw Object( 'Exception.IO', 'Operation not supported' );
+                
                 //echo "moving $anotherObject->url into $this->url\r";
                 
                 if ( $this->url == $anotherObject->url )
@@ -860,7 +863,7 @@
                 
                 $anotherObject->save();
             
-                if ( $anotherObject->isContainer() ) {
+                if ( $anotherObject->isContainer() && !$anotherObject->isLive() ) {
                     
                     // we fetch all objects from the database where their url starts with the $oldUrl
                     
@@ -928,6 +931,9 @@
          */
         public function copyChild( OneDB_Object $anotherObject ) {
             try {
+
+                if ( $this->isLive() )
+                    throw Object( 'Exception.IO', 'Operation not supported' );
             
                 if ( $this->url == $anotherObject->url )
                     throw Object( 'Exception.IO', 'the source and the destination are the same!' );
@@ -985,7 +991,7 @@
                 if ( $newObject === NULL )
                     throw Object( 'Exception.IO', 'failed to fetch the object after insertion!' );
                 
-                if ( $anotherObject->isContainer() ) {
+                if ( $anotherObject->isContainer() && !$anotherObject->isLive() ) {
                     
                     $anotherObject->childNodes->each( function( $node ) use ( &$newObject ) {
                         $newObject->copyChild( $node );

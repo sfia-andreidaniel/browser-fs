@@ -2,6 +2,7 @@ function BFS_Actions( app ) {
     
     var flags = app.interface.filesAssoc.flags;
     
+    // register the "Open" action on folders.
     app.interface.filesAssoc.registerAction(
         "Open",
         true,
