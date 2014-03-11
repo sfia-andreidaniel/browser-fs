@@ -12,6 +12,7 @@ function BFS_AppMode_shell( app ) {
         BFS_cmd_edit_cut( app );
         BFS_cmd_edit_copy( app );
         BFS_cmd_edit_paste( app );
+        BFS_cmd_properties( app );
 
     } );
     
