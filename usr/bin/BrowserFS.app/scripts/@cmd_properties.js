@@ -23,6 +23,7 @@ function BFS_cmd_properties( app ) {
             })();
         };
         
+        var dlgWidth  = 450;
         var dlgHeight = 300;
         
         var $pid = getUID();
@@ -94,7 +95,11 @@ function BFS_cmd_properties( app ) {
                 'BrowserFS_cmd_properties__mono_general',
                 'BrowserFS_cmd_properties__multi_general',
                 'BrowserFS_cmd_properties__search_category',
-                'BrowserFS_cmd_properties__webservice_category'
+                'BrowserFS_cmd_properties__webservice_category',
+                'BrowserFS_cmd_properties__aggregator_category',
+                'BrowserFS_cmd_properties__widget',
+                'BrowserFS_cmd_properties__list',
+                'BrowserFS_cmd_properties__document'
             ];
         
         for ( var i=0, len = plugins.length; i<len; i++ ) {
@@ -119,9 +124,13 @@ function BFS_cmd_properties( app ) {
                 if ( dlgHeight < loaders[i].interface.minHeight )
                     dlgHeight = loaders[i].interface.minHeight;
                 
+                if ( dlgWidth < loaders[i].interface.minWidth )
+                    dlgWidth = loaders[i].interface.minWidth;
+                
             }
 
             dlg.height = dlgHeight;
+            dlg.width = dlgWidth;
             
             dlg.center();
 
